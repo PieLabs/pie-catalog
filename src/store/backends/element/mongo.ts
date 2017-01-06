@@ -75,18 +75,22 @@ export default class Mongo implements Element {
     return new Writable({
       write: (chunk: Buffer, enc, done) => {
         let update = {
-          $push: {
+          $addToSet: {
             'schemas': {
               name: name,
               schema: JSON.parse(chunk.toString('utf8'))
             }
           }
         }
-        this.collection.update(idToQuery(id), update)
-          .then(result => {
+        this.collection.update(idToQuery(id), update, { upsert: true }, (err, result) => {
+          if (err) {
+            done(err);
+          } else {
+            logger.info('count: ', result.result);
             done();
-          })
-          .catch(e => done(e));
+          }
+
+        });
       }
     });
   }
@@ -99,7 +103,7 @@ export default class Mongo implements Element {
             'package': JSON.parse(chunk.toString('utf8'))
           }
         }
-        this.collection.update(idToQuery(id), update)
+        this.collection.update(idToQuery(id), update, { upsert: true })
           .then(result => {
             done();
           })
@@ -116,7 +120,7 @@ export default class Mongo implements Element {
             readme: buffer.toString('utf8')
           }
         }
-        this.collection.update(idToQuery(id), update)
+        this.collection.update(idToQuery(id), update, { upsert: true })
           .then(done.bind(null, null))
           .catch(e => done(e));
       }

@@ -17,7 +17,7 @@ init({ APP: 'silly', mongo: 'debug', default: 'info' });
 const logger = getLogger('APP');
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/pie-catalog';
-
+logger.info('mongoUri:', mongoUri);
 MongoClient.connect(mongoUri)
   .then((db) => {
     const collection = db.collection('elements');
