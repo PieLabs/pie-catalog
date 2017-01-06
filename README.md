@@ -17,8 +17,9 @@ For starters we'll just set up the client and store, and do the building ourselv
 `POST /build/:owner/:repo/:version` - build a repo 
 
 * clone the repo
-* run `pie info` or `pie pack -a some-catalog-app` - where the app will add some webpack `externals` that it knows the app doesn't need etc.
-* create an archive of the generated assets (TODO: How do we know what assets were generated and so should be in the bundle? [webpack?])
+* run `pie info` or `pie pack -a catalog --createArchive` 
+  * will add some webpack `externals` that it knows the app doesn't need etc.
+  * create an archive of the generated assets (includes the `public` dir plus whatever else the catalog app decides is needed.)
 * send archive to the `store`
 
 ## client + store
