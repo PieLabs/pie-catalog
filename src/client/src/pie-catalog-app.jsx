@@ -39,7 +39,6 @@ class App extends Component {
     fetch('/api/elements')
       .then(response => response.json())
       .then(json => {
-        console.log(json);
         this.setState({ elements: json })
       })
       .catch(e => {
@@ -54,7 +53,6 @@ class App extends Component {
   render() {
     console.log('this.state.elements: ', this.state.elements);
     return <div>
-      This is the app...
       <Header />
       <Listings elements={this.state.elements} />
     </div>;
