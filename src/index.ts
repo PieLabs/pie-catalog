@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 
 import mkStore from './store';
-import client from './client';
+import { router as client, views as clientViews } from './client';
 import api from './api';
 import FileStore from './store/backends/demo/file';
 import { Demo, Element } from './services';
@@ -24,6 +24,9 @@ MongoClient.connect(mongoUri)
     const app = express();
     const fileStore = new FileStore(join(process.cwd(), '.file-store'));
     const element: Element = new MongoElement(collection);
+
+    app.set('view engine', 'pug');
+    app.set('views', clientViews);
 
     //store router
     app.use('/store', mkStore(fileStore, element));
