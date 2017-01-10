@@ -62,12 +62,4 @@ export default class CatalogListing extends HTMLElement {
     return this._element;
   }
 
-  connectedCallback() {
-    console.log('connected');
-
-    // this.shadowRoot.querySelector('.root').addEventListener('click', () => {
-    //   console.log('listing clicked');
-    // })
-  }
-
 }
