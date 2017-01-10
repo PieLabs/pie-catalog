@@ -31,7 +31,11 @@ router.get('/', (req, res) => {
   res.render('index', { pretty: true });
 });
 
-router.get('/elements/:org/:repo', (req, res, next) => {
+router.get('/element/*', (req, res, next) => {
+  res.render('index', { pretty: true });
+});
+
+router.get('/org/*', (req, res, next) => {
   res.render('index', { pretty: true });
 });
 

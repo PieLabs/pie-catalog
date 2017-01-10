@@ -35,15 +35,6 @@ export default class CatalogListings extends HTMLElement {
       this.shadowRoot.querySelectorAll('catalog-listing').forEach((n, i) => {
         let index = parseInt(n.getAttribute('data-index'));
         n.element = this._elements[index];
-
-        n.addEventListener('click', (e) => {
-          console.log('node clicked', event.target);
-          this.dispatchEvent(
-            new CustomEvent(
-              'listing-clicked',
-              { bubbles: true, detail: { element: e.target.element } }
-            ));
-        });
       });
     });
   }

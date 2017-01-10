@@ -10,5 +10,8 @@ customElements.define('catalog-listing', CatalogListing);
 import CatalogHeader from './header';
 customElements.define('catalog-header', CatalogHeader);
 
+import CatalogOrg from './org';
+customElements.define('catalog-org', CatalogOrg);
+
 import CatalogEntry from './catalog-entry';
 customElements.define('catalog-entry', CatalogEntry);

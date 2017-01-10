@@ -1,3 +1,5 @@
+import * as events from './events';
+
 export default class CatalogListing extends HTMLElement {
 
   constructor() {
@@ -60,6 +62,22 @@ export default class CatalogListing extends HTMLElement {
 
   get element() {
     return this._element;
+  }
+
+  connectedCallback() {
+    let onRepoClick = (e) => {
+      e.preventDefault();
+      this.dispatchEvent(events.viewRepo(this._element));
+    };
+
+    let onOrgClick = (e) => {
+      e.preventDefault();
+      this.dispatchEvent(events.viewOrg(this._element));
+    };
+
+    this.shadowRoot.querySelector('#repo').addEventListener('click', onRepoClick);
+    this.shadowRoot.querySelector('#description').addEventListener('click', onRepoClick);
+    this.shadowRoot.querySelector('#org').addEventListener('click', onOrgClick);
   }
 
 }

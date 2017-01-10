@@ -1,3 +1,5 @@
+import * as events from './events';
+
 export default class CatalogEntry extends HTMLElement {
 
   constructor() {
@@ -73,6 +75,10 @@ export default class CatalogEntry extends HTMLElement {
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#version').textContent = e.version;
     this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
+      this.dispatchEvent(events.viewOrg(this._element));
+    });
+
     this.shadowRoot.querySelector('#description').textContent = e.description;
 
     this.shadowRoot.querySelector('#demo-holder').innerHTML = `

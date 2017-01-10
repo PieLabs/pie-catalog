@@ -16,18 +16,33 @@ export default function mkApi(demo: DemoRouter) {
         org: 'corespring',
         repo: 'corespring-choice',
         version: '1.0.0',
-        repoLink: '/elements/corespring/corespring-choice',
+        repoLink: '/element/corespring/corespring-choice',
         description: 'A choice element with support for checkboxes and radio buttons.'
       }
     ]);
   });
 
-  r.get('/elements/:org/:repo', (req, res) => {
+  r.get('/org/:org', (req, res) => {
+    res.json({
+      org: 'corespring',
+      elements: [
+        {
+          org: 'corespring',
+          repo: 'corespring-choice',
+          version: '1.0.0',
+          description: 'A choice element with support for checkboxes and radio buttons.',
+          repoLink: '/element/corespring/corespring-choice',
+        }
+      ]
+    });
+  });
+
+  r.get('/element/:org/:repo', (req, res) => {
     res.json({
       org: 'corespring',
       repo: 'corespring-choice',
       version: '1.0.0',
-      repoLink: '/elements/corespring/corespring-choice',
+      repoLink: '/element/corespring/corespring-choice',
       description: 'A choice element with support for checkboxes and radio buttons.',
       demoLink: demo.getDemoLink(new PieId('corespring', 'corespring-choice', null, '1.0.0'))
     });

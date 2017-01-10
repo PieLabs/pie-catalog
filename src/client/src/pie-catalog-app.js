@@ -1,4 +1,4 @@
-
+import { VIEW_ORG, VIEW_REPO } from './events';
 
 export default class PieCatalogApp extends HTMLElement {
 
@@ -43,6 +43,7 @@ export default class PieCatalogApp extends HTMLElement {
       <div class="content">
         <catalog-listings></catalog-listings>
         <catalog-entry></catalog-entry>
+        <catalog-org></catalog-org>
       </div>
     `;
   }
@@ -77,14 +78,40 @@ export default class PieCatalogApp extends HTMLElement {
       });
   }
 
+  loadOrg(link) {
+    return fetch(`/api${link}`)
+      .then(response => {
+        if (response.ok) {
+          return response;
+        } else {
+          throw new Error('error: ' + response.statusText);
+        }
+      })
+      .then(r => r.json())
+      .then(json => {
+        this.shadowRoot.querySelector('catalog-org').org = json;
+      })
+      .catch(e => {
+        console.error(e);
+      });
+  }
+
   showListings() {
     this.shadowRoot.querySelector('catalog-entry').setAttribute('hidden', '');
+    this.shadowRoot.querySelector('catalog-org').setAttribute('hidden', '');
     this.shadowRoot.querySelector('catalog-listings').removeAttribute('hidden');
   }
 
   showEntry() {
-    this.shadowRoot.querySelector('catalog-entry').removeAttribute('hidden');
+    this.shadowRoot.querySelector('catalog-org').setAttribute('hidden', '');
     this.shadowRoot.querySelector('catalog-listings').setAttribute('hidden', '');
+    this.shadowRoot.querySelector('catalog-entry').removeAttribute('hidden');
+  }
+
+  showOrg() {
+    this.shadowRoot.querySelector('catalog-org').removeAttribute('hidden');
+    this.shadowRoot.querySelector('catalog-listings').setAttribute('hidden', '');
+    this.shadowRoot.querySelector('catalog-entry').setAttribute('hidden', '');
   }
 
   updateLayout() {
@@ -93,9 +120,10 @@ export default class PieCatalogApp extends HTMLElement {
     if (path === '/') {
       this.loadListings()
         .then(() => this.showListings());
+    } else if (path.indexOf('/org/') !== -1) {
+      this.loadOrg(path).then(() => this.showOrg());
     } else {
-      this.loadEntry(path)
-        .then(() => this.showEntry());
+      this.loadEntry(path).then(() => this.showEntry());
     }
   }
 
@@ -105,15 +133,20 @@ export default class PieCatalogApp extends HTMLElement {
       this.updateLayout();
     };
 
-
     this.shadowRoot.querySelector('catalog-header').addEventListener('home-click', e => {
       history.pushState(null, 'home', '/');
       this.updateLayout();
     });
 
-    this.shadowRoot.querySelector('catalog-listings').addEventListener('listing-clicked', (e) => {
+    this.addEventListener(VIEW_REPO, (e) => {
       let data = event.detail.element;
       window.history.pushState(data, 'view element', event.detail.element.repoLink);
+      this.updateLayout();
+    });
+
+    this.addEventListener(VIEW_ORG, (e) => {
+      let data = event.detail.element;
+      window.history.pushState(data, 'view org', `/org/${event.detail.element.org}`);
       this.updateLayout();
     });
 
