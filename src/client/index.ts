@@ -1,5 +1,5 @@
 import * as express from 'express';
-import { resolve, join } from 'path';
+import { resolve, join, extname } from 'path';
 import { buildLogger } from '../log-factory';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
@@ -28,7 +28,11 @@ if (env === 'dev') {
 router.use(express.static(join(__dirname, 'public')));
 
 router.get('/', (req, res) => {
-  res.render('index', {});
+  res.render('index', { pretty: true });
+});
+
+router.get('/elements/:org/:repo', (req, res, next) => {
+  res.render('index', { pretty: true });
 });
 
 export let views = join(__dirname, 'views');

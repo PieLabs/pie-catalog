@@ -3,8 +3,8 @@ import * as http from 'http';
 
 import mkStore from './store';
 import { router as client, views as clientViews } from './client';
-import api from './api';
-import FileStore from './store/backends/demo/file';
+import mkApi from './api';
+import FileStore, { DemoRouter } from './store/backends/demo/file';
 import { Demo, Element } from './services';
 import MongoElement from './store/backends/element/mongo';
 import { init } from './log-factory';
@@ -22,11 +22,14 @@ MongoClient.connect(mongoUri)
   .then((db) => {
     const collection = db.collection('elements');
     const app = express();
-    const fileStore = new FileStore(join(process.cwd(), '.file-store'));
+    const fileStore: Demo & DemoRouter = new FileStore(join(process.cwd(), '.file-store'));
     const element: Element = new MongoElement(collection);
 
     app.set('view engine', 'pug');
     app.set('views', clientViews);
+
+    //set up the demo file router...
+    app.use(fileStore.prefix(), fileStore.router());
 
     //store router
     app.use('/store', mkStore(fileStore, element));
@@ -35,7 +38,7 @@ MongoClient.connect(mongoUri)
     app.use('/', client);
 
     //api router
-    app.use('/api', api);
+    app.use('/api', mkApi(fileStore));
 
     const server = http.createServer(app);
 
