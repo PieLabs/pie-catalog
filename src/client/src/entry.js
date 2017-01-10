@@ -1,11 +1,14 @@
 import PieCatalogApp from './pie-catalog-app';
 customElements.define('pie-catalog-app', PieCatalogApp);
 
+import CatalogListings from './listings';
+customElements.define('catalog-listings', CatalogListings);
 
-document.addEventListener('DOMContentLoaded', () => {
+import CatalogListing from './listing';
+customElements.define('catalog-listing', CatalogListing);
 
-  customElements.whenDefined('pie-catalog-app')
-    .then(() => {
-      document.querySelector('pie-catalog-app').config = {};
-    })
-})
+import CatalogHeader from './header';
+customElements.define('catalog-header', CatalogHeader);
+
+import CatalogEntry from './catalog-entry';
+customElements.define('catalog-entry', CatalogEntry);
