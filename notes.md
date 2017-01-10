@@ -73,3 +73,25 @@ A store of an element's built assets + metadata.
   service.listVersions(org, repo);
 
 ```
+
+
+```javascript
+
+{ 
+  org: 'org',
+  repo: 'repo',
+  tag: '2.0.0', //only release versions allowed.
+  latest: true,
+  tags: [
+    '1.0.0',
+    '2.0.0'
+  ],
+  readme: '',
+  schemas: [],
+  package: {}
+}
+
+{
+  version: '1.0.0'
+}
+```
