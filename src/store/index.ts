@@ -7,11 +7,11 @@ import * as stream from 'stream';
 import * as gunzip from 'gunzip-maybe';
 import * as _ from 'lodash';
 import PieId from '../types/pie-id';
-import { Demo, Element } from '../services';
+import { Streamer } from './streams';
 
 const logger = buildLogger();
 
-export default (demo: Demo, element: Element): Router => {
+export default (streamer: Streamer): Router => {
 
   const router: Router = Router();
 
@@ -69,19 +69,19 @@ export default (demo: Demo, element: Element): Router => {
       let id = new PieId(org, repo, sha, tag);
 
       if (_.startsWith(header.name, 'docs/demo')) {
-        stream.pipe(demo.save(id, header.name));
+        stream.pipe(streamer.demoFile(id, header.name));
       } else if (_.startsWith(header.name, 'docs/schemas') && header.type === 'file') {
         stream
-          .pipe(element.json())
-          .pipe(element.schema(id, header.name));
+          .pipe(streamer.json())
+          .pipe(streamer.schema(id, header.name));
       } else if (header.name === 'README.md') {
         stream
-          .pipe(element.string())
-          .pipe(element.readme(id));
+          .pipe(streamer.string())
+          .pipe(streamer.readme(id));
       } else if (header.name === 'package.json') {
         stream
-          .pipe(element.json())
-          .pipe(element.pkg(id));
+          .pipe(streamer.json())
+          .pipe(streamer.pkg(id));
       } else {
         stream.resume() // just auto drain the stream
       }

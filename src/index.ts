@@ -4,9 +4,8 @@ import * as http from 'http';
 import mkStore from './store';
 import { router as client, views as clientViews } from './client';
 import mkApi from './api';
-import FileStore, { DemoRouter } from './store/backends/demo/file';
-import { Demo, Element } from './services';
-import MongoElement from './store/backends/element/mongo';
+import { DefaultStreamer, FileStore, DemoRouter, MongoElementStreamer, DemoFileStreamer, ElementStreamer } from './store/streams';
+import { MongoElements } from './api/services/mongo-elements';
 import { init } from './log-factory';
 import { join } from 'path';
 import { MongoClient, Db } from 'mongodb';
@@ -24,8 +23,14 @@ MongoClient.connect(mongoUri)
   .then((db) => {
     const collection = db.collection('elements');
     const app = express();
-    const demoStore: Demo & DemoRouter = new FileStore(join(process.cwd(), '.file-store'));
-    const element: Element = new MongoElement(collection);
+
+    const demoStore: DemoFileStreamer & DemoRouter = new FileStore(
+      join(process.cwd(), '.file-store')
+    );
+
+    const elementStreamer = new MongoElementStreamer(collection);
+
+    const elements = new MongoElements(collection);
 
     app.set('view engine', 'pug');
     app.set('views', clientViews);
@@ -34,13 +39,13 @@ MongoClient.connect(mongoUri)
     app.use(demoStore.prefix(), demoStore.router());
 
     //store router
-    app.use('/store', mkStore(demoStore, element));
+    app.use('/store', mkStore(new DefaultStreamer(demoStore, elementStreamer)));
 
     //client router
     app.use('/', client);
 
     //api router
-    app.use('/api', mkApi(demoStore));
+    app.use('/api', mkApi(elements, demoStore.getDemoLink.bind(demoStore)));
 
     const server = http.createServer(app);
 

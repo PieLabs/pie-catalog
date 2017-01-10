@@ -1,4 +1,4 @@
-import { Element, Readable, Writable, PieId } from '../../../services';
+import { ElementStreamer, Readable, Writable, PieId } from '../../streams';
 import { buildLogger } from '../../../log-factory';
 import { Collection } from 'mongodb';
 
@@ -57,7 +57,7 @@ class JsonTransform extends Transform {
   }
 }
 
-export default class Mongo implements Element {
+export default class MongoElementStreamer implements ElementStreamer {
 
   constructor(readonly collection: Collection) {
 

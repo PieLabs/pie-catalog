@@ -2,7 +2,7 @@ import { Readable, Writable } from 'stream';
 import PieId from '../../../types/pie-id';
 import { createWriteStream, ensureDirSync } from 'fs-extra';
 import { dirname, join } from 'path';
-import { Demo } from '../../../services';
+import { DemoFileStreamer } from '../../streams';
 import * as express from 'express';
 
 export interface DemoRouter {
@@ -11,7 +11,7 @@ export interface DemoRouter {
   getDemoLink(id: PieId): string;
 }
 
-export default class FileStore implements Demo, DemoRouter {
+export default class FileStore implements DemoFileStreamer, DemoRouter {
 
   constructor(readonly root: string) { }
 
@@ -19,7 +19,7 @@ export default class FileStore implements Demo, DemoRouter {
     return join(this.root, `${id.org}/${id.repo}/${id.tag || id.sha}/${name}`);
   }
 
-  save(id: PieId, name: string): Writable {
+  demoFile(id: PieId, name: string): Writable {
     let path = this.getFilePath(id, name);
     ensureDirSync(dirname(path));
     const fileStream = createWriteStream(path);

@@ -54,3 +54,22 @@ A store of an element's built assets + metadata.
 `GET /:grouping/:element/demo/index.html` - the demo page (to be loaded into an iframe).
 `GET /:grouping/:element/demo/pie.js` - the pie
 `GET /:grouping/:element/demo/:path` - return any static asset used by the demo 
+
+
+
+### TODO
+
+* storing in mongo - need to have access to the latest version, 
+  * all in one document then with a map of versions?
+  * separated documents
+  * have a dedicated service for storing updating and managing versions
+
+
+```javascript
+
+  service.update(org, repo, tag, {});
+  service.find({latest: true, org: });
+  service.findOne();
+  service.listVersions(org, repo);
+
+```
