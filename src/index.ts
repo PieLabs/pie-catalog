@@ -17,28 +17,30 @@ init({ APP: 'silly', mongo: 'debug', default: 'info' });
 const logger = getLogger('APP');
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/pie-catalog';
+
 logger.info('mongoUri:', mongoUri);
+
 MongoClient.connect(mongoUri)
   .then((db) => {
     const collection = db.collection('elements');
     const app = express();
-    const fileStore: Demo & DemoRouter = new FileStore(join(process.cwd(), '.file-store'));
+    const demoStore: Demo & DemoRouter = new FileStore(join(process.cwd(), '.file-store'));
     const element: Element = new MongoElement(collection);
 
     app.set('view engine', 'pug');
     app.set('views', clientViews);
 
     //set up the demo file router...
-    app.use(fileStore.prefix(), fileStore.router());
+    app.use(demoStore.prefix(), demoStore.router());
 
     //store router
-    app.use('/store', mkStore(fileStore, element));
+    app.use('/store', mkStore(demoStore, element));
 
     //client router
     app.use('/', client);
 
     //api router
-    app.use('/api', mkApi(fileStore));
+    app.use('/api', mkApi(demoStore));
 
     const server = http.createServer(app);
 

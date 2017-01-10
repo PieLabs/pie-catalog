@@ -7,19 +7,7 @@ module.exports = {
     path: path.join(__dirname, 'public'),
     filename: 'app.js'
   },
-  module: {
-    loaders: [
-      {
-        test: /\.jsx$/,
-        loader: 'babel-loader',
-        query: {
-          babelrc: false,
-          presets: ['babel-preset-react']
-        }
-      }
-    ]
-  },
   resolve: {
-    extensions: ['.js', '.jsx']
+    extensions: ['.js']
   }
 };

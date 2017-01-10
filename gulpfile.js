@@ -5,7 +5,9 @@ const gulp = require('gulp'),
   tsProject = ts.createProject('tsconfig.json'),
   fsExtra = require('fs-extra'),
   runSequence = require('run-sequence'),
-  path = require('path');
+  path = require('path'),
+  webpack = require('webpack');
+
 
 //Init custom release tasks
 releaseHelper.init(gulp);
@@ -42,7 +44,16 @@ gulp.task('clean', (done) => {
   fsExtra.remove('lib', done);
 })
 
-gulp.task('build', done => runSequence('clean', ['pug', 'ts'], done));
+gulp.task('client', (done) => {
+  let cfg = require('./src/client/webpack.config');
+  cfg.output.path = './lib/client/public';
+
+  webpack(cfg, (err, stats) => {
+    done(err);
+  });
+});
+
+gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
