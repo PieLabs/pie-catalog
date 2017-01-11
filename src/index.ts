@@ -4,14 +4,15 @@ import * as http from 'http';
 import mkStore from './store';
 import { router as client, views as clientViews } from './client';
 import mkApi from './api';
-import { DefaultStreamer, FileStore, DemoRouter, MongoElementStreamer, DemoFileStreamer, ElementStreamer } from './store/streams';
-import { MongoElements } from './api/services/mongo-elements';
 import { init } from './log-factory';
+import ElementService from './element/mongo-service';
+import DemoService from './element/demo/file-service';
+import { DemoRouter } from './element/demo/service';
 import { join } from 'path';
 import { MongoClient, Db } from 'mongodb';
 import { buildLogger, getLogger } from './log-factory';
 
-init({ APP: 'silly', mongo: 'debug', default: 'info' });
+init({ APP: 'silly', mongo: 'debug', default: 'silly' });
 
 const logger = getLogger('APP');
 
@@ -24,28 +25,24 @@ MongoClient.connect(mongoUri)
     const collection = db.collection('elements');
     const app = express();
 
-    const demoStore: DemoFileStreamer & DemoRouter = new FileStore(
-      join(process.cwd(), '.file-store')
-    );
-
-    const elementStreamer = new MongoElementStreamer(collection);
-
-    const elements = new MongoElements(collection);
+    const demoService = new DemoService(join(process.cwd(), '.demo-service'));
+    const demoRouter = (demoService as DemoRouter);
+    const elementService = new ElementService(collection, demoService);
 
     app.set('view engine', 'pug');
     app.set('views', clientViews);
 
     //set up the demo file router...
-    app.use(demoStore.prefix(), demoStore.router());
+    app.use(demoRouter.prefix(), demoRouter.router());
 
     //store router
-    app.use('/store', mkStore(new DefaultStreamer(demoStore, elementStreamer)));
+    app.use('/store', mkStore(new ElementService(collection, demoService)));
 
     //client router
     app.use('/', client);
 
     //api router
-    app.use('/api', mkApi(elements, demoStore.getDemoLink.bind(demoStore)));
+    app.use('/api', mkApi(elementService, demoRouter.getDemoLink.bind(demoRouter)));
 
     const server = http.createServer(app);
 

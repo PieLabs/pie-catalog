@@ -1,4 +1,6 @@
 import { VIEW_ORG, VIEW_REPO } from './events';
+import { elements } from './client';
+import takeRight from 'lodash/takeRight';
 
 export default class PieCatalogApp extends HTMLElement {
 
@@ -50,49 +52,23 @@ export default class PieCatalogApp extends HTMLElement {
 
 
   loadListings() {
-    return fetch('/api/elements')
-      .then(response => response.json())
-      .then(json => {
-        this.shadowRoot.querySelector('catalog-listings').elements = json;
-      })
-      .catch(e => {
-        console.error(e);
+    return elements.list()
+      .then(result => {
+        this.shadowRoot.querySelector('catalog-listings').elements = result.elements;
       });
   }
 
-  loadEntry(link) {
-    return fetch(`/api${link}`)
-      .then(response => {
-        if (response.ok) {
-          return response;
-        } else {
-          throw new Error('error: ' + response.statusText);
-        }
-      })
-      .then(response => response.json())
-      .then(json => {
-        this.shadowRoot.querySelector('catalog-entry').element = json;
-      })
-      .catch(e => {
-        console.error(e);
+  loadEntry(org, repo) {
+    return elements.load(org, repo)
+      .then(result => {
+        this.shadowRoot.querySelector('catalog-entry').element = result;
       });
   }
 
-  loadOrg(link) {
-    return fetch(`/api${link}`)
-      .then(response => {
-        if (response.ok) {
-          return response;
-        } else {
-          throw new Error('error: ' + response.statusText);
-        }
-      })
-      .then(r => r.json())
-      .then(json => {
-        this.shadowRoot.querySelector('catalog-org').org = json;
-      })
-      .catch(e => {
-        console.error(e);
+  loadOrg(org) {
+    return elements.listByOrg(org)
+      .then(result => {
+        this.shadowRoot.querySelector('catalog-org').org = result;
       });
   }
 
@@ -115,15 +91,33 @@ export default class PieCatalogApp extends HTMLElement {
   }
 
   updateLayout() {
-    let path = document.location.pathname;
+    let state = history.state || { view: 'none' };
+    switch (state.view) {
+      case 'home':
+        this.loadListings().then(() => this.showListings());
+        break;
+      case 'element':
+        this.loadEntry(state.org, state.repo).then(() => this.showEntry());
+        break;
+      case 'org':
+        this.loadOrg(state.org).then(() => this.showOrg());
+        break;
+      default:
+        console.error('????');
+        break;
+    }
+  }
 
+  initHistory() {
+    let path = document.location.pathname;
     if (path === '/') {
-      this.loadListings()
-        .then(() => this.showListings());
+      history.replaceState({ view: 'home' }, 'home', '/');
     } else if (path.indexOf('/org/') !== -1) {
-      this.loadOrg(path).then(() => this.showOrg());
-    } else {
-      this.loadEntry(path).then(() => this.showEntry());
+      let org = path.split('/org/')[1];
+      history.replaceState({ view: 'org', org: org }, 'org', `/org/${org}`);
+    } else if (path.indexOf('/element/') !== -1) {
+      let [org, repo] = takeRight(path.split('/'), 2);
+      history.replaceState({ view: 'element', org: org, repo: repo }, 'repo', `/element/${org}/${repo}`);
     }
   }
 
@@ -133,23 +127,35 @@ export default class PieCatalogApp extends HTMLElement {
       this.updateLayout();
     };
 
+
+
     this.shadowRoot.querySelector('catalog-header').addEventListener('home-click', e => {
-      history.pushState(null, 'home', '/');
+      history.pushState({ view: 'home' }, 'home', '/');
       this.updateLayout();
     });
 
     this.addEventListener(VIEW_REPO, (e) => {
       let data = event.detail.element;
-      window.history.pushState(data, 'view element', event.detail.element.repoLink);
+      let state = {
+        view: 'element',
+        org: data.org,
+        repo: data.repo
+      };
+      window.history.pushState(state, 'view element', `/element/${data.org}/${data.repo}`);
       this.updateLayout();
     });
 
     this.addEventListener(VIEW_ORG, (e) => {
       let data = event.detail.element;
-      window.history.pushState(data, 'view org', `/org/${event.detail.element.org}`);
+      let state = {
+        view: 'org',
+        org: data.org
+      }
+      window.history.pushState(state, 'view org', `/org/${data.org}`);
       this.updateLayout();
     });
 
+    this.initHistory();
     this.updateLayout();
   }
 }

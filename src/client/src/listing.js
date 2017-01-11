@@ -44,6 +44,7 @@ export default class CatalogListing extends HTMLElement {
     </style>
 
     <h4 id="repo"></h4>
+    <span id="tag"></span>
     <span id="description"></span>
     <hr/>
     <div class="footer">
@@ -58,6 +59,7 @@ export default class CatalogListing extends HTMLElement {
     this.shadowRoot.querySelector('#org').textContent = e.org;
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#description').textContent = e.description;
+    this.shadowRoot.querySelector('#tag').textContent = e.tag;
   }
 
   get element() {

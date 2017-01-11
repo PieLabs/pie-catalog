@@ -3,3 +3,4 @@ lib
 .vscode
 .file-store
 *.tgz
+.demo-service

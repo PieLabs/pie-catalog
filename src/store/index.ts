@@ -1,17 +1,38 @@
 import { Router } from 'express';
 import { buildLogger } from '../log-factory';
-import * as fs from 'fs-extra';
-import * as zlib from 'zlib';
 import * as tar from 'tar-stream';
-import * as stream from 'stream';
+import { Writable } from 'stream';
 import * as gunzip from 'gunzip-maybe';
 import * as _ from 'lodash';
-import PieId from '../types/pie-id';
-import { Streamer } from './streams';
+import { PieId, ElementService } from '../element/service';
+import { StringTransform } from './transforms';
 
 const logger = buildLogger();
 
-export default (streamer: Streamer): Router => {
+let withString = (fn: (j: string) => Promise<any>): Writable => {
+  return new Writable({
+    write: (chunk: Buffer, enc, done) => {
+      let s = chunk.toString('utf8');
+      fn(s)
+        .then(() => done())
+        .catch(e => done(e));
+    }
+  });
+}
+
+let withJson = (fn: (j: { [key: string]: any }) => Promise<any>): Writable => {
+  return new Writable({
+    write: (chunk: Buffer, enc, done) => {
+      let jsonString = chunk.toString('utf8');
+      let json = JSON.parse(jsonString);
+      fn(json)
+        .then(() => done())
+        .catch(e => done(e));
+    }
+  });
+}
+
+export default (elementService: ElementService): Router => {
 
   const router: Router = Router();
 
@@ -39,68 +60,76 @@ export default (streamer: Streamer): Router => {
    * { org: :org, repo: :repo, versions: [ { tag: :tag?, sha: :sha, readme: '', schemas, package.json }, ...] }
    */
 
-  router.post('/ingest/:org/:repo/:sha', (req, res) => {
+  router.post('/ingest/:org/:repo/:tag', async (req, res) => {
     logger.info('ingest....');
     logger.info('params: ', req.params);
     logger.info('query: ', req.query);
 
     let org = req.params.org;
     let repo = req.params.repo;
-    let sha = req.params.sha;
-    let tag = req.query.tag;
+    let tag = req.params.tag;
 
-    let extract = tar.extract();
+    let id = PieId.build(org, repo, tag);
 
-    let entries = [];
+    if (!id) {
+      res.status(400).json({ error: `org,repo,tag not valid: ${org}, ${repo}, ${tag}` });
+    } else {
 
-    extract.on('entry', function (header, stream, next) {
-      logger.info('entry: ', header);
+      await elementService.reset(id);
 
-      entries.push(header.name);
+      let extract = tar.extract();
 
-      stream.on('end', function () {
-        next(); // ready for next entry
+      let entries = [];
+
+      extract.on('entry', function (header, stream, next) {
+        logger.info('entry: ', header);
+
+        entries.push(header.name);
+
+        stream.on('end', function () {
+          next(); // ready for next entry
+        });
+
+        stream.on('error', function (e) {
+          next(e);
+        });
+
+        if (_.startsWith(header.name, 'docs/demo')) {
+          stream.pipe(elementService.demo.stream(id, header.name));
+        } else if (_.startsWith(header.name, 'docs/schemas') && header.type === 'file') {
+          stream
+            .pipe(new StringTransform())
+            .pipe(withJson(json => elementService.saveSchema(id, header.name, json)));
+        } else if (header.name === 'README.md') {
+          stream
+            .pipe(new StringTransform())
+            .pipe(withString(s => elementService.saveReadme(id, s)));
+        } else if (header.name === 'package.json') {
+          stream
+            .pipe(new StringTransform())
+            .pipe(withJson(json => elementService.savePkg(id, json)));
+        } else {
+          stream.resume() // just auto drain the stream
+        }
       });
 
-      stream.on('error', function (e) {
-        next(e);
+      extract.on('error', (e) => {
+        logger.error(e);
       });
 
-      let id = new PieId(org, repo, sha, tag);
+      extract.on('finish', function () {
+        logger.info('all files in tar listed - done!');
+        if (entries.length === 0) {
+          res.status(401).send('Cant read tar file');
+        } else {
+          res.send('done');
+        }
+      });
 
-      if (_.startsWith(header.name, 'docs/demo')) {
-        stream.pipe(streamer.demoFile(id, header.name));
-      } else if (_.startsWith(header.name, 'docs/schemas') && header.type === 'file') {
-        stream
-          .pipe(streamer.json())
-          .pipe(streamer.schema(id, header.name));
-      } else if (header.name === 'README.md') {
-        stream
-          .pipe(streamer.string())
-          .pipe(streamer.readme(id));
-      } else if (header.name === 'package.json') {
-        stream
-          .pipe(streamer.json())
-          .pipe(streamer.pkg(id));
-      } else {
-        stream.resume() // just auto drain the stream
-      }
-    });
+      req.pipe(gunzip()).pipe(extract);
 
-    extract.on('error', (e) => {
-      logger.error(e);
-    });
+    }
 
-    extract.on('finish', function () {
-      logger.info('all files in tar listed - done!');
-      if (entries.length === 0) {
-        res.status(401).send('Cant read tar file');
-      } else {
-        res.send('done');
-      }
-    });
-
-    req.pipe(gunzip()).pipe(extract);
   });
 
   return router;

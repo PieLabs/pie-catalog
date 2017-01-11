@@ -73,7 +73,7 @@ export default class CatalogEntry extends HTMLElement {
     this._element = e;
 
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
-    this.shadowRoot.querySelector('#version').textContent = e.version;
+    this.shadowRoot.querySelector('#version').textContent = e.tag;
     this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
     this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
       this.dispatchEvent(events.viewOrg(this._element));
@@ -81,8 +81,10 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#description').textContent = e.description;
 
-    this.shadowRoot.querySelector('#demo-holder').innerHTML = `
+    if (e.demoLink) {
+      this.shadowRoot.querySelector('#demo-holder').innerHTML = `
      <iframe src="${e.demoLink}" frameborder="0"></iframe>
     `
+    }
   }
 }
