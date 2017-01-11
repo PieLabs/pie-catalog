@@ -12,7 +12,8 @@ import { join } from 'path';
 import { MongoClient, Db } from 'mongodb';
 import { buildLogger, getLogger } from './log-factory';
 
-init({ APP: 'silly', mongo: 'debug', default: 'silly' });
+init('silly');
+//{ APP: 'silly', mongo: 'debug', default: 'silly' });
 
 const logger = getLogger('APP');
 

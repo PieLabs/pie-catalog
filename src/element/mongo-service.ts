@@ -19,11 +19,11 @@ export default class ElementService implements Api {
   constructor(private collection: Collection, readonly demo: DemoService) {
 
     this.collection.createIndex({ org: 1, repo: 1, tag: 1 })
-      .then(() => logger.info('org/repo/tag index created'));
+      .then(() => logger.silly('org/repo/tag index created'));
 
     this.collection.createIndex({ org: 1, repo: 1 }, { unique: true })
       .then(() => {
-        logger.info('index created');
+        logger.silly('index created');
       })
   }
 

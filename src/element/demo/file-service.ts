@@ -3,6 +3,9 @@ import { Writable } from 'stream';
 import { ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
+import { buildLogger } from '../../log-factory';
+
+const logger = buildLogger();
 
 export default class DemoService implements Api, Router {
 
@@ -19,7 +22,9 @@ export default class DemoService implements Api, Router {
   }
 
   stream(id: PieId, name: string): Writable {
+    logger.silly('[stream], id', id, name);
     let path = this.getFilePath(id, name);
+    logger.silly('[stream] path: ', path);
     ensureDirSync(dirname(path));
     return createWriteStream(path);
   }

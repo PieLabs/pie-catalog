@@ -21,7 +21,6 @@ echo "$PROC_FILE" > .deployment/Procfile
 chmod +x .deployment/Procfile
 cp -rv node_modules .deployment/node_modules 
 cp -rv lib .deployment/lib
-cp -rv .demo-service .deployment/.demo-service
 
 tar -czvf artifact.tgz -C .deployment .
 

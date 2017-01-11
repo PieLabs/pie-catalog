@@ -47,6 +47,7 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
         logger.debug(`[/element/${org}/${repo}] result: `, r);
         let id = new PieId(r.org, r.repo, r.tag);
         (r as any).demoLink = getDemoLink(id);
+        r.schemas = r.schemas || [];
         res.json(r);
       });
   });
