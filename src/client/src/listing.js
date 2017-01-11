@@ -11,6 +11,8 @@ export default class CatalogListing extends HTMLElement {
     <style>
      :host{
         width: 300px;
+        height: 100px;
+        max-height: 100px;
         display: block;
         cursor: pointer;
         padding: 10px;
@@ -30,7 +32,9 @@ export default class CatalogListing extends HTMLElement {
       }
 
       #description {
+        display: block;
         font-size: 14px;
+        height: 20px;
       }
 
       .footer{

@@ -31,3 +31,12 @@ customElements.define('fancy-tabs', FancyTabs);
 import CatalogSchemas from './schemas';
 customElements.define('catalog-schemas', CatalogSchemas);
 
+document.addEventListener('DOMContentLoaded', () => {
+  customElements.whenDefined('pie-catalog-app')
+    .then(() => {
+      setTimeout(function () {
+        document.querySelector('pie-catalog-app').removeAttribute('hidden');
+      }, 0);
+    });
+
+});
