@@ -7,6 +7,11 @@ module.exports = {
     path: path.join(__dirname, 'public'),
     filename: 'app.js'
   },
+  module: {
+    loaders: [
+      { test: /\.css$/, loader: ['raw-loader'] }
+    ]
+  },
   resolve: {
     extensions: ['.js']
   }

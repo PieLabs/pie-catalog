@@ -10,8 +10,10 @@ export default class CatalogHeader extends HTMLElement {
       :host {
         display: block;
         height: 60px;
+        min-height: 60px;
         padding-top: 5px;
         padding-left: 5px;
+        background-color: white;
         border-bottom: solid 1px var(--shadow-color, #cccccc);
       }
       

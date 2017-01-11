@@ -19,3 +19,15 @@ customElements.define('catalog-entry', CatalogEntry);
 import GithubAvatar from './github-avatar';
 customElements.define('github-avatar', GithubAvatar);
 
+import MarkdownElement from './markdown-element';
+customElements.define('markdown-element', MarkdownElement);
+
+import InfoPanel from './info-panel';
+customElements.define('info-panel', InfoPanel);
+
+import FancyTabs from './fancy-tabs';
+customElements.define('fancy-tabs', FancyTabs);
+
+import CatalogSchemas from './schemas';
+customElements.define('catalog-schemas', CatalogSchemas);
+

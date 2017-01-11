@@ -12,7 +12,6 @@ export default class CatalogEntry extends HTMLElement {
         display: block;
         padding: 10px;
         position:relative;
-        background-color: var(--shadow-color, hsla(0,0%, 0%, 0.1));
       }
 
       .header {
@@ -37,6 +36,14 @@ export default class CatalogEntry extends HTMLElement {
         font-size: 19px;
       }
 
+      #demo-holder{
+        margin-bottom: 10px;
+      }
+
+      .header{
+        font-size: 20px;
+      }
+
       hr {
         border: none;
         border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
@@ -48,9 +55,13 @@ export default class CatalogEntry extends HTMLElement {
 
       iframe{
         width: 100%;
-        height: 400px;
+        height: 500px;
         background-color: white;
         box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1));
+      }
+      
+      fancy-tabs{
+        margin-top: 10px;
       }
 
     </style>
@@ -59,9 +70,23 @@ export default class CatalogEntry extends HTMLElement {
       <div id="version"></div>
       <div id="org"></div>
     </div>
-    <hr/>
-    <div id="description"></div>
-    <div id="demo-holder"></demo>
+    <fancy-tabs>
+      <button slot="title">info</button>
+      <button slot="title">schemas</button>
+      <section>
+        <div id="description"></div>
+        <info-panel></info-panel>
+        <div id="demo-holder"></div>
+        <div class="header">README.md</div>
+        <div id="markdown-holder">
+          <markdown-element></markdown-element>
+        </div>
+      </section>
+      <section>
+        <catalog-schemas></catalog-schemas>
+      </section>
+      
+    </fancy-tabs>
     `;
   }
 
@@ -79,7 +104,11 @@ export default class CatalogEntry extends HTMLElement {
       this.dispatchEvent(events.viewOrg(this._element));
     });
 
-    this.shadowRoot.querySelector('#description').textContent = e.description;
+    this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
+
+    this.shadowRoot.querySelector('#description').textContent = e.package.description;
+
+    this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
 
     if (e.demoLink) {
       this.shadowRoot.querySelector('#demo-holder').innerHTML = `

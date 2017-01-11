@@ -31,13 +31,6 @@ export default class PieCatalogApp extends HTMLElement {
           display:none;
         }
 
-        catalog-listings, catalog-entry {
-          position: absolute;
-          top: 0;
-          bottom: 0;
-          left: 0;
-          right: 0;
-        }
       </style>
 
       <catalog-header></catalog-header>
