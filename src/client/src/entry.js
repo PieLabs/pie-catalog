@@ -15,3 +15,7 @@ customElements.define('catalog-org', CatalogOrg);
 
 import CatalogEntry from './catalog-entry';
 customElements.define('catalog-entry', CatalogEntry);
+
+import GithubAvatar from './github-avatar';
+customElements.define('github-avatar', GithubAvatar);
+

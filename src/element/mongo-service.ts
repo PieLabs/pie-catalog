@@ -108,7 +108,7 @@ export default class ElementService implements Api {
     return {
       opts: opts,
       count: count,
-      elements: arr
+      elements: elements
     };
   }
 }

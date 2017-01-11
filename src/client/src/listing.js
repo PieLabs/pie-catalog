@@ -44,11 +44,10 @@ export default class CatalogListing extends HTMLElement {
     </style>
 
     <h4 id="repo"></h4>
-    <span id="tag"></span>
     <span id="description"></span>
     <hr/>
     <div class="footer">
-      <img src="https://avatars.githubusercontent.com/u/23503597?v=3&s=40"></img> 
+      <github-avatar></github-avatar>
       <label id="org"></label>
     </div>
     `;
@@ -57,9 +56,9 @@ export default class CatalogListing extends HTMLElement {
   set element(e) {
     this._element = e;
     this.shadowRoot.querySelector('#org').textContent = e.org;
-    this.shadowRoot.querySelector('#repo').textContent = e.repo;
+    this.shadowRoot.querySelector('#repo').textContent = `${e.repo} - ${e.tag}`;
     this.shadowRoot.querySelector('#description').textContent = e.description;
-    this.shadowRoot.querySelector('#tag').textContent = e.tag;
+    this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
   }
 
   get element() {
