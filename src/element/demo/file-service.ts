@@ -50,7 +50,9 @@ export default class DemoService implements Api, Router {
       logger.debug(req.path);
       let markup = readFileSync(join(this.root, req.path), 'utf8');
       let tweakedReact = '/demo/react.min.js';
-      let tweaked = markup.replace(/<script.*react.*<\/script>/, `<script src="${tweakedReact}" type="text/javascript"></script>`);
+      let tweaked = markup
+        .replace(/<script.*react.*<\/script>/, `<script src="${tweakedReact}" type="text/javascript"></script>`)
+        .replace('<script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.1/react-dom.js" type="text/javascript"></script>', '');
 
       res
         .setHeader('Content-Type', 'text/html')
