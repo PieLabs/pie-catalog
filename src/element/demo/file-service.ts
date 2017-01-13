@@ -1,10 +1,9 @@
 import { PieId, DemoService as Api, DemoRouter as Router } from './service';
 import { Writable } from 'stream';
-import { ensureDirSync, createWriteStream } from 'fs-extra';
+import { readFileSync, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
 import { buildLogger } from '../../log-factory';
-
 const logger = buildLogger();
 
 export default class DemoService implements Api, Router {
@@ -41,6 +40,23 @@ export default class DemoService implements Api, Router {
   /** for the local file store return a static router that serves up the files. */
   router() {
     let r = express.Router();
+
+    r.get('/react.min.js', (req, res) => {
+      let rs = createReadStream(join(__dirname, 'react-w-tap-event.js'));
+      rs.pipe(res);
+    });
+
+    r.get(/(.*)\/docs\/demo\/example\.html/, (req, res) => {
+      logger.debug(req.path);
+      let markup = readFileSync(join(this.root, req.path), 'utf8');
+      let tweakedReact = '/demo/react.min.js';
+      let tweaked = markup.replace(/<script.*react.*<\/script>/, `<script src="${tweakedReact}" type="text/javascript"></script>`);
+
+      res
+        .setHeader('Content-Type', 'text/html')
+      res.send(tweaked);
+    });
+
     r.use(express.static(this.root));
     return r;
   }

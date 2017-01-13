@@ -1,0 +1,21 @@
+{
+  "name": "custom-react-build",
+  "version": "1.0.0",
+  "description": "just a build of react with the tap event plugin added",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^15.4.2",
+    "react-addons-transition-group": "^15.4.2",
+    "react-dom": "^15.4.2",
+    "react-tap-event-plugin": "^2.0.1"
+  },
+  "devDependencies": {
+    "webpack": "^2.2.0-rc.3"
+  }
+}
