@@ -10,7 +10,8 @@ const logger = buildLogger();
 export default class DemoService implements Api, Router {
 
   constructor(readonly root: string) {
-
+    logger.silly('demo-service');
+    logger.info('demo-service');
   }
 
   private toPath(id: PieId, name: string) {

@@ -42,7 +42,7 @@ export let init = (log) => {
 function addLogger(label, level?: string) {
 
   level = level ? level : config['default'] || 'info';
-  console.log('[addLogger] level: ', level);
+  console.log('[addLogger] label:', label, ' level: ', level);
   let cfg = mkLogConfig(label, level);
   let logger;
   if (winston.loggers.has(label)) {
@@ -70,9 +70,12 @@ export let isLogLevel = (l) => _.includes(['error', 'warn', 'info', 'verbose', '
 export let setDefaultLevel = (l) => {
   config = config || { 'default': l };
   config['default'] = l;
+  console.log('default level now: ', config['default']);
   _.forEach(winston.loggers.loggers, (value, key) => {
+    console.log('configure logger: ', key);
+    let logger = winston.loggers.get(key);
     let cfg = mkLogConfig(key, config['default']);
-    value.configure(cfg);
+    logger.configure(cfg);
   });
 };
 
@@ -89,13 +92,13 @@ export let setConfig = (cfg) => {
   });
 };
 
-export let getLogger = (id) => {
+export let getLogger = (id: string) => {
   var existing = winston.loggers.has(id);
 
   if (existing) {
     return winston.loggers.get(id);
   } else {
-    return addLogger(id);
+    return addLogger(id, config[id] || config['default']);
   }
 };
 

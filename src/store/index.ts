@@ -94,7 +94,7 @@ export default (elementService: ElementService): Router => {
           next(e);
         });
 
-        if (_.startsWith(header.name, 'docs/demo' && header.type === 'file')) {
+        if (_.startsWith(header.name, 'docs/demo') && header.type === 'file') {
           stream.pipe(elementService.demo.stream(id, header.name));
         } else if (_.startsWith(header.name, 'docs/schemas') && header.type === 'file') {
           stream
@@ -109,6 +109,7 @@ export default (elementService: ElementService): Router => {
             .pipe(new StringTransform())
             .pipe(withJson(json => elementService.savePkg(id, json)));
         } else {
+          logger.debug(`drain this stream: ${header.name} `)
           stream.resume() // just auto drain the stream
         }
       });
