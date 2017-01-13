@@ -59,12 +59,6 @@ A store of an element's built assets + metadata.
 
 ### TODO
 
-* storing in mongo - need to have access to the latest version, 
-  * all in one document then with a map of versions?
-  * separated documents
-  * have a dedicated service for storing updating and managing versions
-
-
 ```javascript
 
   service.update(org, repo, tag, {});

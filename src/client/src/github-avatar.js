@@ -1,6 +1,18 @@
 /**
  * Note: cant subclass HTMLImageElement yet see: https://www.chromestatus.com/feature/4670146924773376
  */
+
+export class LoadAvatarEvent extends CustomEvent {
+  constructor(user, url) {
+
+    super(LoadAvatarEvent.TYPE, { bubbles: true, composed: true });
+    this.user = user;
+    this.setUrl = url;
+  }
+}
+
+LoadAvatarEvent.prototype.TYPE = 'load-avatar';
+
 export default class GithubAvatar extends HTMLElement {
 
   constructor() {
@@ -24,20 +36,13 @@ export default class GithubAvatar extends HTMLElement {
 
   loadAvatar() {
     let user = this.getAttribute('user');
-    let size = this.getAttribute('size') || '40';
 
     if (user) {
-
-      fetch(`//api.github.com/users/${user}`, { mode: 'cors' })
-        .then(r => {
-          console.log('d: ', r);
-          r.json()
-            .then(d => {
-              this.shadowRoot
-                .querySelector('img')
-                .setAttribute('src', `${d.avatar_url}&s=${size}`);
-            });
-        });
+      this.dispatchEvent(new LoadAvatarEvent(user, (url) => {
+        this.shadowRoot
+          .querySelector('img')
+          .setAttribute('src', url);
+      }));
     }
   }
 

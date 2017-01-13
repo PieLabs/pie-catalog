@@ -1,6 +1,7 @@
 import { VIEW_ORG, VIEW_REPO } from './events';
 import { elements } from './client';
 import takeRight from 'lodash/takeRight';
+import { LoadAvatarEvent } from './github-avatar';
 
 export default class PieCatalogApp extends HTMLElement {
 
@@ -114,17 +115,25 @@ export default class PieCatalogApp extends HTMLElement {
     }
   }
 
+
+  set config(c) {
+    this._config = c;
+  }
+
+
   connectedCallback() {
 
     window.onpopstate = (e) => {
       this.updateLayout();
     };
 
-
-
     this.shadowRoot.querySelector('catalog-header').addEventListener('home-click', e => {
       history.pushState({ view: 'home' }, 'home', '/');
       this.updateLayout();
+    });
+
+    this.addEventListener(LoadAvatarEvent.TYPE, (e) => {
+      e.setUrl(this._config.avatarUrl.replace(':user', e.user));
     });
 
     this.addEventListener(VIEW_REPO, (e) => {

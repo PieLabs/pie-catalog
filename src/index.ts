@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 
 import mkStore from './store';
-import { router as client, views as clientViews } from './client';
+import { AvatarService, router as getClientRouter } from './client';
 import mkApi from './api';
 import { init } from './log-factory';
 import ElementService from './element/mongo-service';
@@ -29,9 +29,10 @@ MongoClient.connect(mongoUri)
     const demoService = new DemoService(join(process.cwd(), '.demo-service'));
     const demoRouter = (demoService as DemoRouter);
     const elementService = new ElementService(collection, demoService);
-
+    const avatarService = new AvatarService(join(process.cwd(), '.avatar-service'));
+    const client = getClientRouter(avatarService);
     app.set('view engine', 'pug');
-    app.set('views', clientViews);
+    app.set('views', client.views);
 
     //set up the demo file router...
     app.use(demoRouter.prefix(), demoRouter.router());
@@ -40,7 +41,7 @@ MongoClient.connect(mongoUri)
     app.use('/store', mkStore(new ElementService(collection, demoService)));
 
     //client router
-    app.use('/', client);
+    app.use('/', client.router);
 
     //api router
     app.use('/api', mkApi(elementService, demoRouter.getDemoLink.bind(demoRouter)));

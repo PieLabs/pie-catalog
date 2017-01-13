@@ -6,9 +6,17 @@ export default class CatalogOrg extends HTMLElement {
     let sr = this.attachShadow({ mode: 'open' });
 
     sr.innerHTML = `
+
+    <style>
+      .elements > catalog-listing {
+        display: inline-block;
+        margin: 4px;
+      }
+
+    </style>
     <h1 id="org">org</h1>
     <hr/>
-    <div id="elements">
+    <div class="elements">
     </div>
     `;
   }
@@ -23,7 +31,7 @@ export default class CatalogOrg extends HTMLElement {
       return `<catalog-listing data-index="${i}"></catalog-listing>`;
     });
 
-    this.shadowRoot.querySelector('#elements').innerHTML = markup.join('\n');
+    this.shadowRoot.querySelector('.elements').innerHTML = markup.join('\n');
 
     this.shadowRoot.querySelectorAll('catalog-listing').forEach((n, i) => {
       let index = parseInt(n.getAttribute('data-index'));

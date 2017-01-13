@@ -34,9 +34,14 @@ customElements.define('catalog-schemas', CatalogSchemas);
 document.addEventListener('DOMContentLoaded', () => {
   customElements.whenDefined('pie-catalog-app')
     .then(() => {
+
+
+      let app = document.querySelector('pie-catalog-app');
+
+      app.config = window['pie-catalog-app-config'];
       setTimeout(function () {
-        document.querySelector('pie-catalog-app').removeAttribute('hidden');
-      }, 0);
+        app.removeAttribute('hidden');
+      }, 50);
     });
 
 });

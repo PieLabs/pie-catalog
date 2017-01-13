@@ -14,10 +14,6 @@ export default class CatalogListings extends HTMLElement {
           margin: 10px;
         }
 
-        .elements{
-          display: block;
-        }
-
         .elements > catalog-listing {
           display: inline-block;
           margin: 4px;
