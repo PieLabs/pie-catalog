@@ -6,7 +6,9 @@ const gulp = require('gulp'),
   fsExtra = require('fs-extra'),
   runSequence = require('run-sequence'),
   path = require('path'),
-  webpack = require('webpack');
+  webpack = require('webpack'),
+  exec = require('child_process').exec;
+
 
 
 //Init custom release tasks
@@ -53,8 +55,22 @@ gulp.task('client', (done) => {
   });
 });
 
+gulp.task('install-client-deps', (done) => {
+  exec('cd src/client && npm install && cd ..', (err) => {
+    done(err);
+  });
+});
+
+gulp.task('build-custom-react', (done) => {
+  exec('cd custom-react-build && npm install && ./node_modules/.bin/webpack && cd ..', (err) => {
+    done(err);
+  });
+});
+
 gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);
+
+gulp.task('postinstall', done => runSequence('install-client-deps', 'build-custom-react', done));
