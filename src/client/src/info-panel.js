@@ -8,6 +8,9 @@ export class GithubInfoCount extends HTMLElement {
     let sr = this.attachShadow({ mode: 'open' });
     sr.innerHTML = `
       <style>
+        :host {
+          display: none;
+        }
         .icon{
           vertical-align: middle;
           display: inline-table;
@@ -16,9 +19,6 @@ export class GithubInfoCount extends HTMLElement {
       <span class="icon"></span>
       <label></label>
     `;
-  }
-
-  set icon(i) {
   }
 
   connectedCallback() {
@@ -31,7 +31,12 @@ export class GithubInfoCount extends HTMLElement {
   }
 
   set count(c) {
-    this.shadowRoot.querySelector('label').innerHTML = c;
+    if (c !== undefined) {
+      this.style.display = 'inline-block';
+      this.shadowRoot.querySelector('label').innerHTML = c;
+    } else {
+      this.style.display = 'none';
+    }
   }
 }
 
@@ -42,6 +47,10 @@ export default class InfoPanel extends HTMLElement {
     let sr = this.attachShadow({ mode: 'open' });
     sr.innerHTML = `
       <style>
+        [hidden]{
+          display: none;
+        }
+
         :host {
           display: block;
           margin-top: 10px;
@@ -50,6 +59,7 @@ export default class InfoPanel extends HTMLElement {
           background-color: white;
           ${styles.boxShadow}
         }
+
         github-info-count{
           margin-right: 20px;
         }
@@ -60,7 +70,8 @@ export default class InfoPanel extends HTMLElement {
         }
         
       </style>
-      <span class="updated"> Last updated <relative-time> </relative-time></span>
+      <span class="no-info">No information from github available</span>
+      <span class="updated" hidden>Last updated <relative-time> </relative-time></span>
       <github-info-count 
         icon="star" 
         label="stargazers"
@@ -81,6 +92,11 @@ export default class InfoPanel extends HTMLElement {
   }
 
   set github(g) {
+
+    if (!g) {
+      g = {};
+    }
+
     this._github = g;
     this.shadowRoot.querySelectorAll('github-info-count').forEach((n) => {
       let key = n.getAttribute('data-key');
@@ -89,6 +105,13 @@ export default class InfoPanel extends HTMLElement {
       }
     });
 
-    this.shadowRoot.querySelector('relative-time').setAttribute('datetime', g.pushed_at);
+    if (g.pushed_at) {
+      this.shadowRoot.querySelector('relative-time').setAttribute('datetime', g.pushed_at);
+      this.shadowRoot.querySelector('.updated').removeAttribute('hidden');
+      this.shadowRoot.querySelector('.no-info').setAttribute('hidden', '');
+    } else {
+      this.shadowRoot.querySelector('.updated').setAttribute('hidden', '');
+      this.shadowRoot.querySelector('.no-info').removeAttribute('hidden');
+    }
   }
 }

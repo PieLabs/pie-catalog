@@ -26,8 +26,8 @@ import InfoPanel, { GithubInfoCount } from './info-panel';
 customElements.define('info-panel', InfoPanel);
 customElements.define('github-info-count', GithubInfoCount);
 
-import timeElements from 'time-elements';
 //Note: these elements auto register themselves
+import timeElements from 'time-elements';
 
 import FancyTabs from './fancy-tabs';
 customElements.define('fancy-tabs', FancyTabs);
