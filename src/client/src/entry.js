@@ -22,6 +22,10 @@ customElements.define('github-avatar', GithubAvatar);
 import MarkdownElement from './markdown-element';
 customElements.define('markdown-element', MarkdownElement);
 
+import DependenciesPanel, { DependencyEl } from './dependencies-panel';
+customElements.define('dependencies-panel', DependenciesPanel);
+customElements.define('dependency-el', DependencyEl);
+
 import InfoPanel, { GithubInfoCount } from './info-panel';
 customElements.define('info-panel', InfoPanel);
 customElements.define('github-info-count', GithubInfoCount);

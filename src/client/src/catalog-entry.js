@@ -76,6 +76,7 @@ export default class CatalogEntry extends HTMLElement {
       <section>
         <div id="description"></div>
         <info-panel></info-panel>
+        <dependencies-panel></dependencies-panel>
         <div id="demo-holder"></div>
         <div class="header">README.md</div>
         <div id="markdown-holder">
@@ -111,6 +112,8 @@ export default class CatalogEntry extends HTMLElement {
     this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
     this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
+
+    this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
 
     if (e.demoLink) {
       this.shadowRoot.querySelector('#demo-holder').innerHTML = `
