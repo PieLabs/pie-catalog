@@ -11,6 +11,7 @@ import { DemoRouter } from './element/demo/service';
 import { join } from 'path';
 import { MongoClient, Db } from 'mongodb';
 import { buildLogger, getLogger } from './log-factory';
+import { MainGithubService } from './github';
 
 init('silly');
 //{ APP: 'silly', mongo: 'debug', default: 'silly' });
@@ -28,7 +29,8 @@ MongoClient.connect(mongoUri)
 
     const demoService = new DemoService(join(process.cwd(), '.demo-service'));
     const demoRouter = (demoService as DemoRouter);
-    const elementService = new ElementService(collection, demoService);
+    const githubService = new MainGithubService();
+    const elementService = new ElementService(collection, demoService, githubService);
     const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
     const avatarService = new AvatarService(avatarBackend);
     const client = getClientRouter(avatarService);
@@ -39,7 +41,7 @@ MongoClient.connect(mongoUri)
     app.use(demoRouter.prefix(), demoRouter.router());
 
     //store router
-    app.use('/store', mkStore(new ElementService(collection, demoService)));
+    app.use('/store', mkStore(elementService));
 
     //client router
     app.use('/', client.router);

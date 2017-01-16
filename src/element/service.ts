@@ -1,6 +1,8 @@
 import { PieId, KeyMap } from '../types';
 import { DemoService } from './demo/service';
-export { PieId, KeyMap, DemoService }
+import { GithubService } from '../github';
+
+export { GithubService, PieId, KeyMap, DemoService }
 
 export type ListOpts = { limit: number, skip: number };
 

@@ -1,4 +1,13 @@
-import { ElementLite, Element, ListOpts, KeyMap, PieId, DemoService, ElementService as Api } from './service';
+import {
+  ElementLite,
+  Element,
+  ListOpts,
+  KeyMap,
+  PieId,
+  DemoService,
+  ElementService as Api,
+  GithubService
+} from './service';
 import { Collection } from 'mongodb';
 import { buildLogger } from '../log-factory';
 import * as _ from 'lodash';
@@ -16,7 +25,10 @@ const liteFields = { org: 1, repo: 1, tag: 1, 'package.description': 1 };
 
 export default class ElementService implements Api {
 
-  constructor(private collection: Collection, readonly demo: DemoService) {
+  constructor(
+    private collection: Collection,
+    readonly demo: DemoService,
+    readonly github: GithubService) {
 
     this.collection.createIndex({ org: 1, repo: 1, tag: 1 })
       .then(() => logger.silly('org/repo/tag index created'));
@@ -65,11 +77,13 @@ export default class ElementService implements Api {
     return this.update(id, update);
   }
 
-  savePkg(id: PieId, pkg: KeyMap) {
+  async savePkg(id: PieId, pkg: KeyMap) {
+    let githubInfo = await this.github.loadInfo(id.org, id.repo);
 
     let update = {
       $set: {
-        'package': pkg
+        'package': pkg,
+        github: githubInfo
       }
     }
 
