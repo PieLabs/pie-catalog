@@ -44,15 +44,19 @@ gulp.task('it', ['build'], () => {
 
 gulp.task('clean', (done) => {
   fsExtra.remove('lib', done);
-})
+});
+
+gulp.task('custom-react', (done) => {
+  let cfg = require('./custom-react-build/webpack.config');
+  webpack(cfg, (err, stats) => {
+    done();
+  });
+});
 
 gulp.task('client', (done) => {
   let cfg = require('./src/client/webpack.config');
   cfg.output.path = './lib/client/public';
-
-  webpack(cfg, (err, stats) => {
-    done(err);
-  });
+  webpack(cfg, done);
 });
 
 gulp.task('install-client-deps', (done) => {
@@ -61,16 +65,16 @@ gulp.task('install-client-deps', (done) => {
   });
 });
 
-gulp.task('build-custom-react', (done) => {
-  exec('cd custom-react-build && npm install && ./node_modules/.bin/webpack && cd ..', (err) => {
+gulp.task('install-custom-react', (done) => {
+  exec('cd custom-react-build && npm install && cd ..', (err) => {
     done(err);
   });
 });
 
-gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client'], done));
+gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client', 'custom-react'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);
 
-gulp.task('postinstall', done => runSequence('install-client-deps', 'build-custom-react', done));
+gulp.task('postinstall', done => runSequence('install-client-deps', 'install-custom-react', done));

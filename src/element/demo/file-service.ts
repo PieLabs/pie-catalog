@@ -42,7 +42,7 @@ export default class DemoService implements Api, Router {
     let r = express.Router();
 
     r.get('/react.min.js', (req, res) => {
-      let rs = createReadStream(join(__dirname, 'react-w-tap-event.js'));
+      let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
       rs.pipe(res);
     });
 
