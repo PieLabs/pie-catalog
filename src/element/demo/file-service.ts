@@ -45,7 +45,11 @@ export default class DemoService implements Api, Router {
       let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
       rs.pipe(res);
     });
-
+    /**
+     * 
+     * Note: We temporarily remove the cdh react and set our custom react here.
+     * We may want to update the catalog app to use this custom react and so add it to the markup directly. 
+     */
     r.get(/(.*)\/docs\/demo\/example\.html/, (req, res) => {
       logger.debug(req.path);
       let markup = readFileSync(join(this.root, req.path), 'utf8');
