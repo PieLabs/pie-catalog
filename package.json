@@ -7,6 +7,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/gulp test",
+    "postinstall": "./node_modules/.bin/gulp postinstall",
     "prepublish": "npm run build",
     "build": "gulp build",
     "it": "./node_modules/.bin/gulp it",

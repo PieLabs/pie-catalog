@@ -32,10 +32,15 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
     service.listByOrg(req.params.org, { skip: 0, limit: 0 })
       .then(result => {
         res.json({
+          count: result.count,
           org: req.params.org,
           elements: result.elements
-        })
+        });
       });
+  });
+
+  r.delete('/element/:org/:repo', (req, res) => {
+    res.status(501).send('todo...');
   });
 
   r.get('/element/:org/:repo', (req, res) => {

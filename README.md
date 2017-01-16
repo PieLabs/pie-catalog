@@ -1,7 +1,9 @@
 # pie-catalog
 
 ## install 
-
+```
+npm install 
+```
 
 ### dependencies
 
