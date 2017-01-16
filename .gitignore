@@ -4,3 +4,4 @@ lib
 .file-store
 *.tgz
 .demo-service
+.avatar-*

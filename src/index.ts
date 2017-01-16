@@ -2,7 +2,7 @@ import * as express from 'express';
 import * as http from 'http';
 
 import mkStore from './store';
-import { AvatarService, router as getClientRouter } from './client';
+import { FileBackend, AvatarService, router as getClientRouter } from './client';
 import mkApi from './api';
 import { init } from './log-factory';
 import ElementService from './element/mongo-service';
@@ -29,7 +29,8 @@ MongoClient.connect(mongoUri)
     const demoService = new DemoService(join(process.cwd(), '.demo-service'));
     const demoRouter = (demoService as DemoRouter);
     const elementService = new ElementService(collection, demoService);
-    const avatarService = new AvatarService(join(process.cwd(), '.avatar-service'));
+    const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
+    const avatarService = new AvatarService(avatarBackend);
     const client = getClientRouter(avatarService);
     app.set('view engine', 'pug');
     app.set('views', client.views);

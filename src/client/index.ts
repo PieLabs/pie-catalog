@@ -4,9 +4,9 @@ import { buildLogger } from '../log-factory';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
 import * as r from 'resolve';
-import AvatarService from './services/avatar-service';
+import AvatarService, { AvatarBackend, FileBackend } from './services/avatar-service';
 
-export { AvatarService }
+export { AvatarService, AvatarBackend, FileBackend }
 
 const logger = buildLogger();
 
