@@ -22,8 +22,12 @@ customElements.define('github-avatar', GithubAvatar);
 import MarkdownElement from './markdown-element';
 customElements.define('markdown-element', MarkdownElement);
 
-import InfoPanel from './info-panel';
+import InfoPanel, { GithubInfoCount } from './info-panel';
 customElements.define('info-panel', InfoPanel);
+customElements.define('github-info-count', GithubInfoCount);
+
+import timeElements from 'time-elements';
+//Note: these elements auto register themselves
 
 import FancyTabs from './fancy-tabs';
 customElements.define('fancy-tabs', FancyTabs);
@@ -34,7 +38,6 @@ customElements.define('catalog-schemas', CatalogSchemas);
 document.addEventListener('DOMContentLoaded', () => {
   customElements.whenDefined('pie-catalog-app')
     .then(() => {
-
 
       let app = document.querySelector('pie-catalog-app');
 

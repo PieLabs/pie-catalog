@@ -10,7 +10,9 @@
   "license": "ISC",
   "dependencies": {
     "highlight.js": "^9.9.0",
-    "marked": "^0.3.6"
+    "marked": "^0.3.6",
+    "octicons": "^5.0.1",
+    "time-elements": "^0.6.1"
   },
   "devDependencies": {
     "css-loader": "^0.26.1",

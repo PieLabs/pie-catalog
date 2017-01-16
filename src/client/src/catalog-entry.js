@@ -104,6 +104,8 @@ export default class CatalogEntry extends HTMLElement {
       this.dispatchEvent(events.viewOrg(this._element));
     });
 
+    this.shadowRoot.querySelector('info-panel').github = e.github;
+
     this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
 
     this.shadowRoot.querySelector('#description').textContent = e.package.description;

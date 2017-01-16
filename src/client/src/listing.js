@@ -1,4 +1,5 @@
 import * as events from './events';
+import * as styles from './styles';
 
 export default class CatalogListing extends HTMLElement {
 
@@ -17,7 +18,7 @@ export default class CatalogListing extends HTMLElement {
         cursor: pointer;
         padding: 10px;
         background-color: white;
-        box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1));
+        ${styles.boxShadow}
       }
       
 

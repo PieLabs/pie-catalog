@@ -32,7 +32,7 @@ MongoClient.connect(mongoUri)
     const githubService = new MainGithubService();
     const elementService = new ElementService(collection, demoService, githubService);
     const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
-    const avatarService = new AvatarService(avatarBackend);
+    const avatarService = new AvatarService(avatarBackend, githubService);
     const client = getClientRouter(avatarService);
     app.set('view engine', 'pug');
     app.set('views', client.views);

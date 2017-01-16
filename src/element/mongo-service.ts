@@ -78,13 +78,17 @@ export default class ElementService implements Api {
   }
 
   async savePkg(id: PieId, pkg: KeyMap) {
-    let githubInfo = await this.github.loadInfo(id.org, id.repo);
 
     let update = {
       $set: {
         'package': pkg,
-        github: githubInfo
       }
+    }
+
+    try {
+      update.$set['github'] = await this.github.loadInfo(id.org, id.repo);
+    } catch (e) {
+      logger.warn('github.loadInfo failed: ', e);
     }
 
     return this.update(id, update);

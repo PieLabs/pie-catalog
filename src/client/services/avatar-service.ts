@@ -1,9 +1,13 @@
 import { Readable, Writable } from 'stream';
 import { dirname } from 'path';
 import { createWriteStream, createReadStream, exists, ensureDirSync } from 'fs-extra';
-import fetch from 'node-fetch';
+import fetch, { } from 'node-fetch';
 import * as http from 'http';
 import { buildLogger } from '../../log-factory';
+import * as url from 'url';
+import * as _ from 'lodash';
+import { GithubService } from '../../github';
+
 const logger = buildLogger();
 
 export interface AvatarBackend {
@@ -42,37 +46,25 @@ export class FileBackend implements AvatarBackend {
 
 export default class AvatarService {
 
-  constructor(private backend: AvatarBackend) {
+  constructor(private backend: AvatarBackend, private github: GithubService) {
   }
 
-  private async streamUrlToFile(url: string, path: string): Promise<string> {
-
-    logger.debug(`[streamUrlToFile]: ${url} ${path}`);
-    return fetch(url)
-      .then(r => {
-        return new Promise(async (resolve, reject) => {
-          logger.debug(`[streamUrlToFile] writing response to a file stream`);
-          let ws = await this.backend.writeStream(path);
-          ws.on('error', reject);
-          ws.on('close', () => { resolve(path) });
-          r.body.pipe(ws)
-        });
-      })
-      .then(() => path);
-  }
-
-  private async loadFromGithub(user: string): Promise<any> {
-    let response = await fetch(`http://api.github.com/users/${user}`);
-    return response.json();
+  private streamUrlToFile(body: NodeJS.ReadableStream, path: string): Promise<string> {
+    return this.backend.writeStream(path).then(ws => {
+      return new Promise<string>((resolve, reject) => {
+        ws.on('error', reject);
+        ws.on('close', () => { resolve(path) });
+        body.pipe(ws);
+      });
+    });
   }
 
   async stream(host: string, user: string): Promise<Readable> {
     let path = `${host}/${user}`;
     let exists = await this.backend.exists(path);
     if (!exists) {
-      let json = await this.loadFromGithub(user);
-      logger.debug('avatar_url: ', json.avatar_url);
-      await this.streamUrlToFile(`${json.avatar_url}&s=40`, path);
+      let response = await this.github.avatar(user);
+      await this.streamUrlToFile(response.body, path);
     }
     return this.backend.readStream(path);
   }

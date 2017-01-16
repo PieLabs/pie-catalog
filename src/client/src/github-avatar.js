@@ -19,7 +19,7 @@ export default class GithubAvatar extends HTMLElement {
     super();
     let sr = this.attachShadow({ mode: 'open' });
 
-    sr.innerHTML = `<img></img>`;
+    sr.innerHTML = `<img width="40" height="40"></img>`;
   }
 
   static get observedAttributes() {
