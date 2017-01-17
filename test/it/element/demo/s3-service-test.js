@@ -97,7 +97,8 @@ describe('s3-service', () => {
       s3.putObject(_.extend({}, params, { Body: 'hi' }), done);
     });
 
-    it.only('should delete all assets', (done) => {
+    it('should delete all assets', function (done) {
+      this.timeout(3000);
       service.delete({ org: 'org', repo: 'repo', tag: '1.0.0' }, 'test.txt')
         .then(r => {
           s3.headObject(params, (err) => {

@@ -63,8 +63,8 @@ function emptyDir(s3: AWS.S3, bucket, prefix, done) {
 
   let params = {
     Bucket: bucket,
-    // Prefix: prefix,
-    // Delimiter: '/'
+    Prefix: prefix,
+    Delimiter: '/'
   };
 
   logger.debug('[emptyDir] params: ', params);
