@@ -4,6 +4,7 @@ import { readFileSync, createReadStream, ensureDirSync, createWriteStream } from
 import { dirname, join } from 'path';
 import * as express from 'express';
 import { buildLogger } from '../../log-factory';
+
 const logger = buildLogger();
 
 export default class S3DemoService implements Api, Router {
