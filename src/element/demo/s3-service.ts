@@ -34,7 +34,11 @@ let bucketExists = (s3, bucket) => {
   });
 };
 
-export function hasConfiguredAwsCredentials() {
+function hasSetAwsEnvVars(): boolean {
+  return process.env['AWS_SECRET_ACCESS_KEY'] && process.env['AWS_ACCESS_KEY_ID'];
+}
+
+function hasCredentials() {
 
   var homedir = process.env[(process.platform == 'win32') ? 'USERPROFILE' :
     'HOME'];
@@ -49,6 +53,7 @@ export function hasConfiguredAwsCredentials() {
   var credentialsFile = expandHomeDir('~/.aws/credentials');
 
   try {
+    logger.debug('credentialsFile: ', credentialsFile);
     var stat = statSync(credentialsFile);
     return stat.isFile();
   } catch (e) {
@@ -67,7 +72,7 @@ function emptyDir(s3: AWS.S3, bucket, prefix, done) {
     Delimiter: '/'
   };
 
-  logger.debug('[emptyDir] params: ', params);
+  logger.silly('[emptyDir] params: ', params);
 
   s3.listObjectsV2(params, function (err, listData) {
 
@@ -103,7 +108,6 @@ function emptyDir(s3: AWS.S3, bucket, prefix, done) {
       } else {
         done();
       }
-
     });
   });
 }
@@ -113,6 +117,11 @@ type Callback = (err?: Error) => void;
 export default class S3DemoService implements Api {
 
   static async build(bucket: string, prefix: string = 'app/.demo-service'): Promise<S3DemoService> {
+
+
+    if (!hasCredentials() && !hasSetAwsEnvVars()) {
+      throw new Error('You havent set any credentials for AWS');
+    }
 
     let client = new S3();
 
@@ -151,6 +160,7 @@ export default class S3DemoService implements Api {
   }
 
   delete(id: PieId): Promise<boolean> {
+    logger.debug('[delete] id: ', id);
     return this.withPromise(
       emptyDir.bind(this, this.client, this.bucket, this.getRoot(id))
     );
@@ -172,14 +182,18 @@ export default class S3DemoService implements Api {
       ContentType: lookup(extname(name))
     };
 
+    logger.debug('[upload], id: ', id, 'name: ', name);
+
     this.client.upload(params, function (err, data) {
-      logger.debug('[upload] err: ', err, 'data: ', data);
+      logger.silly('[upload] err: ', err, 'data: ', data);
       done(err);
     });
   }
 
+
+  //TODO - how do we set up cloudfront?
   getDemoLink(id: PieId): string {
-    return `http://${this.bucket}.s3.amazon.com/${this.getRoot(id)}/docs/demo/example.html`;
+    return `http://${this.bucket}.s3.amazon.com/${this.prefix}/${this.getRoot(id)}/docs/demo/example.html`;
   }
 
 }

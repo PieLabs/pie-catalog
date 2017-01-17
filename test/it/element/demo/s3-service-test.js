@@ -86,27 +86,41 @@ describe('s3-service', () => {
 
   describe('delete', () => {
 
-    let params;
+    let listResult, listErr;
+    before(function (done) {
+      this.timeout(3000);
 
-    before((done) => {
-      params = {
+      let uploadParams = {
         Bucket: 'pie-catalog',
         Key: `${prefix}/org/repo/1.0.0/test.txt`,
+        Body: 'hi'
       }
 
-      s3.putObject(_.extend({}, params, { Body: 'hi' }), done);
+      s3.putObject(uploadParams, (e) => {
+        service.delete({ org: 'org', repo: 'repo', tag: '1.0.0' }, 'test.txt')
+          .then(r => {
+            let p = {
+              Bucket: 'pie-catalog',
+              Prefix: `${prefix}/org/repo/1.0.0`
+            }
+
+            s3.listObjectsV2(p, (err, r) => {
+              console.log('got err: ', err);
+              listResult = r;
+              listErr = err;
+              done();
+            });
+          });
+
+      });
     });
 
-    it('should delete all assets', function (done) {
-      this.timeout(3000);
-      service.delete({ org: 'org', repo: 'repo', tag: '1.0.0' }, 'test.txt')
-        .then(r => {
-          s3.headObject(params, (err) => {
-            console.log('got err: ', err);
-            chai.expect(err).not.to.be.null;
-            done();
-          });
-        });
+    it('should not return an error', () => {
+      chai.expect(listErr).to.be.null;
+    });
+
+    it('should return an empty list', () => {
+      chai.expect(listResult.Contents.length).to.eql(0);
     });
   });
 });
