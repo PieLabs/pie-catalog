@@ -1,5 +1,5 @@
 import { PieId, DemoService as Api, DemoRouter as Router } from './service';
-import { Writable } from 'stream';
+import { Readable, Writable } from 'stream';
 import { remove, readFileSync, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
@@ -42,12 +42,18 @@ export default class DemoService implements Api, Router {
     return true;
   }
 
-  stream(id: PieId, name: string): Writable {
+  upload(id: PieId, name: string, stream: Readable, done: (e?: Error) => void): void {
     logger.silly('[stream], id', id, name);
     let path = this.getFilePath(id, name);
     logger.silly('[stream] path: ', path);
     ensureDirSync(dirname(path));
-    return createWriteStream(path);
+    let ws = createWriteStream(path);
+    ws.on('error', (e) => {
+      logger.error('error writing the file: ', e);
+      done(e);
+    });
+    ws.on('close', done);
+    stream.pipe(ws);
   }
 
   prefix() {

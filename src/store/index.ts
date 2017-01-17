@@ -95,7 +95,11 @@ export default (elementService: ElementService): Router => {
         });
 
         if (_.startsWith(header.name, 'docs/demo') && header.type === 'file') {
-          stream.pipe(elementService.demo.stream(id, header.name));
+
+          elementService.demo.upload(id, header.name, stream, (err) => {
+            next(err);
+          });
+          // stream.pipe(elementService.demo.stream(id, header.name));
         } else if (_.startsWith(header.name, 'docs/schemas') && header.type === 'file') {
           stream
             .pipe(new StringTransform())
