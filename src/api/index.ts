@@ -40,7 +40,17 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
   });
 
   r.delete('/element/:org/:repo', (req, res) => {
-    res.status(501).send('todo...');
+    service.delete(req.params.org, req.params.repo)
+      .then((result) => {
+        if (result.ok) {
+          res.json({ success: true });
+        } else {
+          res.status(result.statusCode).json({ error: result.error });
+        }
+      })
+      .catch(e => {
+        res.status(500).json({ error: e.message });
+      })
   });
 
   r.get('/element/:org/:repo', (req, res) => {

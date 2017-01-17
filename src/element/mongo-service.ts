@@ -1,4 +1,5 @@
 import {
+  DeleteResult,
   ElementLite,
   Element,
   ListOpts,
@@ -37,6 +38,30 @@ export default class ElementService implements Api {
       .then(() => {
         logger.silly('index created');
       })
+  }
+
+  async delete(org: string, repo: string): Promise<DeleteResult> {
+    logger.debug('[delete], org: ', org, 'repo: ', repo);
+
+    let query = { org: org, repo: repo };
+    logger.silly('[delete]: query:', query);
+    let count = await this.collection.count(query);
+    logger.silly('[delete] count: ', count);
+
+    let removeResult = await this.collection.findOneAndDelete(query);
+    logger.silly('[delete] removeResult: ', removeResult);
+
+    if (removeResult.ok && removeResult.value) {
+      let id = new PieId(org, repo, removeResult.value.tag);
+      let demoDeleteResult = await this.demo.delete(id);
+      if (demoDeleteResult) {
+        return { ok: true }
+      } else {
+        return { ok: false, statusCode: 500, error: 'failed to delete the demo dir' }
+      }
+    } else {
+      return { ok: false, statusCode: 500, error: 'failed to delete the repo' }
+    }
   }
 
   private update(id: PieId, update) {

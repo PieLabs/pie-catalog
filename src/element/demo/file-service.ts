@@ -1,9 +1,11 @@
 import { PieId, DemoService as Api, DemoRouter as Router } from './service';
 import { Writable } from 'stream';
-import { readFileSync, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
+import { remove, readFileSync, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
 import { buildLogger } from '../../log-factory';
+import * as bluebird from 'bluebird';
+
 const logger = buildLogger();
 
 export default class DemoService implements Api, Router {
@@ -13,12 +15,31 @@ export default class DemoService implements Api, Router {
     logger.info('demo-service');
   }
 
+
+  private repoRoot(id: PieId): string {
+    return `${id.org}/${id.repo}/${id.tag}`;
+  }
+
   private toPath(id: PieId, name: string) {
-    return `${id.org}/${id.repo}/${id.tag}/${name}`;
+    return `${this.repoRoot(id)}/${name}`;
   }
 
   private getFilePath(id: PieId, name: string) {
     return join(this.root, this.toPath(id, name));
+  }
+
+  async deleteAll(org: string, repo: string): Promise<boolean> {
+    logger.debug('[deleteAll], org: ', org, 'repo: ', repo);
+    let dir = join(this.root, `${org}/${repo}`);
+    let result = await bluebird.promisify(remove)(dir);
+    return true;
+  }
+
+  async delete(id: PieId): Promise<boolean> {
+    logger.debug('[delete], id: ', id);
+    let dir = join(this.root, this.repoRoot(id));
+    let result = await bluebird.promisify(remove)(dir);
+    return true;
   }
 
   stream(id: PieId, name: string): Writable {

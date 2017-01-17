@@ -13,6 +13,12 @@ export type Element = {
   readme: string, pkg: any, schemas: any[]
 }
 
+export type DeleteResult = {
+  ok: boolean,
+  statusCode?: number,
+  error?: string
+}
+
 export interface ElementService {
   readonly demo: DemoService;
   reset(id: PieId): Promise<boolean>;
@@ -21,6 +27,8 @@ export interface ElementService {
   savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
+
+  delete(org:string, repo: string) : Promise<DeleteResult>;
 
   load(org: string, repo: string): Promise<Element>;
 }
