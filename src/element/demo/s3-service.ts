@@ -68,8 +68,7 @@ function emptyDir(s3: AWS.S3, bucket, prefix, done) {
 
   let params = {
     Bucket: bucket,
-    Prefix: prefix,
-    Delimiter: '/'
+    Prefix: prefix
   };
 
   logger.silly('[emptyDir] params: ', params);
@@ -188,10 +187,9 @@ export default class S3DemoService implements Api {
     });
   }
 
-
   //TODO - how do we set up cloudfront?
   getDemoLink(id: PieId): string {
-    return `http://${this.bucket}.s3.amazon.com/${this.prefix}/${this.getRoot(id)}/docs/demo/example.html`;
+    return `//${this.bucket}.s3.amazonaws.com/${this.getRoot(id)}/docs/demo/example.html`;
   }
 
 }
