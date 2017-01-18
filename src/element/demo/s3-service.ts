@@ -118,26 +118,23 @@ export default class S3DemoService implements Api {
 
   static async build(bucket: string, prefix: string = 'app/.demo-service'): Promise<S3DemoService> {
 
+    logger.info('[build] bucket: ', bucket, 'prefix: ', prefix);
 
     if (!hasCredentials() && !hasSetAwsEnvVars()) {
       throw new Error('You havent set any credentials for AWS');
     }
 
     let client = new S3();
-
     let exists = await bucketExists(client, bucket);
 
     if (!exists) {
-      throw new Error('bucket: ' + bucket + ' doesnt exist');
+      throw new Error('bucket: ' + bucket + ' doesnt exist - you need to create it.');
     }
 
     return new S3DemoService(bucket, prefix, client);
   }
 
-  private constructor(readonly bucket: string, readonly prefix: string, readonly client: S3) {
-
-  }
-
+  private constructor(readonly bucket: string, readonly prefix: string, readonly client: S3) { }
 
   private withPromise(fn: (Callback) => void): Promise<boolean> {
     return new Promise((resolve, reject) => {

@@ -8,10 +8,10 @@ export interface DemoService {
   upload(id: PieId, name: string, stream: Readable, done: (e?: Error) => void): void;
   delete(id: PieId): Promise<boolean>;
   deleteAll(org: string, repo: string): Promise<boolean>;
+  getDemoLink(id: PieId): string;
 }
 
 export interface DemoRouter {
   prefix(): string;
   router(): express.Router;
-  getDemoLink(id: PieId): string;
 }

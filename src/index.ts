@@ -6,15 +6,24 @@ import { router as getClientRouter } from './client';
 import mkApi from './api';
 import { init } from './log-factory';
 import { join } from 'path';
-import { buildLogger, getLogger } from './log-factory';
-import { bootstrap } from './bootstrap-services';
+import { getLogger } from './log-factory';
+import { bootstrap, buildOpts } from './bootstrap-services';
+import * as minimist from 'minimist';
 
 init('silly');
 
 const logger = getLogger('APP');
 
-bootstrap()
-  .then(({demo, avatar, element, onError}) => {
+var argv = require('minimist')(process.argv.slice(2));
+
+logger.silly('argv: ', argv);
+
+let raw = process.argv.slice(2);
+let args: any = minimist(raw);
+let opts = buildOpts(args, process.env);
+
+bootstrap(opts)
+  .then(({demo, avatar, element, onError, demoRouter}) => {
 
     const app = express();
     const client = getClientRouter(avatar);
@@ -25,7 +34,10 @@ bootstrap()
     app.use('/', client.router);
 
     //set up the demo file router...
-    app.use(demo.prefix(), demo.router());
+    if (demoRouter) {
+      logger.info(`add the demo router on: ${demoRouter.prefix()}`);
+      app.use(demoRouter.prefix(), demoRouter.router());
+    }
 
     //store router
     app.use('/store', mkStore(element));
@@ -35,7 +47,7 @@ bootstrap()
 
     const server = http.createServer(app);
 
-    const port = process.env.PORT || 4001;
+    const port = args.port || process.env.PORT || 4001;
 
     server.on('close', (e) => {
       console.error('error', e);

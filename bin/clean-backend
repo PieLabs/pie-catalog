@@ -1,0 +1,116 @@
+#!/usr/bin/env node
+
+console.log('clean backend: !!! > requires [aws-cli]');
+
+const minimist = require('minimist');
+const MongoDB = require('mongodb');
+const inquirer = require('inquirer');
+const exec = require('child_process').exec;
+const opts = minimist(process.argv.slice(2));
+
+opts.mongoUri = opts.mongoUri || 'mongodb://localhost:27017/pie-catalog';
+opts.interactive = opts.interactive === undefined ? true : false;
+
+let getS3Path = () => `s3://${opts.bucket}/${opts.prefix}`
+
+let wipeS3 = () => {
+
+  return new Promise((resolve, reject) => {
+    let cmd = `aws s3 rm ${getS3Path(opts.bucket, opts.prefix)} --recursive`;
+    console.log('[wipeS3] cmd: ', cmd);
+    exec(cmd, (err, stdout, stderr) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ stdout: stdout });
+      }
+    });
+  });
+};
+
+let wipeCollections = () => {
+  return MongoDB.MongoClient.connect(opts.mongoUri)
+    .then(db => {
+      return db.collection('elements').remove({})
+        .then((r) => {
+          console.log('remove from elements collection result: ', r.result);
+          return db.close();
+        });
+    })
+    .catch(e => {
+      console.error('Error wiping db: ', e);
+    });
+}
+
+let cleanMongo = () => {
+  return new Promise((resolve, reject) => {
+    if (opts.mongoUri) {
+      if (opts.interactive) {
+        inquirer.prompt([
+          {
+            type: 'confirm',
+            name: 'confirm-mongo',
+            message: `Wipe the collections in: ${opts.mongoUri}?`,
+          }
+        ]).then(answers => {
+          console.log('answers: ', answers);
+          if (answers['confirm-mongo']) {
+            wipeCollections(opts.mongoUri)
+              .then(() => { resolve({ mongo: { skipped: false } }) });
+          } else {
+            resolve({ mongo: { skipped: true } });
+          }
+        })
+      } else {
+        wipeCollections(opts.mongoUri)
+          .then(() => { resolve({ mongo: { skipped: false } }) });
+      }
+    } else {
+      resolve({ mongo: { skipped: true } });
+    }
+  });
+};
+
+let make = (message, run) => {
+  return new Promise((resolve, reject) => {
+    if (opts.interactive) {
+      inquirer.prompt([{
+        type: 'confirm',
+        name: 'confirm',
+        message: message
+      }]).then(answers => {
+        if (answers.confirm) {
+          run(resolve, reject);
+        } else {
+          resolve({ skipped: true });
+        }
+      })
+    }
+  });
+}
+
+let cleanS3 = () => {
+
+  if (opts.bucket && opts.prefix) {
+    let s3Path = getS3Path(opts.bucket, opts.prefix);
+    return make(`Wipe contents from ${s3Path}`, (resolve, reject) => {
+      wipeS3()
+        .then(() => resolve({ skipped: false }))
+        .catch(e => {
+          console.error(e)
+          reject(e);
+        });
+    });
+  } else {
+    return Promise.resolve({ skipped: true });
+  }
+}
+
+cleanMongo()
+  .then(cleanS3)
+  .then(() => {
+    console.log('clean complete');
+  })
+  .catch(e => {
+    console.error(e);
+  });

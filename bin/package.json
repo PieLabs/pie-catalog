@@ -1,0 +1,14 @@
+{
+  "name": "pie-catalog-bin",
+  "version": "1.0.0",
+  "description": "private scripts for pie-catalog",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "inquirer": "^2.0.0"
+  }
+}
