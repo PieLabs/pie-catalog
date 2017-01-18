@@ -113,10 +113,11 @@ function emptyDir(s3: AWS.S3, bucket, prefix, done) {
 }
 
 type Callback = (err?: Error) => void;
+export const SERVICE_PREFIX = '.demo-service';
 
 export default class S3DemoService implements Api {
 
-  static async build(bucket: string, prefix: string = 'app/.demo-service'): Promise<S3DemoService> {
+  static async build(bucket: string, prefix: string = 'app'): Promise<S3DemoService> {
 
     logger.info('[build] bucket: ', bucket, 'prefix: ', prefix);
 
@@ -164,7 +165,7 @@ export default class S3DemoService implements Api {
   }
 
   private getRoot(id: PieId) {
-    return `${this.prefix}/${id.org}/${id.repo}/${id.tag}`;
+    return `${this.prefix}/${SERVICE_PREFIX}/${id.org}/${id.repo}/${id.tag}`;
   }
 
   private getKey(id: PieId, name: string) {

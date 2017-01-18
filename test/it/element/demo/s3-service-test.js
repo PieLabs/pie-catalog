@@ -8,7 +8,11 @@ AWS.config.logger = {
 const _ = require('lodash');
 const fs = require('fs-extra');
 const s3 = new AWS.S3();
-const Service = require('../../../../lib/element/demo/s3-service').default;
+
+const mod = require('../../../../lib/element/demo/s3-service');
+const Service = mod.default;
+const SERVICE_PREFIX = mod.SERVICE_PREFIX;
+
 const chai = require('chai');
 const path = require('path');
 
@@ -16,7 +20,7 @@ require('../../../../lib/log-factory').init('silly');
 
 describe('s3-service', () => {
   let service;
-  let prefix = 'integration-test/.demo-service';
+  let prefix = 'integration-test';
 
   before(() => {
     return Service.build('pie-catalog', prefix)
@@ -39,7 +43,7 @@ describe('s3-service', () => {
   describe('upload', () => {
 
     let testImage = 'img.jpg';
-    let key = `${prefix}/org/repo/1.0.0/${testImage}`;
+    let key = `${prefix}/${SERVICE_PREFIX}/org/repo/1.0.0/${testImage}`;
     let headResult, headErr;
 
     after((done) => {
@@ -92,7 +96,7 @@ describe('s3-service', () => {
 
       let uploadParams = {
         Bucket: 'pie-catalog',
-        Key: `${prefix}/org/repo/1.0.0/test.txt`,
+        Key: `${prefix}/${SERVICE_PREFIX}/org/repo/1.0.0/test.txt`,
         Body: 'hi'
       }
 
@@ -101,7 +105,7 @@ describe('s3-service', () => {
           .then(r => {
             let p = {
               Bucket: 'pie-catalog',
-              Prefix: `${prefix}/org/repo/1.0.0`
+              Prefix: `${prefix}/${SERVICE_PREFIX}/org/repo/1.0.0`
             }
 
             s3.listObjectsV2(p, (err, r) => {
