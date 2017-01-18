@@ -5,7 +5,7 @@ import { dirname, join } from 'path';
 import * as express from 'express';
 import { buildLogger } from '../../log-factory';
 import * as bluebird from 'bluebird';
-
+import { replaceReact } from './utils';
 const logger = buildLogger();
 
 export default class DemoService implements Api, Router {
@@ -80,14 +80,8 @@ export default class DemoService implements Api, Router {
     r.get(/(.*)\/docs\/demo\/example\.html/, (req, res) => {
       logger.debug(req.path);
       let markup = readFileSync(join(this.root, req.path), 'utf8');
-      let tweakedReact = '/demo/react.min.js';
-      let tweaked = markup
-        .replace(/<script.*react.*<\/script>/, `<script src="${tweakedReact}" type="text/javascript"></script>`)
-        .replace('<script src="//cdnjs.cloudflare.com/ajax/libs/react/15.4.1/react-dom.js" type="text/javascript"></script>', '');
-
-      res
-        .setHeader('Content-Type', 'text/html')
-      res.send(tweaked);
+      res.setHeader('Content-Type', 'text/html')
+      res.send(replaceReact(markup, '/demo/react.min.js'));
     });
 
     r.use(express.static(this.root));

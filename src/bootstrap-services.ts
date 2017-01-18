@@ -3,6 +3,7 @@ import { init } from './log-factory';
 import ElementService from './element/mongo-service';
 import DemoFileService from './element/demo/file-service';
 import DemoS3Service from './element/demo/s3-service';
+import DemoS3Router from './element/demo/s3-router';
 import { DemoService, DemoRouter } from './element/demo/service';
 import { MongoClient, Db } from 'mongodb';
 import { buildLogger } from './log-factory';
@@ -11,19 +12,28 @@ import { join } from 'path';
 
 export type Services = {
   avatar: AvatarService,
-  demo: DemoService,
-  demoRouter?: DemoRouter,
+  demoService: DemoService,
+  demoRouter: DemoRouter,
   element: ElementService,
   onError: () => void
 }
 
 const logger = buildLogger();
 
-let getDemoService = async (opts: BootstrapOpts): Promise<DemoService> => {
+let demoServiceAndRouter = async (opts: BootstrapOpts): Promise<{ service: DemoService, router: DemoRouter }> => {
   if (opts.s3 && opts.s3.bucket && opts.s3.prefix) {
-    return await DemoS3Service.build(opts.s3.bucket, opts.s3.prefix);
+    let service = await DemoS3Service.build(opts.s3.bucket, opts.s3.prefix);
+
+    let routerOpts = {
+      bucket: opts.s3.bucket,
+      prefix: service.servicePrefix
+    }
+
+    let router = new DemoS3Router(service.client, routerOpts);
+    return { service, router };
   } else {
-    return new DemoFileService(join(process.cwd(), '.demo-service'));
+    let service = new DemoFileService(join(process.cwd(), '.demo-service'));
+    return { service, router: service }
   }
 }
 
@@ -53,17 +63,16 @@ export async function bootstrap(opts: BootstrapOpts): Promise<Services> {
   logger.info('opts: ', opts);
   const db = await MongoClient.connect(opts.mongoUri);
   const collection = db.collection('elements');
-  const demo = await getDemoService(opts);
-  const demoRouter = (demo instanceof DemoFileService) ? (demo as DemoRouter) : null;
+  const {service: demoService, router: demoRouter} = await demoServiceAndRouter(opts);
   const github = new MainGithubService();
-  const element = new ElementService(collection, demo, github);
+  const element = new ElementService(collection, demoService, github);
   const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
   const avatar = new AvatarService(avatarBackend, github);
   const onError = () => db.close();
 
   return {
     avatar,
-    demo,
+    demoService,
     demoRouter,
     element,
     onError,

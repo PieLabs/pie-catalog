@@ -23,7 +23,7 @@ let args: any = minimist(raw);
 let opts = buildOpts(args, process.env);
 
 bootstrap(opts)
-  .then(({demo, avatar, element, onError, demoRouter}) => {
+  .then(({demoService, avatar, element, onError, demoRouter}) => {
 
     const app = express();
     const client = getClientRouter(avatar);
@@ -34,16 +34,14 @@ bootstrap(opts)
     app.use('/', client.router);
 
     //set up the demo file router...
-    if (demoRouter) {
-      logger.info(`add the demo router on: ${demoRouter.prefix()}`);
-      app.use(demoRouter.prefix(), demoRouter.router());
-    }
+    logger.info(`add the demo router on: ${demoRouter.prefix()}`);
+    app.use(demoRouter.prefix(), demoRouter.router());
 
     //store router
     app.use('/store', mkStore(element));
 
     //api router
-    app.use('/api', mkApi(element, demo.getDemoLink.bind(demo)));
+    app.use('/api', mkApi(element, demoService.getDemoLink.bind(demoService)));
 
     const server = http.createServer(app);
 

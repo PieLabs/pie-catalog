@@ -134,7 +134,7 @@ export default class S3DemoService implements Api {
     return new S3DemoService(bucket, prefix, client);
   }
 
-  private constructor(readonly bucket: string, readonly prefix: string, readonly client: S3) { }
+  private constructor(readonly bucket: string, private prefix: string, readonly client: S3) { }
 
   private withPromise(fn: (Callback) => void): Promise<boolean> {
     return new Promise((resolve, reject) => {
@@ -163,8 +163,16 @@ export default class S3DemoService implements Api {
     );
   }
 
+  private idToPath(id: PieId) {
+    return `${id.org}/${id.repo}/${id.tag}`;
+  }
+
   private getRoot(id: PieId) {
-    return `${this.prefix}/${SERVICE_PREFIX}/${id.org}/${id.repo}/${id.tag}`;
+    return `${this.servicePrefix}/${this.idToPath(id)}`
+  }
+
+  public get servicePrefix() {
+    return `${this.prefix}/${SERVICE_PREFIX}`;
   }
 
   private getKey(id: PieId, name: string) {
@@ -189,7 +197,7 @@ export default class S3DemoService implements Api {
 
   //TODO - how do we set up cloudfront?
   getDemoLink(id: PieId): string {
-    return `//${this.bucket}.s3.amazonaws.com/${this.getRoot(id)}/docs/demo/example.html`;
+    return `/demo/${this.idToPath(id)}/docs/demo/example.html`;
   }
 
 }
