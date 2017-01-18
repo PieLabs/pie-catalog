@@ -40,8 +40,11 @@ export function router(avatarService: AvatarService): { router: express.Router, 
   }
 
   //fallback to serving static assets
-  router.use(express.static(join(__dirname, 'public')));
-
+  router.use(
+    express.static(
+      join(__dirname, '../../lib/client/public')
+    )
+  );
 
   router.get('/avatars/github/:user', (req, res, next) => {
     avatarService.stream('github', req.params.user)

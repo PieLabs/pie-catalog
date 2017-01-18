@@ -11,7 +11,7 @@
     "prepublish": "npm run build",
     "build": "gulp build",
     "it": "./node_modules/.bin/gulp it",
-    "dev": "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts",
+    "dev": "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='silly'",
     "release": "./node_modules/.bin/gulp release",
     "source-maps": "gulp build && ./node_modules/.bin/tsc"
   },

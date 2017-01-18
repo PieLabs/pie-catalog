@@ -42,6 +42,12 @@ TODO...
 npm test
 ```
 
+## debug 
+
+```shell 
+./node_modules/.bin/ts-node --debug-brk src/index.ts
+```
+
 ## deploying a preview version
 
 To deploy a preview version of the app for others to look at run: 

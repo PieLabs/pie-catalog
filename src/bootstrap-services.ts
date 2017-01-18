@@ -28,8 +28,7 @@ let demoServiceAndRouter = async (opts: BootstrapOpts): Promise<{ service: DemoS
       bucket: opts.s3.bucket,
       prefix: service.servicePrefix
     }
-
-    let router = new DemoS3Router(service.client, routerOpts);
+    let router = await DemoS3Router.build(service.client, routerOpts);
     return { service, router };
   } else {
     let service = new DemoFileService(join(process.cwd(), '.demo-service'));

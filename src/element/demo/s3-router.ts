@@ -14,9 +14,42 @@ const logger = buildLogger();
  * 
  * It is hoped that once the dependency on 'inject-tap-event-plugin' is gone we can do away with all this.
  */
+type S3Opts = { prefix: string, bucket: string }
+
+let customReactKey = (prefix: string) => `${prefix}/react.min.js`;
+
 export default class S3Router implements Router {
 
-  constructor(
+  static build(s3: S3, opts: S3Opts): Promise<S3Router> {
+    let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
+
+    return new Promise((resolve, reject) => {
+      const params = {
+        Bucket: opts.bucket,
+        Key: customReactKey(opts.prefix),
+        Body: rs,
+        ContentType: 'text/javascript'
+      }
+      logger.debug('[build] uploading custom react to s3: key:', params.Key);
+      s3.upload({
+        Bucket: opts.bucket,
+        Key: customReactKey(opts.prefix),
+        Body: rs,
+        ContentType: 'text/javascript'
+      }, (err, result) => {
+        logger.silly('[build] custom react upload complete');
+        if (err) {
+          reject(err);
+        } else {
+          resolve(new S3Router(s3, opts));
+        }
+      });
+    });
+
+  }
+
+
+  private constructor(
     private s3: S3,
     private s3Opts: { prefix: string, bucket: string }) { }
 
@@ -52,29 +85,49 @@ export default class S3Router implements Router {
       });
     });
 
-    r.get('/react.min.js', (req, res) => {
-      let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
-      rs.pipe(res);
-    });
-
     /**
      * Pipe all the other assets from s3
      */
     r.get('*', (req, res) => {
 
-      const params = {
+
+      const params: any = {
         Bucket: this.s3Opts.bucket,
         Key: `${this.s3Opts.prefix}${req.path}`
+      }
+
+      if (req.headers['if-none-match']) {
+        params.IfNoneMatch = req.headers['if-none-match'];
+      }
+
+      if (req.headers['if-modified-since']) {
+        try {
+          params.IfModifiedSince = Date.parse(req.headers['if-modified-since']);
+        } catch (e) {
+          logger.warn('failed to parse: if-modified-since header as date: ', req.headers['if-modified-since']);
+        }
       }
 
       logger.silly(`[GET ${req.path}] params: `, params);
 
       this.s3.getObject(params)
         .on('httpHeaders', function (statusCode, headers) {
-          res.set('Content-Length', headers['content-length']);
-          res.set('Content-Type', headers['content-type']);
-          this.response.httpResponse.createUnbufferedStream()
-            .pipe(res);
+          if (statusCode === 304) {
+            res.status(statusCode).send();
+          } else {
+            logger.silly(`[GET ${req.path}] s3 statusCode: ${statusCode}, headers: ${headers}`);
+            res.set('Content-Length', headers['content-length']);
+            res.set('Content-Type', headers['content-type']);
+            res.set('ETag', headers['etag']);
+            res.set('Date', headers['date']);
+            res.set('Cache-Control', 'public, max-age=0');
+            res.set('Last-Modified', headers['last-modified']);
+
+            logger.silly(`[GET ${req.path}] params: `, res.header);
+            this.response.httpResponse.createUnbufferedStream()
+              .pipe(res);
+
+          }
         })
         .send();
     });
