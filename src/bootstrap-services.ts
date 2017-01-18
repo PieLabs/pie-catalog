@@ -58,7 +58,6 @@ export function buildOpts(args: any, env: any): BootstrapOpts {
 }
 
 export async function bootstrap(opts: BootstrapOpts): Promise<Services> {
-  // const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/pie-catalog';
   logger.info('opts: ', opts);
   const db = await MongoClient.connect(opts.mongoUri);
   const collection = db.collection('elements');

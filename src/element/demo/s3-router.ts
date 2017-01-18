@@ -90,7 +90,6 @@ export default class S3Router implements Router {
      */
     r.get('*', (req, res) => {
 
-
       const params: any = {
         Bucket: this.s3Opts.bucket,
         Key: `${this.s3Opts.prefix}${req.path}`
