@@ -7,7 +7,13 @@ import { createReadStream } from 'fs-extra';
 import { join } from 'path';
 
 const logger = buildLogger();
-
+/**
+ * Alot of the corespring components depend on material-ui which in turn depends on 'inject-tap-event-plugin'.
+ * This means that the build of react that's on cdn won't work. The cdn version of react is what's added to the example.html.
+ * This router will modify the example.html so that is uses the custom build of react that is part of this application.
+ * 
+ * It is hoped that once the dependency on 'inject-tap-event-plugin' is gone we can do away with all this.
+ */
 export default class S3Router implements Router {
 
   constructor(
