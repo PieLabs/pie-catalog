@@ -116,7 +116,7 @@ export const SERVICE_PREFIX = '.demo-service';
 
 export default class S3DemoService implements Api {
 
-  static async build(bucket: string, prefix: string = 'app'): Promise<S3DemoService> {
+  static async build(bucket: string, prefix: string = 'dev-app'): Promise<S3DemoService> {
 
     logger.info('[build] bucket: ', bucket, 'prefix: ', prefix);
 

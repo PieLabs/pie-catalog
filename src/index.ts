@@ -10,16 +10,16 @@ import { getLogger } from './log-factory';
 import { bootstrap, buildOpts } from './bootstrap-services';
 import * as minimist from 'minimist';
 
-init('silly');
-
-const logger = getLogger('APP');
-
 var argv = require('minimist')(process.argv.slice(2));
-
-logger.silly('argv: ', argv);
 
 let raw = process.argv.slice(2);
 let args: any = minimist(raw);
+let logConfig = process.env['LOG_CONFIG'] || args.logConfig || 'info';
+init(logConfig);
+
+const logger = getLogger('APP');
+logger.silly('argv: ', argv);
+
 let opts = buildOpts(args, process.env);
 
 bootstrap(opts)

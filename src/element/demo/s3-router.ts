@@ -17,7 +17,8 @@ const logger = buildLogger();
 export default class S3Router implements Router {
 
   constructor(
-    private s3: S3, private s3Opts: { prefix: string, bucket: string }) { }
+    private s3: S3,
+    private s3Opts: { prefix: string, bucket: string }) { }
 
   prefix(): string {
     return '/demo';
