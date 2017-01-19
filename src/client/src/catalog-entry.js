@@ -73,7 +73,7 @@ export default class CatalogEntry extends HTMLElement {
     <fancy-tabs>
       <button slot="title">info</button>
       <button slot="title">schemas</button>
-      <section>
+      <div>
         <div id="description"></div>
         <info-panel></info-panel>
         <dependencies-panel></dependencies-panel>
@@ -82,10 +82,10 @@ export default class CatalogEntry extends HTMLElement {
         <div id="markdown-holder">
           <markdown-element></markdown-element>
         </div>
-      </section>
-      <section>
+      </div>
+      <div>
         <catalog-schemas></catalog-schemas>
-      </section>
+      </div>
       
     </fancy-tabs>
     `;
