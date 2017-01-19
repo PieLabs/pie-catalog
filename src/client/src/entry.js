@@ -1,6 +1,9 @@
 import PieCatalogApp from './pie-catalog-app';
 customElements.define('pie-catalog-app', PieCatalogApp);
 
+import {define} from 'json-schema-element';
+define();
+
 import CatalogListings from './listings';
 customElements.define('catalog-listings', CatalogListings);
 
