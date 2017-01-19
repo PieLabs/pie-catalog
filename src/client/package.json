@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "json-schema-element": "../../../json-schema",
+    "json-schema-element": "PieLabs/json-schema-element#develop",
     "highlight.js": "^9.9.0",
     "marked": "^0.3.6",
     "octicons": "^5.0.1",
