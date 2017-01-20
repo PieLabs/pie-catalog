@@ -13,8 +13,9 @@ export default class CatalogHeader extends HTMLElement {
         min-height: 60px;
         padding-top: 5px;
         padding-left: 5px;
-        background-color: white;
+        background-color: var(--catalog-header-bg, green);
         border-bottom: solid 1px var(--shadow-color, #cccccc);
+
       }
       
       h1 {
@@ -22,19 +23,16 @@ export default class CatalogHeader extends HTMLElement {
         padding: 0;
       }
 
-      #pie-logo{
-        cursor: pointer;
-      }
 
     </style>
-    <h1 id="pie-logo">pie</h1>
+    <pie-brand></pie-brand>
     `;
   }
 
   connectedCallback() {
     console.log('connected header');
 
-    this.shadowRoot.querySelector('#pie-logo').addEventListener('click', e => {
+    this.shadowRoot.querySelector('pie-brand').addEventListener('click', e => {
       this.dispatchEvent(new CustomEvent('home-click', { bubbles: true }));
     });
   }

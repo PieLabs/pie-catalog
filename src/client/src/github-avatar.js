@@ -19,7 +19,13 @@ export default class GithubAvatar extends HTMLElement {
     super();
     let sr = this.attachShadow({ mode: 'open' });
 
-    sr.innerHTML = `<img width="40" height="40"></img>`;
+    sr.innerHTML = `
+    <style>
+    :host{
+      display: inline-block;
+    }
+    </style>
+    <img></img>`;
   }
 
   static get observedAttributes() {
@@ -47,6 +53,9 @@ export default class GithubAvatar extends HTMLElement {
   }
 
   connectedCallback() {
+    let img  = this.shadowRoot.querySelector('img');
+    img.setAttribute('width', this.getAttribute('size'));
+    img.setAttribute('height', this.getAttribute('size'));
     this.loadAvatar();
   }
 }

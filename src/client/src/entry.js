@@ -42,6 +42,9 @@ customElements.define('fancy-tabs', FancyTabs);
 import CatalogSchemas from './schemas';
 customElements.define('catalog-schemas', CatalogSchemas);
 
+import PieBrand from './pie-brand';
+customElements.define('pie-brand', PieBrand);
+
 document.addEventListener('DOMContentLoaded', () => {
   customElements.whenDefined('pie-catalog-app')
     .then(() => {
@@ -51,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
       app.config = window['pie-catalog-app-config'];
       setTimeout(function () {
         app.removeAttribute('hidden');
-      }, 50);
+      }, 150);
     });
 
 });

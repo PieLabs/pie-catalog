@@ -9,7 +9,6 @@ export default class CatalogListings extends HTMLElement {
     <style>
         :host {
           display: block;
-          background-color:#eeeeee;
           padding: 10px;
           margin: 10px;
         }
@@ -22,10 +21,6 @@ export default class CatalogListings extends HTMLElement {
     <div class="elements">
     </div>
     `;
-  }
-
-  connectedCallback() {
-    console.log('connected');
   }
 
   set elements(e) {

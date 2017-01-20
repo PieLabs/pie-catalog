@@ -52,7 +52,7 @@ export default class CatalogListing extends HTMLElement {
     <span id="description"></span>
     <hr/>
     <div class="footer">
-      <github-avatar></github-avatar>
+      <github-avatar size="40"></github-avatar>
       <label id="org"></label>
     </div>
     `;
