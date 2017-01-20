@@ -87,8 +87,8 @@ export default class FancyTabs extends HTMLElement {
 
     // Add aria role="tabpanel" to each content panel.
     for (let [i, panel] of this.panels.entries()) {
-      panel.setAttribute('role', 'tabpanel');
-      panel.setAttribute('tabindex', 0);
+      // panel.setAttribute('role', 'tabpanel');
+      // panel.setAttribute('tabindex', 0);
     }
 
     // Save refer to we can remove listeners later.
