@@ -5,31 +5,58 @@ export default class ProgresBar extends HTMLElement {
     let sr = this.attachShadow({ mode: 'open' });
     sr.innerHTML = `
       <style>
-        progress {
-          width: 100%;
-          height: 2px;
-          background: white;
-        }
-
-        progress::-webkit-progress-bar {
-          background: grey;
-          border-radius: 0;
-          padding: 0;
-          box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+        :host{
+          display: block;
         }
         
-        progress::-webkit-progress-value {
-          background: red;
-          border-radius: 0px;
-          padding: 0;
-          box-shadow: 0 1px 0px 0 rgba(255, 255, 255, 0.2);
+        :host([disabled]) #progress{
+          opacity: 0;
         }
+
+        #progress {
+          opacity: 1;
+          width: 100%;
+          height: 2px;
+          background-color: var(--progress-bar-color, rgba(0,0,0,0.2));
+          transition: opacity 100ms ease-in;
+          -webkit-transform-origin: right center;
+          transform-origin: right center;
+          -webkit-animation: indeterminate-bar 2s linear infinite;
+          animation: indeterminate-bar 2s linear infinite;
+        }
+        
+        @-webkit-keyframes indeterminate-bar {
+          0% {
+            -webkit-transform: scaleX(1) translateX(-100%);
+          }
+          50% {
+            -webkit-transform: scaleX(1) translateX(0%);
+          }
+          75% {
+            -webkit-transform: scaleX(1) translateX(0%);
+            -webkit-animation-timing-function: cubic-bezier(.28,.62,.37,.91);
+          }
+          100% {
+            -webkit-transform: scaleX(0) translateX(0%);
+          }
+        }
+
+
       </style>
-      <progress max="100" value="40"></progress>
+      <div id="progress" hidden></div>
     `
   }
 
-  connectedCallback() {
-
+  enable() {
+    this.removeAttribute('disabled');
   }
+
+  disable() {
+    this.setAttribute('disabled', '');
+  }
+
+  connectedCallback() {
+    this.shadowRoot.querySelector('#progress').removeAttribute('hidden');
+  }
+
 }

@@ -35,7 +35,7 @@ export default class PieCatalogApp extends HTMLElement {
       </style>
 
       <catalog-header></catalog-header>
-      <progress-bar></progress-bar>
+      <progress-bar disabled></progress-bar>
       <div class="content">
         <catalog-listings></catalog-listings>
         <catalog-entry></catalog-entry>
@@ -44,28 +44,40 @@ export default class PieCatalogApp extends HTMLElement {
     `;
   }
 
+  error(e) {
+    console.log(e);
+  }
+
   entryReady() {
     console.log('the entry logic is ready');
+    this._entryReady = true;
+    this._progress.disable();
   }
 
   loadListings() {
+    this._progress.enable();
     return elements.list()
       .then(result => {
         this.shadowRoot.querySelector('catalog-listings').elements = result.elements;
+        this._progress.disable();
       });
   }
 
   loadEntry(org, repo) {
+    this._progress.enable();
     return elements.load(org, repo)
       .then(result => {
         this.shadowRoot.querySelector('catalog-entry').element = result;
+        this._progress.disable();
       });
   }
 
   loadOrg(org) {
+    this._progress.enable();
     return elements.listByOrg(org)
       .then(result => {
         this.shadowRoot.querySelector('catalog-org').org = result;
+        this._progress.disable();
       });
   }
 
@@ -76,6 +88,11 @@ export default class PieCatalogApp extends HTMLElement {
   }
 
   showEntry() {
+
+    if (!this._entryReady) {
+      this._progress.removeAttribute('disabled');
+    }
+
     this.shadowRoot.querySelector('catalog-org').setAttribute('hidden', '');
     this.shadowRoot.querySelector('catalog-listings').setAttribute('hidden', '');
     this.shadowRoot.querySelector('catalog-entry').removeAttribute('hidden');
@@ -118,11 +135,13 @@ export default class PieCatalogApp extends HTMLElement {
     }
   }
 
-
   set config(c) {
     this._config = c;
   }
 
+  get _progress() {
+    return this.shadowRoot.querySelector('progress-bar');
+  }
 
   connectedCallback() {
 

@@ -5,6 +5,7 @@ import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
 import * as r from 'resolve';
 import AvatarService, { AvatarBackend, FileBackend } from './services/avatar-service';
+import * as gzip from './middleware/gzip';
 
 export { AvatarService, AvatarBackend, FileBackend }
 
@@ -35,17 +36,16 @@ export function router(avatarService: AvatarService): { router: express.Router, 
     let compiler = webpack(cfg);
     let middleware = webpackMiddleware(compiler, {
       publicPath: '/',
-      noInfo:true 
+      noInfo: true
     });
     router.use(middleware)
+  } else {
+    let dir = join(__dirname, '../../lib/client/public');
+    router.use(gzip.staticFiles(dir));
+    //fallback to serving static assets
+    router.use(express.static(dir));
   }
 
-  //fallback to serving static assets
-  router.use(
-    express.static(
-      join(__dirname, '../../lib/client/public')
-    )
-  );
 
   router.get('/avatars/github/:user', (req, res, next) => {
     avatarService.stream('github', req.params.user)

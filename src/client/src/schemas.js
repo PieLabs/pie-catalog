@@ -9,10 +9,22 @@ export default class CatalogSchema extends HTMLElement {
   }
 
   set schemas(s) {
+
+    console.log('[schemas] set....');
     this._schemas = s;
+    this.update();
+  }
+
+  update() {
+
+    if (!this._schemas) {
+      return;
+    }
+
+    let s = this._schemas;
 
     let jsonString = s.map((v, i) => {
-    return `<json-schema 
+      return `<json-schema 
       data-id="${i}"></json-schema>`;
     });
 
@@ -21,5 +33,13 @@ export default class CatalogSchema extends HTMLElement {
     s.forEach((s, i) => {
       this.shadowRoot.querySelector(`[data-id="${i}"]`).schema = s.schema;
     });
+  }
+
+
+  connectedCallback() {
+    if (this.schemas) {
+      this._schemas = this.schemas;
+      this.update();
+    }
   }
 }
