@@ -11,12 +11,23 @@ let config = {
   'default': 'info'
 };
 
+let mkLogConfig = (label: string, level: string) => {
+  return {
+    level: level,
+    transports: [
+      new (winston.transports.Console)({ colorize: true, label: label })
+    ]
+  }
+}
+
+const logger = addLogger('LOG_FACTORY');
 
 //levels: error > warn > info > verbose > debug > silly
 
+
 export let init = (log) => {
 
-  console.log('init: ', log);
+  logger.debug('init: ', log);
   if (!log) {
     return;
   }
@@ -27,7 +38,7 @@ export let init = (log) => {
   } else {
     try {
       let config = JSON.parse(log);
-      console.log('parsed log: ', log);
+      logger.debug('parsed log: ', log);
       setConfig(config);
     } catch (e) {
       if (fs.existsSync(log)) {
@@ -39,10 +50,10 @@ export let init = (log) => {
   }
 };
 
+
 function addLogger(label, level?: string) {
 
   level = level ? level : config['default'] || 'info';
-  console.log('[addLogger] label:', label, ' level: ', level);
   let cfg = mkLogConfig(label, level);
   let logger;
   if (winston.loggers.has(label)) {
@@ -55,14 +66,6 @@ function addLogger(label, level?: string) {
   return logger;
 }
 
-let mkLogConfig = (label: string, level: string) => {
-  return {
-    level: level,
-    transports: [
-      new (winston.transports.Console)({ colorize: true, label: label })
-    ]
-  }
-}
 
 export let isLogLevel = (l) => _.includes(['error', 'warn', 'info', 'verbose', 'debug', 'silly'], l);
 
@@ -70,9 +73,8 @@ export let isLogLevel = (l) => _.includes(['error', 'warn', 'info', 'verbose', '
 export let setDefaultLevel = (l) => {
   config = config || { 'default': l };
   config['default'] = l;
-  console.log('default level now: ', config['default']);
+  logger.debug('default level now: ', config['default']);
   _.forEach(winston.loggers.loggers, (value, key) => {
-    console.log('configure logger: ', key);
     let logger = winston.loggers.get(key);
     let cfg = mkLogConfig(key, config['default']);
     logger.configure(cfg);
@@ -81,7 +83,7 @@ export let setDefaultLevel = (l) => {
 
 export let setConfigFromFile = (configPath) => {
   var cfg = fs.readJsonSync(configPath);
-  console.log(cfg);
+  logger.debug(cfg);
   setConfig(cfg);
 };
 

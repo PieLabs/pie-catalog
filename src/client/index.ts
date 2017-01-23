@@ -6,6 +6,8 @@ import * as webpack from 'webpack';
 import * as r from 'resolve';
 import AvatarService, { AvatarBackend, FileBackend } from './services/avatar-service';
 import * as gzip from './middleware/gzip';
+import { lookup } from 'mime-types';
+import { stat } from 'fs-extra';
 
 export { AvatarService, AvatarBackend, FileBackend }
 
@@ -41,8 +43,8 @@ export function router(avatarService: AvatarService): { router: express.Router, 
     router.use(middleware)
   } else {
     let dir = join(__dirname, '../../lib/client/public');
+    //try and find the .gz version of the file and update the headers accordingly 
     router.use(gzip.staticFiles(dir));
-    //fallback to serving static assets
     router.use(express.static(dir));
   }
 
