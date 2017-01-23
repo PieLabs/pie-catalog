@@ -31,10 +31,11 @@ export function router(avatarService: AvatarService): { router: express.Router, 
   if (env === 'dev') {
 
     const cfg = require('./webpack.config');
+    cfg.output.publicPath = 'http://localhost:4001/';
     let compiler = webpack(cfg);
     let middleware = webpackMiddleware(compiler, {
       publicPath: '/',
-      noInfo: false
+      noInfo:true 
     });
     router.use(middleware)
   }

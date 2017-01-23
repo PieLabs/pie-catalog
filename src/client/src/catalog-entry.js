@@ -100,10 +100,21 @@ export default class CatalogEntry extends HTMLElement {
 
   connectedCallback() {
     console.log('catalog entry connected');
+    console.log('this.element set already?', this.element);
+    this._element = this.element;
+    this._update();
   }
 
   set element(e) {
     this._element = e;
+    this._update();
+  }
+
+  _update(){
+    if(!this._element){
+      return;
+    }
+    let e = this._element;
 
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#version').textContent = e.tag;
@@ -130,4 +141,5 @@ export default class CatalogEntry extends HTMLElement {
     `
     }
   }
+
 }
