@@ -35,7 +35,7 @@ export default class PieCatalogApp extends HTMLElement {
       </style>
 
       <catalog-header></catalog-header>
-
+      <progress-bar></progress-bar>
       <div class="content">
         <catalog-listings></catalog-listings>
         <catalog-entry></catalog-entry>
@@ -44,6 +44,9 @@ export default class PieCatalogApp extends HTMLElement {
     `;
   }
 
+  entryReady() {
+    console.log('the entry logic is ready');
+  }
 
   loadListings() {
     return elements.list()

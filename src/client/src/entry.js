@@ -13,11 +13,18 @@ customElements.define('catalog-header', CatalogHeader);
 import CatalogOrg from './org';
 customElements.define('catalog-org', CatalogOrg);
 
-console.log('load entry chunk...');
+import GithubAvatar from './github-avatar';
+customElements.define('github-avatar', GithubAvatar);
 
-var o = require.ensure([], () => {
-  
-  const {define} = require( 'json-schema-element');
+import PieBrand from './pie-brand';
+customElements.define('pie-brand', PieBrand);
+
+import ProgressBar from './progress-bar';
+customElements.define('progress-bar', ProgressBar);
+
+require.ensure([], () => {
+
+  const {define} = require('json-schema-element');
   define();
 
   const MarkdownElement = require('./markdown-element').default;
@@ -29,42 +36,33 @@ var o = require.ensure([], () => {
   customElements.define('dependencies-panel', DependenciesPanel);
   customElements.define('dependency-el', DependencyEl);
 
-  const { default: InfoPanel, GithubInfoCount } = require( './info-panel');
+  const { default: InfoPanel, GithubInfoCount } = require('./info-panel');
   customElements.define('info-panel', InfoPanel);
   customElements.define('github-info-count', GithubInfoCount);
 
   //Note: these elements auto register themselves
   require('time-elements');
 
-  const FancyTabs = require( './fancy-tabs').default;
+  const FancyTabs = require('./fancy-tabs').default;
   customElements.define('fancy-tabs', FancyTabs);
 
-  const CatalogSchemas = require( './schemas').default;
+  const CatalogSchemas = require('./schemas').default;
   customElements.define('catalog-schemas', CatalogSchemas);
 
-  document.dispatchEvent(new CustomEvent('entry-chunk-loaded'));
+}).then(() => {
+  let app = document.querySelector('pie-catalog-app');
+  app.entryReady();
+}).catch((e) => {
+  let app = document.querySelector('pie-catalog-app');
+  app.error(e);
 });
-console.log('o: ', o); 
-o.then(function(){
-  console.log('o.value: ', arguments);
-})
-document.addEventListener('entry-chunk-loaded', () => {
-  console.log('entry chunk loaded!');
-});
-import GithubAvatar from './github-avatar';
-customElements.define('github-avatar', GithubAvatar);
 
-
-
-import PieBrand from './pie-brand';
-customElements.define('pie-brand', PieBrand);
 
 document.addEventListener('DOMContentLoaded', () => {
   customElements.whenDefined('pie-catalog-app')
     .then(() => {
 
       let app = document.querySelector('pie-catalog-app');
-
       app.config = window['pie-catalog-app-config'];
       setTimeout(function () {
         app.removeAttribute('hidden');
