@@ -17,13 +17,13 @@ export default class PieBrand extends HTMLElement {
     }
 
     .pie {
-      color: #404042;
+      color: var(--pie-brand-color, #404042);
       transition:color 100ms linear;
       cursor: pointer;
     }
     
     .pie:hover{
-      color: #64B362;
+      color: var(--pie-brand-hover-color,#64B362);
     }
 
     .other {

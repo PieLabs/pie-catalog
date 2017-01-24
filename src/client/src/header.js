@@ -23,9 +23,27 @@ export default class CatalogHeader extends HTMLElement {
         padding: 0;
       }
 
+      a{
+        font-size: 14px;
+        text-transform: uppercase;
+        text-decoration: none;
+        color: var(--pie-brand-color, #333333);
+        transition: color 100ms linear;
+        margin-right: 10px;
+      }
+      
+      a:hover{
+        color: var(--pie-brand-hover-color, #300333);
+      }
+
+      pie-brand{
+        margin-right: 10px;
+      }
+
 
     </style>
     <pie-brand></pie-brand>
+    <a href="//pielabs.github.io/pie-docs/" target="_blank">Documentation</a>
     `;
   }
 
