@@ -7,6 +7,7 @@ export default class ProgresBar extends HTMLElement {
       <style>
         :host{
           display: block;
+          overflow: hidden;
         }
         
         :host([disabled]) #progress{
@@ -16,7 +17,7 @@ export default class ProgresBar extends HTMLElement {
         #progress {
           opacity: 1;
           width: 100%;
-          height: 2px;
+          height: 1px;
           background-color: var(--progress-bar-color, rgba(0,0,0,0.2));
           transition: opacity 100ms ease-in;
           -webkit-transform-origin: right center;

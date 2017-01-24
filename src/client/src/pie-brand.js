@@ -1,30 +1,29 @@
-export default class PieBrand extends HTMLElement{
-  constructor(){
+export default class PieBrand extends HTMLElement {
+  constructor() {
     super();
 
-    let sr = this.attachShadow({mode: 'open'});
+    let sr = this.attachShadow({ mode: 'open' });
 
     sr.innerHTML = `
     <style>
     
     :host{
        cursor: pointer;
+       font-family: 'Patua One', serif;
     }
 
     * {
        font-size: 39px;
     }
 
-    .p{
-      color: #1095D4;
-    }
 
-    .i {
-      color: #64B362;
-    }
-
-    .e {
+    .p, .i, .e {
       color: #404042;
+    }
+
+    .other {
+      color: #64B362;
+      color: #1095D4;
     }
     
     </style>

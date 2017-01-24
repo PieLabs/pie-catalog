@@ -30,8 +30,15 @@ require.ensure([], () => {
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
 
+  const CatalogSchemas = require('./schemas').default;
+  customElements.define('catalog-schemas', CatalogSchemas);
+
+  const { default: IframeHolder } = require('./iframe-holder');
+  customElements.define('iframe-holder', IframeHolder);
+
   const CatalogEntry = require('./catalog-entry').default;
   customElements.define('catalog-entry', CatalogEntry);
+
   const { default: DependenciesPanel, DependencyEl } = require('./dependencies-panel');
   customElements.define('dependencies-panel', DependenciesPanel);
   customElements.define('dependency-el', DependencyEl);
@@ -45,9 +52,6 @@ require.ensure([], () => {
 
   const FancyTabs = require('./fancy-tabs').default;
   customElements.define('fancy-tabs', FancyTabs);
-
-  const CatalogSchemas = require('./schemas').default;
-  customElements.define('catalog-schemas', CatalogSchemas);
 
 }).then(() => {
   let app = document.querySelector('pie-catalog-app');

@@ -32,6 +32,13 @@ export default class PieCatalogApp extends HTMLElement {
           display:none;
         }
 
+        catalog-listings, 
+        catalog-entry,
+        catalog-org {
+          margin: 10px;
+          padding: 10px;
+        } 
+
       </style>
 
       <catalog-header></catalog-header>

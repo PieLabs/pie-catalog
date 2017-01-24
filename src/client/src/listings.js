@@ -9,8 +9,6 @@ export default class CatalogListings extends HTMLElement {
     <style>
         :host {
           display: block;
-          padding: 10px;
-          margin: 10px;
         }
 
         .elements > catalog-listing {

@@ -8,13 +8,22 @@ export default class CatalogOrg extends HTMLElement {
     sr.innerHTML = `
 
     <style>
+
+      :host{
+        display: block;
+      }
       .elements > catalog-listing {
         display: inline-block;
         margin: 4px;
       }
 
+      hr{
+        border: none;
+        border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
+      } 
+
     </style>
-    <h1 id="org">org</h1>
+    <div id="org">org</div>
     <hr/>
     <div class="elements">
     </div>

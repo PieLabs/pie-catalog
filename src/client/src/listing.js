@@ -18,9 +18,14 @@ export default class CatalogListing extends HTMLElement {
         cursor: pointer;
         padding: 10px;
         background-color: white;
-        ${styles.boxShadow}
+        box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+        transition: box-shadow 200ms ease-in;
       }
-      
+
+      :host(:hover){
+        cursor: pointer;
+        box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.4);
+      } 
 
       h4 {
         padding: 0;

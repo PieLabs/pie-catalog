@@ -53,13 +53,10 @@ export default class CatalogEntry extends HTMLElement {
 
       #demo-holder{
         padding-top: 20px;
+        min-height: 500px;
+        height: 400px;
       }
 
-      iframe{
-        width: 100%;
-        height: 500px;
-        background-color: white;
-      }
       
       fancy-tabs{
         margin-top: 10px;
@@ -82,7 +79,7 @@ export default class CatalogEntry extends HTMLElement {
       <button slot="title">schemas</button>
       <div>
         <div id="description"></div>
-        <div id="demo-holder"></div>
+        <iframe-holder id="demo-holder"></iframe-holder>
         <hr/>
         <div id="markdown-holder">
           <markdown-element></markdown-element>
@@ -110,8 +107,8 @@ export default class CatalogEntry extends HTMLElement {
     this._update();
   }
 
-  _update(){
-    if(!this._element){
+  _update() {
+    if (!this._element) {
       return;
     }
     let e = this._element;
@@ -125,7 +122,10 @@ export default class CatalogEntry extends HTMLElement {
       this.dispatchEvent(events.viewOrg(this._element));
     });
 
-    this.shadowRoot.querySelector('info-panel').github = e.github;
+    customElements.whenDefined('info-panel')
+      .then(() => {
+        this.shadowRoot.querySelector('info-panel').github = e.github;
+      });
 
     this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
 
@@ -133,12 +133,12 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
 
-    this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
+    customElements.whenDefined('dependencies-panel').then(() => {
+      this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
+    });
 
     if (e.demoLink) {
-      this.shadowRoot.querySelector('#demo-holder').innerHTML = `
-     <iframe src="${e.demoLink}" frameborder="0"></iframe>
-    `
+      this.shadowRoot.querySelector('#demo-holder').src = e.demoLink;
     }
   }
 
