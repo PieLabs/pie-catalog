@@ -74,8 +74,12 @@ export default class PieCatalogApp extends HTMLElement {
     this._progress.enable();
     return elements.load(org, repo)
       .then(result => {
-        this.shadowRoot.querySelector('catalog-entry').element = result;
-        this._progress.disable();
+        customElements.whenDefined('catalog-entry').then(() => {
+          let entry = this.shadowRoot.querySelector('catalog-entry');
+          console.log('[loadEntry] result:', result);
+          entry.element = result;
+          this._progress.disable();
+        });
       });
   }
 

@@ -97,12 +97,11 @@ export default class CatalogEntry extends HTMLElement {
 
   connectedCallback() {
     console.log('catalog entry connected');
-    console.log('this.element set already?', this.element);
-    this._element = this.element;
     this._update();
   }
 
   set element(e) {
+    console.log('[set element] e:', e);
     this._element = e;
     this._update();
   }
