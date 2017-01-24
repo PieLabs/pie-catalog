@@ -16,18 +16,22 @@ export default class PieBrand extends HTMLElement {
        font-size: 39px;
     }
 
-
-    .p, .i, .e {
+    .pie {
       color: #404042;
+      transition:color 100ms linear;
+      cursor: pointer;
+    }
+    
+    .pie:hover{
+      color: #64B362;
     }
 
     .other {
-      color: #64B362;
       color: #1095D4;
     }
     
     </style>
-    <span class="p">p</span><span class="i">i</span><span class="e">e</span>
+    <span class="pie">pie</span>
     `;
   }
 }

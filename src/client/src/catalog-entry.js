@@ -76,7 +76,7 @@ export default class CatalogEntry extends HTMLElement {
     </div>
     <fancy-tabs>
       <button slot="title">info</button>
-      <button slot="title">schemas</button>
+      <button id="schemas-button" slot="title">schemas</button>
       <div>
         <div id="description"></div>
         <iframe-holder id="demo-holder"></iframe-holder>
@@ -131,7 +131,11 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
-    this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
+    if (!e.schemas || e.schemas.length === 0) {
+      this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
+    } else {
+      this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
+    }
 
     customElements.whenDefined('dependencies-panel').then(() => {
       this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
