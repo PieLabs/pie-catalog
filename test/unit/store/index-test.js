@@ -55,7 +55,6 @@ describe('store', () => {
 
     this.handlers = {};
     this.on = (keyword, handler) => {
-      console.log('keyword: ', keyword, handler);
       this.handlers[keyword] = handler;
     };
 
