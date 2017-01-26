@@ -45,13 +45,10 @@ export default (elementService: ElementService): Router => {
    * ingest a zip file build by [pie-cli](github.com/PieLabs/pie-cli)'s catalog app.
    * The zip is expected to have the following format: 
    * 
-   * - README.md
-   * - docs/schemas/*.json
-   * - docs/demo/example.html
-   * - docs/demo/pie-item.js
-   * - docs/demo/public/*
-   * - version-info.json
-   * - package.json
+   * - pie-pkg/README.md -> to elementService
+   * - pie-pkg/package.json -> to elementService 
+   * - schemas/*.json  -> to elementService
+   * - * -> to demo service
    * 
    * the demo assets are send to an object-store/cdn using a key: 
    * - :org/:repo/:tag?|:sha/:filepath
