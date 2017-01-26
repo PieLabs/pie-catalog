@@ -179,7 +179,7 @@ export default class S3DemoService implements Api {
     return `${this.getRoot(id)}/${name}`
   }
 
-  upload(id: PieId, name: string, stream: Readable, done: (e?: Error) => void): void {
+  upload(id: PieId, name: string, stream: Readable): Promise<any> {
     let params = {
       Bucket: this.bucket,
       Key: this.getKey(id, name),
@@ -188,11 +188,7 @@ export default class S3DemoService implements Api {
     };
 
     logger.debug('[upload], id: ', id, 'name: ', name);
-
-    this.client.upload(params, function (err, data) {
-      logger.silly('[upload] err: ', err, 'data: ', data);
-      done(err);
-    });
+    return this.client.upload(params).promise();
   }
 
   //TODO - how do we set up cloudfront?

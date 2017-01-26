@@ -42,18 +42,20 @@ export default class DemoService implements Api, Router {
     return true;
   }
 
-  upload(id: PieId, name: string, stream: Readable, done: (e?: Error) => void): void {
-    logger.silly('[stream], id', id, name);
-    let path = this.getFilePath(id, name);
-    logger.silly('[stream] path: ', path);
-    ensureDirSync(dirname(path));
-    let ws = createWriteStream(path);
-    ws.on('error', (e) => {
-      logger.error('error writing the file: ', e);
-      done(e);
+  upload(id: PieId, name: string, stream: Readable): Promise<any> {
+    return new Promise((resolve, reject) => {
+      logger.silly('[stream], id', id, name);
+      let path = this.getFilePath(id, name);
+      logger.silly('[stream] path: ', path);
+      ensureDirSync(dirname(path));
+      let ws = createWriteStream(path);
+      ws.on('error', (e) => {
+        logger.error('error writing the file: ', e);
+        reject(e);
+      });
+      ws.on('close', resolve);
+      stream.pipe(ws);
     });
-    ws.on('close', done);
-    stream.pipe(ws);
   }
 
   prefix() {

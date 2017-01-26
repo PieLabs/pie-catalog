@@ -28,6 +28,7 @@ const logger = addLogger('LOG_FACTORY');
 export let init = (log) => {
 
   logger.debug('init: ', log);
+  console.log('init: ', log);
   if (!log) {
     return;
   }
@@ -71,8 +72,7 @@ export let isLogLevel = (l) => _.includes(['error', 'warn', 'info', 'verbose', '
 
 
 export let setDefaultLevel = (l) => {
-  config = config || { 'default': l };
-  config['default'] = l;
+  config = _.merge(config, { 'default': l });
   logger.debug('default level now: ', config['default']);
   _.forEach(winston.loggers.loggers, (value, key) => {
     let logger = winston.loggers.get(key);
