@@ -197,7 +197,7 @@ export default class S3DemoService implements Api {
 
   //TODO - how do we set up cloudfront?
   getDemoLink(id: PieId): string {
-    return `/demo/${this.idToPath(id)}/docs/demo/example.html`;
+    return `/demo/${this.idToPath(id)}/example.html`;
   }
 
 }

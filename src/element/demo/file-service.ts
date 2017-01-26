@@ -61,7 +61,7 @@ export default class DemoService implements Api, Router {
   }
 
   getDemoLink(id: PieId): string {
-    return `${this.prefix()}/${this.toPath(id, 'docs/demo/example.html')}`;
+    return `${this.prefix()}/${this.toPath(id, 'example.html')}`;
   }
 
   /** for the local file store return a static router that serves up the files. */
@@ -72,13 +72,13 @@ export default class DemoService implements Api, Router {
       let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
       rs.pipe(res);
     });
+
     /**
-     * 
-     * Note: We temporarily remove the cdh react and set our custom react here.
+     * Note: We temporarily remove the cdn react and set our custom react here.
      * We may want to update the catalog app to use this custom react and so add it to the markup directly. 
      */
-    r.get(/(.*)\/docs\/demo\/example\.html/, (req, res) => {
-      logger.debug(req.path);
+    r.get(/(.*)\/example\.html/, (req, res) => {
+      logger.debug('[GET example.html]', req.path);
       let markup = readFileSync(join(this.root, req.path), 'utf8');
       res.setHeader('Content-Type', 'text/html')
       res.send(replaceReact(markup, '/demo/react.min.js'));

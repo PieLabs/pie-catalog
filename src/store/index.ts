@@ -96,28 +96,31 @@ export default (elementService: ElementService): Router => {
         });
 
         let name = normalize(header.name);
-        if (_.startsWith(name, 'docs/demo') && header.type === 'file') {
 
-          elementService.demo.upload(id, name, stream, (err) => {
-            next(err);
-          });
-          // stream.pipe(elementService.demo.stream(id, header.name));
-        } else if (_.startsWith(name, 'docs/schemas') && header.type === 'file') {
-          stream
-            .pipe(new StringTransform())
-            .pipe(withJson(json => elementService.saveSchema(id, name, json)));
-        } else if (name === 'README.md') {
-          stream
-            .pipe(new StringTransform())
-            .pipe(withString(s => elementService.saveReadme(id, s)));
-        } else if (name === 'package.json') {
+        if (name === 'pie-pkg/package.json') {
           stream
             .pipe(new StringTransform())
             .pipe(withJson(json => elementService.savePkg(id, json)));
+
+        } else if (name === 'pie-pkg/README.md') {
+          stream
+            .pipe(new StringTransform())
+            .pipe(withString(s => elementService.saveReadme(id, s)));
+
+        } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
+          stream
+            .pipe(new StringTransform())
+            .pipe(withJson(json => elementService.saveSchema(id, name, json)));
+
+        } else if (header.type === 'file') {
+          elementService.demo.upload(id, name, stream, (err) => {
+            next(err);
+          });
         } else {
           logger.debug(`drain this stream: ${name} `)
           stream.resume(); // just auto drain the stream
         }
+
       });
 
       extract.on('error', (e) => {

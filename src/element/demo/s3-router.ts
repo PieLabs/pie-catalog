@@ -63,14 +63,14 @@ export default class S3Router implements Router {
     /**
      * Tweak the html so that it points to the right markup
      */
-    r.get(/(.*)\/docs\/demo\/example\.html/, (req, res) => {
+    r.get(/(.*)\/example\.html/, (req, res) => {
 
       const params = {
         Bucket: this.s3Opts.bucket,
         Key: `${this.s3Opts.prefix}${req.path}`
       }
 
-      logger.silly('[GET example.htm] params: ', params);
+      logger.silly('[GET example.html] params: ', params);
       this.s3.getObject(params, (err, data) => {
 
         if (err) {
