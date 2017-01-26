@@ -2,10 +2,11 @@ import { stub, assert, spy, match } from 'sinon';
 import { expect } from 'chai';
 import proxyquire from 'proxyquire';
 import { Writable, Readable } from 'stream';
+import * as _ from 'lodash';
 
 describe('store', () => {
 
-  let mod, express, router, tarStream, gunzipMaybe, elementService, mkRouter, ingestHandler;
+  let mod, express, router, tarStream, extract, extractHandlers, gunzipMaybe, elementService, mkRouter, ingestHandler;
 
   beforeEach(() => {
 
@@ -28,11 +29,12 @@ describe('store', () => {
 
     elementService = {
       demo: {
-        upload: stub().yields(null)
+        upload: stub().returns(Promise.resolve(null))
       },
       reset: stub().returns(Promise.resolve(null)),
       savePkg: stub().returns(Promise.resolve()),
-      saveReadme: stub().returns(Promise.resolve())
+      saveReadme: stub().returns(Promise.resolve()),
+      saveSchema: stub().returns(Promise.resolve())
     }
 
     mod = proxyquire('../../../lib/store', {
@@ -51,20 +53,73 @@ describe('store', () => {
 
   function MockExtract() {
 
-    let handlers = {};
+    this.handlers = {};
     this.on = (keyword, handler) => {
-      handlers[keyword] = handler;
+      console.log('keyword: ', keyword, handler);
+      this.handlers[keyword] = handler;
     };
+
     this.entry = (header, stream, next) => {
-      handlers.entry(header, stream, next);
+      this.handlers.entry(header, stream, next);
     }
   }
 
-  describe('onEntry', () => {
+  function MockWritable() {
+    this.handlers = {};
+    this.on = function (key, handler) {
+      this.handlers[key] = handler;
+    }
+  }
+
+  describe('POST /ingest/:org/:repo/:tag', () => {
+    let res, responseJson, mockExtract, mockWritable;
+
+    beforeEach((done) => {
+      mockExtract = new MockExtract();
+      tarStream.extract.returns(mockExtract);
+      mockWritable = new MockWritable();
+      mod.writeStream = stub().returns(mockWritable);
+      mkRouter(elementService);
+      let req = {
+        params: {
+          org: 'org', repo: 'repo', tag: '1.0.0'
+        },
+      };
+
+      req.pipe = stub().returns(req);
+
+      res = {}
+      res.status = stub().returns(res);
+      res.json = spy(function (json) {
+        responseJson = json;
+        done();
+      });
+
+      ingestHandler(req, res)
+        .then(() => {
+          mockExtract.handlers.entry({ name: 'name.txt' }, { on: stub() }, stub());
+          mockExtract.handlers.finish();
+          mockWritable.handlers.finish();
+        })
+        .catch(done);
+    });
+
+    it('returns json', () => {
+      assert.calledWith(res.json, { success: true, files: ['name.txt'] });
+    });
+
+    it('returns ok', () => {
+      assert.calledWith(res.status, 200);
+    });
+  });
+
+  describe('writeStream', () => {
     beforeEach(() => {
     });
 
     let handles = (parts, name, assertFn) => {
+
+      let header = _.isObject(name) ? name : { name: name, type: 'file' };
       return (done) => {
         let id = { org: 'org', repo: 'repo', tag: 'tag' }
         let stream = new Readable();
@@ -72,115 +127,46 @@ describe('store', () => {
         parts.forEach(p => stream.push(p));
         stream.push(null);
 
-        let ws = mod.onEntry(id, elementService, { type: 'file', name: name }, stream, (e) => { });
+        let ws = mod.writeStream(id, elementService, stream, header.name, header);
 
-        ws.on('finish', () => {
-          try {
-            assertFn(id);
-            done();
-          } catch (e) {
-            done(e);
-          }
-        });
-        ws.on('error', done);
+        if (ws) {
+          ws.on('finish', () => {
+            try {
+              assertFn(id);
+              done();
+            } catch (e) {
+              done(e);
+            }
+          });
+          ws.on('error', done);
 
+        } else {
+          assertFn(id);
+          done();
+        }
       }
     }
 
-    it.only('handles pie-pkg/package.json', handles(['{', '"hello"', ':', '"there"', '}'], 'pie-pkg/package.json', (id) => {
+    it('handles pie-pkg/package.json', handles(['{', '"hello"', ':', '"there"', '}'], 'pie-pkg/package.json', (id) => {
       assert.calledWith(elementService.savePkg, id, { hello: 'there' });
     }));
 
-    it.only('handles pie-pkg/README.md', handles(['#', 'README'], 'pie-pkg/README.md', (id) => {
+    it('handles pie-pkg/README.md', handles(['#', 'README'], 'pie-pkg/README.md', (id) => {
       assert.calledWith(elementService.saveReadme, id, '#README');
     }));
 
-    // it('handles pie-pkg/package.json', (done) => {
-    //   let id = { org: 'org', repo: 'repo', tag: 'tag' }
-    //   let stream = new Readable();
-    //   stream._read = () => { }
-    //   stream.push('{')
-    //   stream.push('}');
-    //   stream.push(null);
+    it('handles schemas/config.json', handles(['{', '}'], 'schemas/config.json', (id) => {
+      assert.calledWith(elementService.saveSchema, id, 'schemas/config.json', {});
+    }));
 
-    //   let ws = mod.onEntry(id, elementService, { type: 'file', name: 'pie-pkg/package.json' }, stream, (e) => { });
+    it('skips directories', handles([], { name: 'some-dir', type: 'directory' }, (id) => {
+      assert.notCalled(elementService.savePkg);
+      assert.notCalled(elementService.saveReadme);
+    }));
 
-    //   ws.on('finish', () => {
-    //     try {
-    //       assert.calledWith(elementService.savePkg, id, {});
-    //       done();
-    //     } catch (e) {
-    //       done(e);
-    //     }
-    //   });
-    //   ws.on('error', done);
-    // });
-    // let handles = (name, assertFn) => {
-    //   return (done) => {
-    //     let r = mkRouter(elementService);
-    //     let extract = new MockExtract();
-    //     tarStream.extract.returns(extract)
+    it('handles any other files as a demo file', handles([], 'some-file.txt', (id) => {
+      assert.calledWith(elementService.demo.upload, id, 'some-file.txt', match.object);
+    }));
 
-    //     let req = {
-    //       params: {
-    //         org: 'org',
-    //         repo: 'repo',
-    //         tag: '1.0.0',
-    //       },
-    //       pipe: stub().returns(mockReadable())
-
-    //     }
-
-    //     let res = {
-
-    //     }
-
-    //     ingestHandler(req, res)
-    //       .then(() => {
-    //         let next = stub();
-    //         let stream = new Readable();
-    //         let handlers = {};
-    //         stream._read = () => { }
-    //         stream.push('{');
-    //         stream.push('  ');
-    //         stream.push('}');
-    //         stream.push(null);
-    //         stream.on = (key, handler) => {
-    //           handlers[key] = handler;
-    //         }
-
-    //         // stream.pipe(new Writable({
-    //         //   write: function (chunk, enc, done) {
-    //         //     console.log('write args: ', chunk.toString('utf8'));
-    //         //     done();
-    //         //   }
-    //         // })).on('finish', () => {
-    //         //   done();
-    //         // });
-    //         extract.entry({ name: name, type: 'file' }, stream, (err) => {
-    //         });
-
-    //         stream.on('finish', () => {
-    //           assertFn(req);
-    //           done(err);
-    //         });
-    //         stream.on('error', done);
-    //         handlers.end();
-    //       })
-    //       .catch(done);
-    //   }
-    // };
-
-    // it.only('handles pie-pkg/package.json', handles('pie-pkg/package.json', req => {
-    //   assert.calledWith(elementService.savePkg, req.params, {});
-    // }));
-
-    // it('handles docs/demo', handles('docs/demo/example.html', (req) => {
-    //   assert.calledWith(elementService.demo.upload, req.params, 'docs/demo/example.html', match.any, match.func);
-    // }));
-
-    // it('handles ./docs/demo', handles('./docs/demo/example.html', (req) => {
-    //   assert.calledWith(elementService.demo.upload, req.params, 'docs/demo/example.html', match.any, match.func);
-    // }));
   });
 });

@@ -40,7 +40,7 @@ let withJson = (fn: (j: { [key: string]: any }) => Promise<any>): Writable => {
   });
 }
 
-let writeStream = (id: PieId, elementService: ElementService, stream: Readable, name: string, header: any): Writable => {
+export let writeStream = (id: PieId, elementService: ElementService, stream: Readable, name: string, header: any): Writable | void => {
   if (name === 'pie-pkg/package.json') {
     return stream
       .pipe(new StringTransform())
@@ -56,35 +56,18 @@ let writeStream = (id: PieId, elementService: ElementService, stream: Readable, 
       .pipe(new StringTransform())
       .pipe(withJson(json => elementService.saveSchema(id, name, json)));
 
-    // } else if (header.type === 'file') {
-    //   elementService.demo.upload(id, name, stream, (err) => {
-    //     next(err);
-    //   });
+  } else if (header.type === 'file') {
+    let p = elementService.demo.upload(id, name, stream);
+    let w = new Writable();
+    p.then((d) => w.end())
+      .catch(e => w.emit('error', e));
+    return w;
   } else {
     logger.debug(`drain this stream: ${name} `)
     stream.resume(); // just auto drain the stream 
-    let w = new Writable();
-    w.end();
-    return w;
+    return null;
   }
 }
-
-export function onEntry(id: PieId, elementService: ElementService, header: any, stream: Readable, next): Writable {
-  logger.info('entry: ', header);
-  logger.silly('entry: ', header);
-
-
-  stream.on('end', function () {
-    next(); // ready for next entry
-  });
-
-  stream.on('error', function (e) {
-    next(e);
-  });
-
-  let name = normalize(header.name);
-  return writeStream(id, elementService, stream, name, header);
-};
 
 export default (elementService: ElementService): Router => {
 
@@ -116,11 +99,37 @@ export default (elementService: ElementService): Router => {
     logger.info('params: ', req.params);
     logger.info('query: ', req.query);
 
-    let org = req.params.org;
-    let repo = req.params.repo;
-    let tag = req.params.tag;
-
+    let writeStreams = [];
+    let extractComplete = false;
+    let {org, repo, tag} = req.params;
     let id = PieId.build(org, repo, tag);
+
+
+    let respond = (name: string) => {
+      logger.debug('[respond] name: ', name);
+
+      if (!extractComplete) {
+        logger.debug('[respond] name: ', name, 'extraction is not completed.. wait.'); 0
+        return;
+      }
+
+      let {done, pending, error} = _.extend({ done: [], pending: [], error: [] }, _.groupBy(writeStreams, 'status'));
+
+      logger.debug('[respond] name: ', name, 'pending streams count: ', pending.length);
+
+      if (pending.length === 0) {
+
+        if (_.isEmpty(error)) {
+          res.status(200).json({ success: true, files: done.map(d => d.name) });
+        } else {
+          let out = {
+            success: false,
+            errors: _.map(error, e => ({ name: e.name, message: e.error.message }))
+          }
+          res.status(400).json(out);
+        }
+      }
+    }
 
     if (!id) {
       res.status(400).json({ error: `org,repo,tag not valid: ${org}, ${repo}, ${tag}` });
@@ -130,62 +139,47 @@ export default (elementService: ElementService): Router => {
 
       let extract = tar.extract();
 
-      let entries = [];
+      extract.on('entry', (header, stream, next) => {
+        logger.info('entry: ', header);
+        logger.silly('entry: ', header);
 
-      extract.on('entry', onEntry.bind(null, id, elementService));
-      // function (header, stream, next) {
-      //   logger.info('entry: ', header);
-      //   logger.silly('entry: ', header);
+        stream.on('end', function () {
+          next(); // ready for next entry
+        });
 
-      //   entries.push(header.name);
+        stream.on('error', function (e) {
+          next(e);
+        });
 
-      //   stream.on('end', function () {
-      //     next(); // ready for next entry
-      //   });
+        let name = normalize(header.name);
+        let ws = writeStream(id, elementService, stream, name, header);
 
-      //   stream.on('error', function (e) {
-      //     next(e);
-      //   });
+        if (ws) {
+          let writeStatus = { name: name, stream: ws, status: 'pending' };
+          ws.on('finish', () => {
+            writeStatus.status = 'done';
+            respond(name);
+          });
 
-      //   let name = normalize(header.name);
+          ws.on('error', (e) => {
+            writeStatus[name].status = 'error';
+            writeStatus[name].error = e;
+            respond(name);
+          });
 
-      //   if (name === 'pie-pkg/package.json') {
-      //     stream
-      //       .pipe(new StringTransform())
-      //       .pipe(withJson(json => elementService.savePkg(id, json)));
-
-      //   } else if (name === 'pie-pkg/README.md') {
-      //     stream
-      //       .pipe(new StringTransform())
-      //       .pipe(withString(s => elementService.saveReadme(id, s)));
-
-      //   } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
-      //     stream
-      //       .pipe(new StringTransform())
-      //       .pipe(withJson(json => elementService.saveSchema(id, name, json)));
-
-      //   } else if (header.type === 'file') {
-      //     elementService.demo.upload(id, name, stream, (err) => {
-      //       next(err);
-      //     });
-      //   } else {
-      //     logger.debug(`drain this stream: ${name} `)
-      //     stream.resume(); // just auto drain the stream
-      //   }
-
-      // });
+          writeStreams.push(writeStatus);
+        }
+      });
 
       extract.on('error', (e) => {
         logger.error(e);
+        res.status(500).json({ success: false, error: e.message });
       });
 
       extract.on('finish', function () {
         logger.info('all files in tar listed - done!');
-        if (entries.length === 0) {
-          res.status(401).send('Cant read tar file');
-        } else {
-          res.send('done');
-        }
+        extractComplete = true;
+        respond('');
       });
 
       req.pipe(gunzip()).pipe(extract);
