@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { buildLogger } from '../log-factory';
 import * as tar from 'tar-stream';
-import { Writable } from 'stream';
+import { Readable, Writable } from 'stream';
 import * as gunzip from 'gunzip-maybe';
 import * as _ from 'lodash';
 import { PieId, ElementService } from '../element/service';
@@ -22,16 +22,69 @@ let withString = (fn: (j: string) => Promise<any>): Writable => {
 }
 
 let withJson = (fn: (j: { [key: string]: any }) => Promise<any>): Writable => {
+  logger.debug('[withJson]');
   return new Writable({
     write: (chunk: Buffer, enc, done) => {
       let jsonString = chunk.toString('utf8');
-      let json = JSON.parse(jsonString);
-      fn(json)
-        .then(() => done())
-        .catch(e => done(e));
+      logger.silly('[withJson] write: ', jsonString);
+      try {
+        let json = JSON.parse(jsonString);
+        logger.silly('[withJson] json: ', json);
+        fn(json)
+          .then(() => done())
+          .catch(e => done(e));
+      } catch (e) {
+        done(e);
+      }
     }
   });
 }
+
+let writeStream = (id: PieId, elementService: ElementService, stream: Readable, name: string, header: any): Writable => {
+  if (name === 'pie-pkg/package.json') {
+    return stream
+      .pipe(new StringTransform())
+      .pipe(withJson(json => elementService.savePkg(id, json)));
+
+  } else if (name === 'pie-pkg/README.md') {
+    return stream
+      .pipe(new StringTransform())
+      .pipe(withString(s => elementService.saveReadme(id, s)));
+
+  } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
+    return stream
+      .pipe(new StringTransform())
+      .pipe(withJson(json => elementService.saveSchema(id, name, json)));
+
+    // } else if (header.type === 'file') {
+    //   elementService.demo.upload(id, name, stream, (err) => {
+    //     next(err);
+    //   });
+  } else {
+    logger.debug(`drain this stream: ${name} `)
+    stream.resume(); // just auto drain the stream 
+    let w = new Writable();
+    w.end();
+    return w;
+  }
+}
+
+export function onEntry(id: PieId, elementService: ElementService, header: any, stream: Readable, next): Writable {
+  logger.info('entry: ', header);
+  logger.silly('entry: ', header);
+
+
+  stream.on('end', function () {
+    next(); // ready for next entry
+  });
+
+  stream.on('error', function (e) {
+    next(e);
+  });
+
+  let name = normalize(header.name);
+  return writeStream(id, elementService, stream, name, header);
+};
 
 export default (elementService: ElementService): Router => {
 
@@ -79,46 +132,48 @@ export default (elementService: ElementService): Router => {
 
       let entries = [];
 
-      extract.on('entry', function (header, stream, next) {
-        logger.info('entry: ', header);
+      extract.on('entry', onEntry.bind(null, id, elementService));
+      // function (header, stream, next) {
+      //   logger.info('entry: ', header);
+      //   logger.silly('entry: ', header);
 
-        entries.push(header.name);
+      //   entries.push(header.name);
 
-        stream.on('end', function () {
-          next(); // ready for next entry
-        });
+      //   stream.on('end', function () {
+      //     next(); // ready for next entry
+      //   });
 
-        stream.on('error', function (e) {
-          next(e);
-        });
+      //   stream.on('error', function (e) {
+      //     next(e);
+      //   });
 
-        let name = normalize(header.name);
+      //   let name = normalize(header.name);
 
-        if (name === 'pie-pkg/package.json') {
-          stream
-            .pipe(new StringTransform())
-            .pipe(withJson(json => elementService.savePkg(id, json)));
+      //   if (name === 'pie-pkg/package.json') {
+      //     stream
+      //       .pipe(new StringTransform())
+      //       .pipe(withJson(json => elementService.savePkg(id, json)));
 
-        } else if (name === 'pie-pkg/README.md') {
-          stream
-            .pipe(new StringTransform())
-            .pipe(withString(s => elementService.saveReadme(id, s)));
+      //   } else if (name === 'pie-pkg/README.md') {
+      //     stream
+      //       .pipe(new StringTransform())
+      //       .pipe(withString(s => elementService.saveReadme(id, s)));
 
-        } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
-          stream
-            .pipe(new StringTransform())
-            .pipe(withJson(json => elementService.saveSchema(id, name, json)));
+      //   } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
+      //     stream
+      //       .pipe(new StringTransform())
+      //       .pipe(withJson(json => elementService.saveSchema(id, name, json)));
 
-        } else if (header.type === 'file') {
-          elementService.demo.upload(id, name, stream, (err) => {
-            next(err);
-          });
-        } else {
-          logger.debug(`drain this stream: ${name} `)
-          stream.resume(); // just auto drain the stream
-        }
+      //   } else if (header.type === 'file') {
+      //     elementService.demo.upload(id, name, stream, (err) => {
+      //       next(err);
+      //     });
+      //   } else {
+      //     logger.debug(`drain this stream: ${name} `)
+      //     stream.resume(); // just auto drain the stream
+      //   }
 
-      });
+      // });
 
       extract.on('error', (e) => {
         logger.error(e);
