@@ -6,7 +6,7 @@ import * as http from 'http';
 import { buildLogger } from '../../log-factory';
 import * as url from 'url';
 import * as _ from 'lodash';
-import { GithubService } from '../../github';
+import { GithubService } from '../github';
 
 const logger = buildLogger();
 

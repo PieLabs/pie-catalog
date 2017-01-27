@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { PieId, ElementService } from '../element/service';
+import { PieId, ElementService } from '../services';
 import { buildLogger } from '../log-factory';
 const logger = buildLogger();
 

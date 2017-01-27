@@ -1,4 +1,4 @@
-import { PieId, KeyMap } from '../types';
+import { PieId, KeyMap } from '../../types';
 import { DemoService } from './demo/service';
 import { GithubService } from '../github';
 
@@ -28,7 +28,7 @@ export interface ElementService {
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
 
-  delete(org:string, repo: string) : Promise<DeleteResult>;
+  delete(org: string, repo: string): Promise<DeleteResult>;
 
   load(org: string, repo: string): Promise<Element>;
 }

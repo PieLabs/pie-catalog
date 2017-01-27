@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from '../../log-factory';
 import { Readable } from 'stream';
 import * as url from 'url';
 import * as _ from 'lodash';

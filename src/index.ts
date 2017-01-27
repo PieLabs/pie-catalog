@@ -7,7 +7,7 @@ import mkApi from './api';
 import { init } from './log-factory';
 import { join } from 'path';
 import { getLogger } from './log-factory';
-import { bootstrap, buildOpts } from './bootstrap-services';
+import { bootstrap, buildOpts } from './services';
 import * as minimist from 'minimist';
 
 var argv = require('minimist')(process.argv.slice(2));

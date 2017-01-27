@@ -1,4 +1,4 @@
-import { PieId } from '../../types';
+import { PieId } from '../../../types';
 import { Readable, Writable } from 'stream';
 import * as express from 'express';
 
