@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import proxyquire from 'proxyquire';
 import { Writable, Readable } from 'stream';
 import * as _ from 'lodash';
+import { MockRouter } from '../helpers';
 
 describe('store', () => {
 
@@ -10,12 +11,7 @@ describe('store', () => {
 
   beforeEach(() => {
 
-    router = {
-      get: stub(),
-      post: spy(function (key, fn) {
-        ingestHandler = fn;
-      })
-    }
+    router = new MockRouter();
 
     express = {
       Router: stub().returns(router)
@@ -77,15 +73,15 @@ describe('store', () => {
       writables = [];
       mockExtract = new MockExtract();
       tarStream.extract.returns(mockExtract);
-      
-      mod.writeStream = spy( function() {
+
+      mod.writeStream = spy(function () {
         let w = new MockWritable();
         writables.push(w);
         return w;
       });
 
       mkRouter(elementService);
-      
+
       let req = {
         params: {
           org: 'org', repo: 'repo', tag: '1.0.0'
@@ -100,6 +96,8 @@ describe('store', () => {
         responseJson = json;
         done();
       });
+
+      ingestHandler = router.handlers.post['/ingest/:org/:repo/:tag'];
 
       ingestHandler(req, res)
         .then(() => {
