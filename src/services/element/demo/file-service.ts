@@ -1,12 +1,15 @@
 import { PieId, DemoService as Api, DemoRouter as Router } from './service';
 import { Readable, Writable } from 'stream';
-import { remove, readFileSync, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
+import { remove, readFile, readJson, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
 import { buildLogger } from '../../../log-factory';
 import * as bluebird from 'bluebird';
 import { replaceReact } from './utils';
 const logger = buildLogger();
+
+let readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
+let readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
 
 export default class DemoService implements Api, Router {
 
@@ -66,12 +69,22 @@ export default class DemoService implements Api, Router {
     return `${this.prefix()}/${this.toPath(id, 'example.html')}`;
   }
 
+  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
+    return Promise.all(
+      [
+        readJsonAsync(this.getFilePath(id, 'config.json'), 'utf8'),
+        readFileAsync(this.getFilePath(id, 'index.html'), 'utf8')
+      ]).then(([config, markup]) => {
+        return { config, markup };
+      });
+  }
+
   /** for the local file store return a static router that serves up the files. */
   router() {
     let r = express.Router();
 
     r.get('/react.min.js', (req, res) => {
-      let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
+      let rs = createReadStream(join(__dirname, '../../../../lib/element/demo/react-w-tap-event.js'));
       rs.pipe(res);
     });
 
@@ -79,9 +92,9 @@ export default class DemoService implements Api, Router {
      * Note: We temporarily remove the cdn react and set our custom react here.
      * We may want to update the catalog app to use this custom react and so add it to the markup directly. 
      */
-    r.get(/(.*)\/example\.html/, (req, res) => {
+    r.get(/(.*)\/example\.html/, async (req, res) => {
       logger.debug('[GET example.html]', req.path);
-      let markup = readFileSync(join(this.root, req.path), 'utf8');
+      let markup = await readFileAsync(join(this.root, req.path), 'utf8');
       res.setHeader('Content-Type', 'text/html')
       res.send(replaceReact(markup, '/demo/react.min.js'));
     });

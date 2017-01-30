@@ -9,8 +9,17 @@ export type ListOpts = { limit: number, skip: number };
 export type ElementLite = { org: string, repo: string, description: string, tag: string }
 
 export type Element = {
-  org: string, repo: string, description: string, tag: string,
-  readme: string, pkg: any, schemas: any[]
+  org: string,
+  repo: string,
+  description: string,
+  tag: string,
+  readme: string,
+  pkg: any,
+  schemas: any[],
+  demo: {
+    config: any,
+    markup: string
+  }
 }
 
 export type DeleteResult = {

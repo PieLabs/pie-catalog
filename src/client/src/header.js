@@ -51,7 +51,8 @@ export default class CatalogHeader extends HTMLElement {
     console.log('connected header');
 
     this.shadowRoot.querySelector('pie-brand').addEventListener('click', e => {
-      this.dispatchEvent(new CustomEvent('home-click', { bubbles: true }));
+      document.location.pathname = '/';
+      // this.dispatchEvent(new CustomEvent('home-click', { bubbles: true }));
     });
   }
 }

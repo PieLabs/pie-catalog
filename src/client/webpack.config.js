@@ -4,16 +4,29 @@ var CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
   context: path.join(__dirname),
-  entry: './src/entry.js',
+  entry: {
+    index: './src/entry.js',
+    repo: './src/repo-entry.js',
+    org: './src/org-entry.js'
+  },
   output: {
     publicPath: '/',
     path: path.join(__dirname, 'public'),
-    filename: 'app.js',
-    chunkFilename: '[id].app.js'
+    filename: '[name].js',
+    chunkFilename: '[chunkhash].[id].js'
   },
   module: {
+
     loaders: [
-      { test: /\.css$/, loader: ['raw-loader'] }
+      { test: /\.css$/, use: ['raw-loader'] },
+      {
+        test: /\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'less-loader'
+        ]
+      }
     ]
   },
   resolve: {

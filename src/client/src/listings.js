@@ -23,6 +23,10 @@ export default class CatalogListings extends HTMLElement {
 
   set elements(e) {
     this._elements = e;
+    if (!this._elements) {
+      return;
+    }
+
     let markup = this._elements.map((n, index) => {
       return `<catalog-listing data-index="${index}"></catalog-listing>`;
     });

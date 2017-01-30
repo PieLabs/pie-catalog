@@ -21,7 +21,7 @@ let customReactKey = (prefix: string) => `${prefix}/react.min.js`;
 export default class S3Router implements Router {
 
   static build(s3: S3, opts: S3Opts): Promise<S3Router> {
-    let rs = createReadStream(join(__dirname, '../../../lib/element/demo/react-w-tap-event.js'));
+    let rs = createReadStream(join(__dirname, '../../../../lib/element/demo/react-w-tap-event.js'));
 
     return new Promise((resolve, reject) => {
       const params = {
