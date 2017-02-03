@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import proxyquire from 'proxyquire';
 import { Writable, Readable } from 'stream';
 import * as _ from 'lodash';
+import { MockRouter } from '../helpers';
 
 describe('store', () => {
 
@@ -10,12 +11,7 @@ describe('store', () => {
 
   beforeEach(() => {
 
-    router = {
-      get: stub(),
-      post: spy(function (key, fn) {
-        ingestHandler = fn;
-      })
-    }
+    router = new MockRouter();
 
     express = {
       Router: stub().returns(router)
@@ -71,14 +67,21 @@ describe('store', () => {
   }
 
   describe('POST /ingest/:org/:repo/:tag', () => {
-    let res, responseJson, mockExtract, mockWritable;
+    let res, responseJson, mockExtract, writables;
 
     beforeEach((done) => {
+      writables = [];
       mockExtract = new MockExtract();
       tarStream.extract.returns(mockExtract);
-      mockWritable = new MockWritable();
-      mod.writeStream = stub().returns(mockWritable);
+
+      mod.writeStream = spy(function () {
+        let w = new MockWritable();
+        writables.push(w);
+        return w;
+      });
+
       mkRouter(elementService);
+
       let req = {
         params: {
           org: 'org', repo: 'repo', tag: '1.0.0'
@@ -94,17 +97,22 @@ describe('store', () => {
         done();
       });
 
+      ingestHandler = router.handlers.post['/ingest/:org/:repo/:tag'];
+
       ingestHandler(req, res)
         .then(() => {
           mockExtract.handlers.entry({ name: 'name.txt' }, { on: stub() }, stub());
+          mockExtract.handlers.entry({ name: 'test.txt' }, { on: stub() }, stub());
           mockExtract.handlers.finish();
-          mockWritable.handlers.finish();
+          writables.forEach(w => {
+            w.handlers.finish();
+          });
         })
         .catch(done);
     });
 
     it('returns json', () => {
-      assert.calledWith(res.json, { success: true, files: ['name.txt'] });
+      assert.calledWith(res.json, { success: true, files: ['name.txt', 'test.txt'] });
     });
 
     it('returns ok', () => {
@@ -113,8 +121,6 @@ describe('store', () => {
   });
 
   describe('writeStream', () => {
-    beforeEach(() => {
-    });
 
     let handles = (parts, name, assertFn) => {
 
@@ -161,6 +167,7 @@ describe('store', () => {
     it('skips directories', handles([], { name: 'some-dir', type: 'directory' }, (id) => {
       assert.notCalled(elementService.savePkg);
       assert.notCalled(elementService.saveReadme);
+      assert.notCalled(elementService.saveSchema);
     }));
 
     it('handles any other files as a demo file', handles([], 'some-file.txt', (id) => {

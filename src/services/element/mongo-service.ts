@@ -10,7 +10,7 @@ import {
   GithubService
 } from './service';
 import { Collection } from 'mongodb';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from '../../log-factory';
 import * as _ from 'lodash';
 
 const logger = buildLogger();
@@ -44,10 +44,6 @@ export default class ElementService implements Api {
     logger.debug('[delete], org: ', org, 'repo: ', repo);
 
     let query = { org: org, repo: repo };
-    logger.silly('[delete]: query:', query);
-    let count = await this.collection.count(query);
-    logger.silly('[delete] count: ', count);
-
     let removeResult = await this.collection.findOneAndDelete(query);
     logger.silly('[delete] removeResult: ', removeResult);
 

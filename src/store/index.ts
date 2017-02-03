@@ -4,7 +4,7 @@ import * as tar from 'tar-stream';
 import { Readable, Writable } from 'stream';
 import * as gunzip from 'gunzip-maybe';
 import * as _ from 'lodash';
-import { PieId, ElementService } from '../element/service';
+import { PieId, ElementService } from '../services';
 import { StringTransform } from './transforms';
 import { normalize } from 'path';
 
@@ -190,4 +190,3 @@ export default (elementService: ElementService): Router => {
 
   return router;
 }
-

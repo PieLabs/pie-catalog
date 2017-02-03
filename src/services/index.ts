@@ -1,14 +1,17 @@
-import { FileBackend, AvatarService, router as getClientRouter } from './client';
-import { init } from './log-factory';
-import ElementService from './element/mongo-service';
+import MongoService from './element/mongo-service';
+import { ElementService } from './element/service';
 import DemoFileService from './element/demo/file-service';
 import DemoS3Service from './element/demo/s3-service';
 import DemoS3Router from './element/demo/s3-router';
 import { DemoService, DemoRouter } from './element/demo/service';
 import { MongoClient, Db } from 'mongodb';
-import { buildLogger } from './log-factory';
+import { buildLogger } from '../log-factory';
 import { MainGithubService } from './github';
+import AvatarService, { FileBackend } from './avatar';
 import { join } from 'path';
+import { PieId } from '../types';
+
+export { PieId, ElementService, AvatarService }
 
 export type Services = {
   avatar: AvatarService,
@@ -63,7 +66,7 @@ export async function bootstrap(opts: BootstrapOpts): Promise<Services> {
   const collection = db.collection('elements');
   const {service: demoService, router: demoRouter} = await demoServiceAndRouter(opts);
   const github = new MainGithubService();
-  const element = new ElementService(collection, demoService, github);
+  const element = new MongoService(collection, demoService, github);
   const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
   const avatar = new AvatarService(avatarBackend, github);
   const onError = () => db.close();

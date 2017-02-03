@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from '../../log-factory';
 import { Readable } from 'stream';
 import * as url from 'url';
 import * as _ from 'lodash';
@@ -36,7 +36,7 @@ export class MainGithubService implements GithubService {
 
   async loadInfo(org: string, repo: string): Promise<any> {
 
-    let url = `http://api.github.com/repos/${org}/${repo}`;
+    let url = `https://api.github.com/repos/${org}/${repo}`;
     logger.info('[loadInfo] url: ', url);
 
     let response = await fetch(url);

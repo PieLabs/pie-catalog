@@ -4,12 +4,11 @@ import { buildLogger } from '../log-factory';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
 import * as r from 'resolve';
-import AvatarService, { AvatarBackend, FileBackend } from './services/avatar-service';
+import { AvatarService } from '../services';
 import * as gzip from './middleware/gzip';
 import { lookup } from 'mime-types';
 import { stat } from 'fs-extra';
 
-export { AvatarService, AvatarBackend, FileBackend }
 
 const logger = buildLogger();
 
