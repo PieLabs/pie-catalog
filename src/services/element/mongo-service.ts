@@ -119,11 +119,12 @@ export default class ElementService implements Api {
     return this._list({ org: org }, opts);
   }
 
-  load(org: string, repo: string) {
-    return this.collection.findOne({ org: org, repo: repo })
-      .then(r => {
-        return r;
-      });
+  async load(org: string, repo: string) {
+    let r = await this.collection.findOne({ org: org, repo: repo });
+
+    //TODO: should we store this in the db instead of getting it from the demo service?
+    let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
+    return _.merge(r, { demo: demo });
   }
 
   async list(opts: ListOpts = { skip: 0, limit: 0 }) {

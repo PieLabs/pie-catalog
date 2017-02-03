@@ -9,6 +9,7 @@ export interface DemoService {
   delete(id: PieId): Promise<boolean>;
   deleteAll(org: string, repo: string): Promise<boolean>;
   getDemoLink(id: PieId): string;
+  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }>
 }
 
 export interface DemoRouter {

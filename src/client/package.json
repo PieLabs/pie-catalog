@@ -9,14 +9,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "json-schema-element": "PieLabs/json-schema-element#develop",
-    "highlight.js": "^9.9.0",
-    "marked": "^0.3.6",
-    "octicons": "^5.0.1",
-    "time-elements": "^0.6.1"
   },
   "devDependencies": {
+    "highlight.js": "^9.9.0",
+    "json-schema-element": "PieLabs/json-schema-element#develop",
+    "marked": "^0.3.6",
+    "octicons": "^5.0.1",
+    "time-elements": "^0.6.1",
+    "less": "^2.7.2",
     "css-loader": "^0.26.1",
+    "less-loader": "^2.2.3",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.13.1"
   }

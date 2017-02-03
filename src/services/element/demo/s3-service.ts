@@ -150,6 +150,20 @@ export default class S3DemoService implements Api {
     });
   }
 
+
+  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
+
+    let markupRequest = this.client.getObject({ Bucket: this.bucket, Key: this.getKey(id, 'index.html') });
+    let configRequest = this.client.getObject({ Bucket: this.bucket, Key: this.getKey(id, 'config.json') });
+
+    return Promise.all([
+      markupRequest.promise(),
+      configRequest.promise()])
+      .then(([m, c]) => {
+        return { markup: m.Body.toString(), config: JSON.parse(c.Body.toString()) }
+      });
+  }
+
   deleteAll(org: string, repo: string) {
     return this.withPromise(
       emptyDir.bind(this, this.client, this.bucket, `${this.prefix}/${org}/${repo}`)

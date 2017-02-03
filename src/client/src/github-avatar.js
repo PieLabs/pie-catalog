@@ -1,17 +1,4 @@
-/**
- * Note: cant subclass HTMLImageElement yet see: https://www.chromestatus.com/feature/4670146924773376
- */
-
-export class LoadAvatarEvent extends CustomEvent {
-  constructor(user, url) {
-
-    super(LoadAvatarEvent.TYPE, { bubbles: true, composed: true });
-    this.user = user;
-    this.setUrl = url;
-  }
-}
-
-LoadAvatarEvent.prototype.TYPE = 'load-avatar';
+import { LoadAvatar } from './avatar-service';
 
 export default class GithubAvatar extends HTMLElement {
 
@@ -29,31 +16,32 @@ export default class GithubAvatar extends HTMLElement {
   }
 
   static get observedAttributes() {
-    return ['user'];
+    return ['user', 'url'];
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    if (name === 'user') {
-      if (newValue) {
-        this.loadAvatar();
-      }
+    console.log('attr changed:', arguments);
+    if (name === 'user' && newValue) {
+      //remove the old url
+      this.removeAttribute('url');
+      this.loadAvatar();
+    } else if (name === 'url' && newValue) {
+      this.shadowRoot
+        .querySelector('img')
+        .setAttribute('src', this.getAttribute('url'));
     }
   }
 
   loadAvatar() {
     let user = this.getAttribute('user');
-
     if (user) {
-      this.dispatchEvent(new LoadAvatarEvent(user, (url) => {
-        this.shadowRoot
-          .querySelector('img')
-          .setAttribute('src', url);
-      }));
+      console.log('dispatch event ..')
+      this.dispatchEvent(new LoadAvatar(user, this));
     }
   }
 
   connectedCallback() {
-    let img  = this.shadowRoot.querySelector('img');
+    let img = this.shadowRoot.querySelector('img');
     img.setAttribute('width', this.getAttribute('size'));
     img.setAttribute('height', this.getAttribute('size'));
     this.loadAvatar();
