@@ -10,7 +10,6 @@ export default class CatalogEntry extends HTMLElement {
 
       :host {
         display: block;
-        padding: 10px;
         position:relative;
       }
 
@@ -39,7 +38,7 @@ export default class CatalogEntry extends HTMLElement {
       }
 
       #demo-holder{
-        margin-bottom: 10px;
+        margin-bottom: 0px;
       }
 
       .header{
@@ -53,8 +52,6 @@ export default class CatalogEntry extends HTMLElement {
 
       #demo-holder{
         padding-top: 20px;
-        min-height: 500px;
-        height: 400px;
       }
 
       
@@ -79,7 +76,9 @@ export default class CatalogEntry extends HTMLElement {
       <button id="schemas-button" slot="title">schemas</button>
       <div>
         <div id="description"></div>
-        <iframe-holder id="demo-holder"></iframe-holder>
+        <div id="demo-holder">
+          <slot></slot>
+        </div>
         <hr/>
         <div id="markdown-holder">
           <markdown-element></markdown-element>
@@ -96,15 +95,14 @@ export default class CatalogEntry extends HTMLElement {
   }
 
   connectedCallback() {
-    console.log('catalog entry connected');
     this._update();
   }
 
   set element(e) {
-    console.log('[set element] e:', e);
     this._element = e;
     this._update();
   }
+
 
   _update() {
     if (!this._element) {
@@ -140,9 +138,6 @@ export default class CatalogEntry extends HTMLElement {
       this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
     });
 
-    if (e.demoLink) {
-      this.shadowRoot.querySelector('#demo-holder').src = e.demoLink;
-    }
   }
 
 }

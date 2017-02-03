@@ -26,7 +26,7 @@ bootstrap(opts)
   .then(({demoService, avatar, element, onError, demoRouter}) => {
 
     const app = express();
-    const client = getClientRouter(avatar);
+    const client = getClientRouter(avatar, element);
     app.set('view engine', 'pug');
 
     //client router

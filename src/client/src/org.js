@@ -23,7 +23,7 @@ export default class CatalogOrg extends HTMLElement {
       } 
 
     </style>
-    <div id="org">org</div>
+    <div id="org"></div>
     <hr/>
     <div class="elements">
     </div>
