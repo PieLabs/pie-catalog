@@ -9,6 +9,7 @@ import * as gzip from './middleware/gzip';
 import { lookup } from 'mime-types';
 import { stat } from 'fs-extra';
 import * as jsesc from 'jsesc';
+import * as _ from 'lodash';
 
 const logger = buildLogger();
 
@@ -85,10 +86,11 @@ export function router(
     elementService.load(org, repo)
       .then(el => {
         res.render('repo', {
-          js: [
+          js: _.concat(el.externals ? el.externals.js : [], [
             '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js',
             '/demo/react.min.js'
-          ],
+          ]),
+          css: el.externals ? el.externals.css : [],
           org: org,
           repo: repo,
           demo: {
@@ -109,7 +111,13 @@ export function router(
     let {org, repo} = req.params;
     logger.info(req.headers);
     logger.info(req.params);
-    res.redirect(`/demo/${org}/${repo}/1.5.0/${req.params[0]}`);
+    elementService.tag(org, repo)
+      .then(tag => {
+        res.redirect(`/demo/${org}/${repo}/${tag}/${req.params[0]}`);
+      })
+      .catch(e => {
+        res.status(404).send();
+      });
   });
 
   router.get('/org/*', (req, res, next) => {

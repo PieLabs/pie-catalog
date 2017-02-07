@@ -51,6 +51,16 @@ export let writeStream = (id: PieId, elementService: ElementService, stream: Rea
       .pipe(new StringTransform())
       .pipe(withString(s => elementService.saveReadme(id, s)));
 
+  } else if (name === 'pie-pkg/externals.json') {
+    return stream
+      .pipe(new StringTransform())
+      .pipe(withJson(s => {
+        let externals = {
+          js: s['js'] || [],
+          css: s['css'] || []
+        }
+        return elementService.saveExternals(id, externals);
+      }));
   } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
     return stream
       .pipe(new StringTransform())

@@ -88,6 +88,16 @@ export default class ElementService implements Api {
     return this.update(id, update);
   }
 
+
+  saveExternals(id: PieId, externals: any) {
+    let update = {
+      $set: {
+        externals: externals
+      }
+    }
+    return this.update(id, update);
+  }
+
   saveReadme(id: PieId, readme: string) {
 
     let update = {
@@ -119,12 +129,19 @@ export default class ElementService implements Api {
     return this._list({ org: org }, opts);
   }
 
+  tag(org: string, repo: string) {
+    return this.collection.findOne({ org: org, repo: repo }, { fields: { tag: 1 } })
+      .then((r) => r.tag);
+  }
+
   async load(org: string, repo: string) {
     let r = await this.collection.findOne({ org: org, repo: repo });
 
     //TODO: should we store this in the db instead of getting it from the demo service?
     let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
-    return _.merge(r, { demo: demo });
+    let out = _.merge(r, { demo: demo });
+    logger.silly('[load] out: ', out);
+    return out;
   }
 
   async list(opts: ListOpts = { skip: 0, limit: 0 }) {
