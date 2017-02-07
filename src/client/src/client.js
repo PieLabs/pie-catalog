@@ -1,8 +1,28 @@
+const status = (response) => {
+  if (response.status >= 200 && response.status < 300) {
+    return Promise.resolve(response)
+  } else {
+    return Promise.reject(new Error(response.statusText))
+  }
+}
+
+const json = (response) => response.json();
+
 class Elements {
+
+  version() {
+    return fetch('/version')
+      .then(status)
+      .then(json)
+      .catch(e => {
+        console.log('/version error: ', e);
+        Promise.resolve();
+      });
+  }
 
   list() {
     return fetch('/api/element')
-      .then(response => response.json())
+      .then(json)
       .catch(e => {
         console.error(e);
       });
@@ -10,14 +30,8 @@ class Elements {
 
   load(org, repo) {
     return fetch(`/api/element/${org}/${repo}`)
-      .then(response => {
-        if (response.ok) {
-          return response;
-        } else {
-          throw new Error('error: ' + response.statusText);
-        }
-      })
-      .then(r => r.json())
+      .then(status)
+      .then(json)
       .catch(e => {
         console.error(e);
       });
@@ -25,14 +39,8 @@ class Elements {
 
   listByOrg(org) {
     return fetch(`/api/org/${org}`)
-      .then(response => {
-        if (response.ok) {
-          return response;
-        } else {
-          throw new Error('error: ' + response.statusText);
-        }
-      })
-      .then(r => r.json())
+      .then(status)
+      .then(json)
       .catch(e => {
         console.error(e);
       });

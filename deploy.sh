@@ -18,9 +18,15 @@ EOL
 
 echo "$PROC_FILE" > .deployment/Procfile
 
+GIT_VERSION="$(git describe --always)"
+echo "$GIT_VERSION" 
+echo "$GIT_VERSION" > .deployment/.git-version
+
 chmod +x .deployment/Procfile
+
 cp -rv node_modules .deployment/node_modules 
 cp -rv lib .deployment/lib
+cp -rv package.json .deployment/package.json 
 
 tar -czvf artifact.tgz -C .deployment .
 

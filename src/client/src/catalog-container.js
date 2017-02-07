@@ -37,6 +37,7 @@ export default class CatalogContainer extends HTMLElement {
       <div id="content">
         <slot></slot>
       </div>
+      <catalog-footer></catalog-footer>
     `;
   }
 
@@ -47,6 +48,11 @@ export default class CatalogContainer extends HTMLElement {
   get _content() {
     return this.shadowRoot.querySelector('#content');
   }
+
+  set version(v) {
+    this.shadowRoot.querySelector('catalog-footer').version = v;
+  }
+
 
   isLoading(loading) {
     if (!this._progressBar) {

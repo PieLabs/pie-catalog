@@ -7,9 +7,19 @@ import * as r from 'resolve';
 import { AvatarService, ElementService } from '../services';
 import * as gzip from './middleware/gzip';
 import { lookup } from 'mime-types';
-import { stat } from 'fs-extra';
+import { stat, readJson, readFile, exists } from 'fs-extra';
 import * as jsesc from 'jsesc';
 import * as _ from 'lodash';
+import * as bluebird from 'bluebird';
+
+
+
+const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
+const existsAsync = (p) => new Promise((resolve) => {
+  exists(p, (e) => resolve(e));
+});
+
+const readFileAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readFile);
 
 const logger = buildLogger();
 
@@ -31,6 +41,35 @@ export function router(
   }
 
   const router: express.Router = express.Router();
+
+  let tryToLoad = async (p: string) => {
+    let filepath = join(__dirname, p);
+    logger.info(`[tryToLoad] ${filepath}`);
+
+    let exists = await existsAsync(filepath);
+    if (exists) {
+      return await readFileAsync(filepath, 'utf8')
+        .catch(e => {
+          logger.error(e);
+          return null;
+        });
+    } else {
+      logger.info(`[tryToLoad] filepath: ${filepath} does not exist`);
+      return null;
+    }
+  }
+
+  let loadVersionInfo = async () => {
+    logger.debug('load version info...');
+    let pkg = await tryToLoad('../../package.json');
+    let sha = await tryToLoad('../../.git-version').then(s => s ? s.trim() : null);
+    logger.info(`got pkg: ${pkg}`);
+    logger.info(`got sha: ${sha}`);
+    let version = pkg ? JSON.parse(pkg).version : null;
+    return { version, sha }
+  }
+
+  let loadVersionInfoOnce = _.memoize(loadVersionInfo);
 
   if (env === 'dev') {
 
@@ -54,6 +93,16 @@ export function router(
     avatarService.stream('github', req.params.user)
       .then(s => s.pipe(res))
       .catch(next);
+  });
+
+  router.get('/version', (req, res) => {
+
+    loadVersionInfoOnce()
+      .then(v => res.json(v))
+      .catch(e => {
+        logger.error('[GET /version]', e.message);
+        res.status(404);
+      });
   });
 
   router.get('/', (req, res) => {

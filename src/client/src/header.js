@@ -15,7 +15,6 @@ export default class CatalogHeader extends HTMLElement {
         padding-left: 5px;
         background-color: var(--catalog-header-bg, green);
         border-bottom: solid 1px var(--shadow-color, #cccccc);
-
       }
       
       h1 {
