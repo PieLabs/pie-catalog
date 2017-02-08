@@ -26,7 +26,7 @@ export default class CatalogFooter extends HTMLElement {
     console.log('version: ', v);
     if (v) {
       this._$version.textContent = v.version;
-      if (v.sha) {
+      if (v.sha && v.sha !== `v${v.version}`) {
         this._$version.textContent += ` : ${v.sha}`;
       }
     }
