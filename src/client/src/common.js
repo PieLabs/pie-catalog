@@ -9,6 +9,9 @@ customElements.define('catalog-listing', CatalogListing);
 import CatalogHeader from './header';
 customElements.define('catalog-header', CatalogHeader);
 
+import CatalogFooter from './footer';
+customElements.define('catalog-footer', CatalogFooter);
+
 import CatalogOrg from './org';
 customElements.define('catalog-org', CatalogOrg);
 

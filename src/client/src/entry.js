@@ -6,15 +6,19 @@ import { VIEW_REPO, VIEW_ORG } from './events';
 
 document.addEventListener('DOMContentLoaded', () => {
 
+  let container = document.querySelector('catalog-container');
+
   customElements.whenDefined('catalog-container')
     .then(() => {
-      document.querySelector('catalog-container').isLoading(true);
-      return common.elements.list();
+      container.isLoading(true);
+      return Promise.all([common.elements.list(), common.elements.version()]);
     })
-    .then((list) => {
+    .then(([list, version]) => {
       let listings = document.querySelector('catalog-listings');
       listings.elements = list.elements;
-      document.querySelector('catalog-container').isLoading(false);
+      console.log('set version to: ', version);
+      container.version = version;
+      container.isLoading(false);
     });
 });
 

@@ -8,7 +8,7 @@ export default class ControlPanel extends HTMLElement {
     :host{
       padding-bottom: 6px;
       --select-field-font-family: 'Droid Sans', sans-serif;
-      border-bottom: solid 1px #dddddd;
+      --select-option-selected-color: var(--pie-brand-hover-color);
       margin-bottom: 10px;
     }
 

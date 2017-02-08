@@ -79,7 +79,6 @@ export default class CatalogEntry extends HTMLElement {
         <div id="demo-holder">
           <slot></slot>
         </div>
-        <hr/>
         <div id="markdown-holder">
           <markdown-element></markdown-element>
         </div>

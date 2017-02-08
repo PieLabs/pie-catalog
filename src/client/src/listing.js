@@ -12,8 +12,8 @@ export default class CatalogListing extends HTMLElement {
     <style>
      :host{
         width: 300px;
-        height: 100px;
-        max-height: 100px;
+        height: 120px;
+        max-height: 120px;
         display: block;
         cursor: pointer;
         padding: 10px;
@@ -48,12 +48,27 @@ export default class CatalogListing extends HTMLElement {
         align-items: center;
         padding: 2px;
       }
+      
       #org{
         padding: 6px;
       }
+
+      #repo{
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      #tag{
+        font-size: 12px;
+        margin-top: 4px;
+        margin-bottom: 4px;
+      }
+
     </style>
 
     <h4 id="repo"></h4>
+    <div id="tag"></div>
     <span id="description"></span>
     <hr/>
     <div class="footer">
@@ -61,14 +76,22 @@ export default class CatalogListing extends HTMLElement {
       <label id="org"></label>
     </div>
     `;
+
+    this._$org = this.shadowRoot.querySelector('#org');
+    this._$repo = this.shadowRoot.querySelector('#repo');
+    this._$tag = this.shadowRoot.querySelector('#tag');
+    this._$description = this.shadowRoot.querySelector('#description');
+    this._$avatar = this.shadowRoot.querySelector('github-avatar');
   }
 
   set element(e) {
     this._element = e;
-    this.shadowRoot.querySelector('#org').textContent = e.org;
-    this.shadowRoot.querySelector('#repo').textContent = `${e.repo} - ${e.tag}`;
-    this.shadowRoot.querySelector('#description').textContent = e.description;
-    this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
+    let qs = this.shadowRoot.querySelector;
+    this._$org.textContent = e.org;
+    this._$repo.textContent = e.repo;
+    this._$tag.textContent = e.tag;
+    this._$description.textContent = e.description;
+    this._$avatar.setAttribute('user', e.org);
   }
 
   get element() {

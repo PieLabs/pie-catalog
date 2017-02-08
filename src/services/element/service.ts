@@ -16,6 +16,10 @@ export type Element = {
   readme: string,
   pkg: any,
   schemas: any[],
+  externals?: {
+    js: string[],
+    css: string[]
+  },
   demo: {
     config: any,
     markup: string
@@ -33,11 +37,12 @@ export interface ElementService {
   reset(id: PieId): Promise<boolean>;
   saveSchema(id: PieId, name: string, schema: KeyMap): Promise<boolean>;
   saveReadme(id: PieId, readme: string): Promise<boolean>;
+  saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
   savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
 
   delete(org: string, repo: string): Promise<DeleteResult>;
-
+  tag(org: string, repo: string): Promise<string>;
   load(org: string, repo: string): Promise<Element>;
 }
