@@ -1,5 +1,5 @@
 import { Writable, Transform } from 'stream';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 
 const logger = buildLogger();
 
