@@ -1,17 +1,17 @@
 import * as express from 'express';
 import { resolve, join, extname } from 'path';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
 import * as r from 'resolve';
 import { AvatarService, ElementService } from '../services';
 import * as gzip from './middleware/gzip';
 import { lookup } from 'mime-types';
-import { stat, readJson, readFile, exists } from 'fs-extra';
+import { stat, readJson, readFile, exists, createReadStream } from 'fs-extra';
 import * as jsesc from 'jsesc';
 import * as _ from 'lodash';
 import * as bluebird from 'bluebird';
-
+import polyfills from './polyfills';
 
 
 const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
@@ -63,8 +63,8 @@ export function router(
     logger.debug('load version info...');
     let pkg = await tryToLoad('../../package.json');
     let sha = await tryToLoad('../../.git-version').then(s => s ? s.trim() : null);
-    logger.info(`got pkg: ${pkg}`);
-    logger.info(`got sha: ${sha}`);
+    logger.silly(`got pkg: ${pkg}`);
+    logger.silly(`got sha: ${sha}`);
     let version = pkg ? JSON.parse(pkg).version : null;
     return { version, sha }
   }
@@ -158,7 +158,6 @@ export function router(
 
   router.get('/element/:org/:repo/*', (req, res, next) => {
     let {org, repo} = req.params;
-    logger.info(req.headers);
     logger.info(req.params);
     elementService.tag(org, repo)
       .then(tag => {
@@ -172,6 +171,14 @@ export function router(
   router.get('/org/*', (req, res, next) => {
     render(res);
   });
+
+
+  let streamNodeModulePath = (p) => {
+    let jsPath = join(__dirname, '/node_modules/', p);
+    return createReadStream(jsPath);
+  }
+
+  router.use('/polyfills', polyfills);
 
   let views = join(__dirname, 'views');
   return { router, views }

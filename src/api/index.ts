@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PieId, ElementService } from '../services';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 const logger = buildLogger();
 
 import * as _ from 'lodash';
@@ -64,6 +64,10 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
         (r as any).demoLink = getDemoLink(id);
         r.schemas = r.schemas || [];
         res.json(r);
+      })
+      .catch(e => {
+        logger.info('error loading: ', req.path, e.message);
+        res.status(404).json({ org: org, repo: repo });
       });
   });
 

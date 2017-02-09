@@ -1,96 +1,83 @@
 import * as events from './events';
 
-export default class CatalogEntry extends HTMLElement {
+import { applyStyle, prepareTemplate } from './styles';
 
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const templateHTML = `
     <style>
 
-      :host {
+      :host { 
         display: block;
         position:relative;
+        padding-top:20px;
       }
-
+      
       .header {
         display: flex;
         align-items: bottom;
+        font-size: 20px;
       }
-
+      
       #repo, #version {
-        font-size: 25px;
+
+      #repo {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 36px;
         padding-left: 5px;
       }
-
-      #org {
+      #version {
+        line-height: 36px;
+        font-size: 18px;
+        color: gray;
+        padding-left: 15px;
+      }
+      #description {
+        color: darkgray;
+        font-size: 18px;
+        line-height: 36px;
         padding-left: 5px;
-        font-size: 19px;
-        line-height: 33px;
-        cursor:pointer;
+      }
+      #org {
+        padding-left: 15px;
+        font-size: 14px;
+        line-height: 36px;
+        cursor: pointer;
         transition: color ease-in 100ms;
         color: rgba(0,0,0,0.8);
-        
       }
 
       #org:hover{
         color: rgba(0,0,0,0.5);
       }
 
-      #demo-holder{
-        margin-bottom: 0px;
-      }
-
-      .header{
-        font-size: 20px;
-      }
-
-      hr {
-        border: none;
-        border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-      }
-
-      #demo-holder{
-        padding-top: 20px;
-      }
-
-      
-      fancy-tabs{
-        margin-top: 10px;
-      }
-      
-      github-avatar{
-        padding-left: 6px;
-      }
-
 
     </style>
-    <div class="header">
-      <div id="repo"></div>
-      <div id="version"></div>
-      <div id="org"></div>
-      <github-avatar size="30"></github-avatar>
-    </div>
-    <fancy-tabs>
-      <button slot="title">info</button>
-      <button id="schemas-button" slot="title">schemas</button>
-      <div>
-        <div id="description"></div>
-        <div id="demo-holder">
-          <slot></slot>
-        </div>
-        <div id="markdown-holder">
-          <markdown-element></markdown-element>
-        </div>
-        <info-panel></info-panel>
-        <dependencies-panel></dependencies-panel>
-      </div>
-      <div>
-        <catalog-schemas></catalog-schemas>
-      </div>
-      
-    </fancy-tabs>
-    `;
+   <div>
+     <div class="header">
+       <div id="repo"></div>
+       <div id="version"></div>
+       <div id="org"></div>
+       <github-avatar size="30"></github-avatar>
+     </div>
+     <c-tabs>
+       <c-tab title="demo">
+         <slot></slot>
+       </c-tab>
+       <c-tab title="information">
+         <div id="description"></div>
+         <div id="markdown-holder">
+         </c-tab>
+    </c-tabs>
+  </div>
+`;
+
+const template = prepareTemplate(templateHTML, 'catalog-entry');
+
+export default class CatalogEntry extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, template);
   }
 
   connectedCallback() {
@@ -111,7 +98,7 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#version').textContent = e.tag;
-    this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    this.shadowRoot.querySelector('#org').textContent = `${e.org}`;
     this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
 
     this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
@@ -127,16 +114,9 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
-    if (!e.schemas || e.schemas.length === 0) {
-      this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
-    } else {
-      this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
-    }
 
     customElements.whenDefined('dependencies-panel').then(() => {
       this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
     });
-
   }
-
 }

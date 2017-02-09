@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 import * as tar from 'tar-stream';
 import { Readable, Writable } from 'stream';
 import * as gunzip from 'gunzip-maybe';

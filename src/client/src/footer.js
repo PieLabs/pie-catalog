@@ -1,13 +1,13 @@
-export default class CatalogFooter extends HTMLElement {
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+import { prepareTemplate, applyStyle } from './styles';
+
+
+const templateHTML = `
     <style>
     :host{
+      height: 50px;
       padding: 7px;
       display: block;
-      background-color: var(--catalog-header-bg, green);
+      background-color: var(--catalog-header-bg, rgba(0,50, 49,0.1));
       border-top: solid 1px var(--shadow-color, #cccccc);
     }
 
@@ -17,9 +17,15 @@ export default class CatalogFooter extends HTMLElement {
 
     </style>
     <label id="version"></label> 
-    `;
+`;
 
-    this._$version = this.shadowRoot.querySelector('#version');
+const template = prepareTemplate(templateHTML, 'catalog-footer');
+
+export default class CatalogFooter extends HTMLElement {
+  constructor() {
+    super();
+    let sr = applyStyle(this, template);
+    this._$version = sr.querySelector('#version');
   }
 
   set version(v) {

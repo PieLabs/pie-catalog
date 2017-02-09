@@ -10,7 +10,7 @@ import {
   GithubService
 } from './service';
 import { Collection } from 'mongodb';
-import { buildLogger } from '../../log-factory';
+import { buildLogger } from 'log-factory';
 import * as _ from 'lodash';
 
 const logger = buildLogger();
@@ -137,11 +137,16 @@ export default class ElementService implements Api {
   async load(org: string, repo: string) {
     let r = await this.collection.findOne({ org: org, repo: repo });
 
-    //TODO: should we store this in the db instead of getting it from the demo service?
-    let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
-    let out = _.merge(r, { demo: demo });
-    logger.silly('[load] out: ', out);
-    return out;
+    if (r) {
+
+      //TODO: should we store this in the db instead of getting it from the demo service?
+      let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
+      let out = _.merge(r, { demo: demo });
+      logger.silly('[load] out: ', out);
+      return out;
+    } else {
+      throw new Error(`cant find org/repo: ${org}/${repo}`);
+    }
   }
 
   async list(opts: ListOpts = { skip: 0, limit: 0 }) {

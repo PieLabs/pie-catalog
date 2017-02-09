@@ -5,7 +5,7 @@ import DemoS3Service from './element/demo/s3-service';
 import DemoS3Router from './element/demo/s3-router';
 import { DemoService, DemoRouter } from './element/demo/service';
 import { MongoClient, Db } from 'mongodb';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 import { MainGithubService } from './github';
 import AvatarService, { FileBackend } from './avatar';
 import { join } from 'path';

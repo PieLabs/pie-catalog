@@ -1,11 +1,6 @@
-export default class CatalogHeader extends HTMLElement {
+import { prepareTemplate, applyStyle } from './styles';
 
-  constructor() {
-    super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+const templateHTML = `
     <style>
       :host {
         display: block;
@@ -13,7 +8,7 @@ export default class CatalogHeader extends HTMLElement {
         min-height: 60px;
         padding-top: 5px;
         padding-left: 5px;
-        background-color: var(--catalog-header-bg, green);
+        background-color: var(--catalog-header-bg, rgba(0,50, 49,0.1));
         border-bottom: solid 1px var(--shadow-color, #cccccc);
       }
       
@@ -23,7 +18,7 @@ export default class CatalogHeader extends HTMLElement {
       }
 
       a{
-        font-size: 14px;
+        font-size: 12px;
         text-transform: uppercase;
         text-decoration: none;
         color: var(--pie-brand-color, #333333);
@@ -42,16 +37,25 @@ export default class CatalogHeader extends HTMLElement {
 
     </style>
     <pie-brand></pie-brand>
-    <a href="//pielabs.github.io/pie-docs/" target="_blank">Documentation</a>
+    <a href="//pielabs.github.io/pie-docs/" target="_blank">PIE FRAMEWORK</a>
     `;
+
+
+const template = prepareTemplate(templateHTML, 'catalog-header');
+
+export default class CatalogHeader extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, template);
+    this._$brand = this.shadowRoot.querySelector('pie-brand');
   }
 
   connectedCallback() {
-    console.log('connected header');
-
-    this.shadowRoot.querySelector('pie-brand').addEventListener('click', e => {
+    this._$brand.addEventListener('click', e => {
       document.location.pathname = '/';
-      // this.dispatchEvent(new CustomEvent('home-click', { bubbles: true }));
     });
   }
 }
+
+CatalogHeader.TAG_NAME = 'catalog-header';

@@ -1,15 +1,24 @@
+<<<<<<< HEAD
+import { prepareTemplate, applyStyle } from '../styles';
+const templateHTML = `
+=======
+import * as styles from '../styles.js';
 export default class ControlPanel extends HTMLElement {
   constructor() {
     super();
 
     let sr = this.attachShadow({ mode: 'open' });
     sr.innerHTML = `
+>>>>>>> 683e833... Wip styling
     <style>
     :host{
       padding-bottom: 6px;
       --select-field-font-family: 'Droid Sans', sans-serif;
       --select-option-selected-color: var(--pie-brand-hover-color);
       margin-bottom: 10px;
+      ${styles.boxShadow}
+      padding: 18px;
+      background-color: #f3f3f3;
     }
 
     #control-panel{
@@ -35,7 +44,14 @@ export default class ControlPanel extends HTMLElement {
     </select-field>
 
     <span id="langs-holder"></span>
-    `;
+`;
+
+
+export default class ControlPanel extends HTMLElement {
+  constructor() {
+    super();
+    const template = prepareTemplate(templateHTML, 'control-panel');
+    let sr = applyStyle(this, template);
   }
 
   set env(e) {

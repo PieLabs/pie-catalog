@@ -3,7 +3,7 @@ import { Readable, Writable } from 'stream';
 import { remove, readFile, readJson, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
 import { dirname, join } from 'path';
 import * as express from 'express';
-import { buildLogger } from '../../../log-factory';
+import { buildLogger } from 'log-factory';
 import * as bluebird from 'bluebird';
 import { replaceReact } from './utils';
 const logger = buildLogger();

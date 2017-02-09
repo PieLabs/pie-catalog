@@ -1,21 +1,14 @@
-export default class ProgresBar extends HTMLElement {
+import { applyStyle, prepareTemplate } from './styles';
 
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const templateHTML = `
       <style>
         :host{
           display: block;
           overflow: hidden;
         }
-        
-        :host([disabled]) #progress{
-          opacity: 0;
-        }
 
-        #progress {
-          opacity: 1;
+        #progress{
+          opacity: 0;
           width: 100%;
           height: 1px;
           background-color: var(--progress-bar-color, rgba(0,0,0,0.2));
@@ -24,6 +17,10 @@ export default class ProgresBar extends HTMLElement {
           transform-origin: right center;
           -webkit-animation: indeterminate-bar 2s linear infinite;
           animation: indeterminate-bar 2s linear infinite;
+        }
+
+        #progress[loading] {
+          opacity: 1;
         }
         
         @-webkit-keyframes indeterminate-bar {
@@ -42,18 +39,26 @@ export default class ProgresBar extends HTMLElement {
           }
         }
 
-
       </style>
       <div id="progress" hidden></div>
-    `
+    `;
+
+
+const template = prepareTemplate(templateHTML, 'progress-bar');
+export default class ProgressBar extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, template, true);
+    this._$progress = sr.querySelector('#progress');
   }
 
   enable() {
-    this.removeAttribute('disabled');
+    this._$progress.setAttribute('loading', '');
   }
 
   disable() {
-    this.setAttribute('disabled', '');
+    this._$progress.removeAttribute('loading');
   }
 
   connectedCallback() {

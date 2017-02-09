@@ -6,20 +6,10 @@ import { VIEW_ORG } from './events'
 
 let logic = require.ensure([], () => {
 
-  const {define} = require('json-schema-element');
-  define();
-
-  //load up the select field
   require('material-elements/src/select-field');
 
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
-
-  const CatalogSchemas = require('./schemas').default;
-  customElements.define('catalog-schemas', CatalogSchemas);
-
-  const { default: IframeHolder } = require('./iframe-holder');
-  customElements.define('iframe-holder', IframeHolder);
 
   const CatalogEntry = require('./catalog-entry').default;
   customElements.define('catalog-entry', CatalogEntry);
@@ -32,48 +22,41 @@ let logic = require.ensure([], () => {
   customElements.define('info-panel', InfoPanel);
   customElements.define('github-info-count', GithubInfoCount);
 
-  //Note: these elements auto register themselves
-  require('time-elements');
-
-  const FancyTabs = require('./fancy-tabs').default;
-  customElements.define('fancy-tabs', FancyTabs);
+  const ctabs = require('./c-tabs');
+  customElements.define('c-tabs', ctabs.CTabs);
+  customElements.define('c-tab', ctabs.CTab);
+  customElements.define('c-tab-title', ctabs.CTabTitle);
 
   const { default: CatalogDemo } = require('./catalog-demo');
   customElements.define('catalog-demo', CatalogDemo);
-  const {default: ControlPanel} = require('./catalog-demo/control-panel');
+  const { default: ControlPanel } = require('./catalog-demo/control-panel');
   customElements.define('control-panel', ControlPanel);
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
+let init = () => {
 
   let info = common.elements.load(window.pie.org, window.pie.repo);
 
-  Promise.all([logic, info])
-    .then(([l, infoResult]) => {
-      document.querySelector('catalog-entry').element = infoResult;
-      document.querySelector('catalog-entry').config = window.pie.config;
-    })
-    .catch((e) => {
-      console.error(e);
-    });
+  /** init loader */
+
+  let container = document.querySelector('catalog-container');
+
   customElements.whenDefined('catalog-container')
     .then(() => {
-      document.querySelector('catalog-container').isLoading(true);
+      container.isLoading(true);
     });
 
-  Promise.all([logic]).then(() => {
-    setTimeout(() => {
-      document.querySelector('catalog-container').isLoading(false);
-    }, 180)
-  });
+  let elementNames = ['catalog-demo'].concat(Object.keys(window.demo.config.elements));
+  let demoElements = elementNames.map(el => customElements.whenDefined(el));
+  let allPromises = [logic, info].concat(demoElements);
 
-  let demoElements = ['catalog-demo'].concat(Object.keys(window.demo.config.elements)).map(el => {
-    return customElements.whenDefined(el);
-  });
+  Promise.all(allPromises)
+    .then(([logic, infoResult]) => {
+      let entry = document.querySelector('catalog-entry');
+      entry.element = infoResult;
+      entry.config = window.pie.config;
 
-  Promise.all(demoElements)
-    .then(() => {
       if (!window.demo.config) {
         throw new Error('config is missing');
       }
@@ -84,9 +67,21 @@ document.addEventListener('DOMContentLoaded', () => {
       demo.config = window.demo.config;
       demo.controllers = window.controllers;
       demo.markup = window.demo.markup;
+      setTimeout(() => {
+        container.isLoading(false);
+      }, 180)
     })
-});
+};
 
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  init();
+} else {
+  document.onreadystatechange = (e) => {
+    if (document.readyState === 'complete') {
+      init();
+    }
+  }
+}
 
 document.addEventListener(VIEW_ORG, (e) => {
   let org = event.detail.element.org;

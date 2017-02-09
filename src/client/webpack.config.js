@@ -3,6 +3,7 @@ const webpack = require('webpack');
 var CompressionPlugin = require("compression-webpack-plugin");
 
 module.exports = {
+  // devtool: 'eval',
   context: path.join(__dirname),
   entry: {
     index: './src/entry.js',
