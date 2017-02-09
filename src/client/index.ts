@@ -158,7 +158,6 @@ export function router(
 
   router.get('/element/:org/:repo/*', (req, res, next) => {
     let {org, repo} = req.params;
-    logger.info(req.headers);
     logger.info(req.params);
     elementService.tag(org, repo)
       .then(tag => {

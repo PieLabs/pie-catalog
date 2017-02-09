@@ -74,7 +74,7 @@ export default class S3Router implements Router {
       this.s3.getObject(params, (err, data) => {
 
         if (err) {
-          logger.error(err);
+          logger.error(err.toString());
           res.status(500).send('Error loading example.html');
         } else {
           let markup = data.Body.toString();
