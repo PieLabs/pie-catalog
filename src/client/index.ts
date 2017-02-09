@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { resolve, join, extname } from 'path';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 import * as webpackMiddleware from 'webpack-dev-middleware';
 import * as webpack from 'webpack';
 import * as r from 'resolve';
@@ -63,8 +63,8 @@ export function router(
     logger.debug('load version info...');
     let pkg = await tryToLoad('../../package.json');
     let sha = await tryToLoad('../../.git-version').then(s => s ? s.trim() : null);
-    logger.info(`got pkg: ${pkg}`);
-    logger.info(`got sha: ${sha}`);
+    logger.silly(`got pkg: ${pkg}`);
+    logger.silly(`got sha: ${sha}`);
     let version = pkg ? JSON.parse(pkg).version : null;
     return { version, sha }
   }

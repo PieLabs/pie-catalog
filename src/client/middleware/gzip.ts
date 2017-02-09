@@ -2,7 +2,7 @@ import * as express from 'express';
 import { stat, createReadStream } from 'fs-extra';
 import { join } from 'path';
 import { lookup } from 'mime-types';
-import { buildLogger } from '../../log-factory';
+import { buildLogger } from 'log-factory';
 import { extname } from 'path';
 
 const logger = buildLogger();

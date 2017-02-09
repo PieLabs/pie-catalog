@@ -1,7 +1,7 @@
 import { DemoRouter as Router } from './service';
 import * as express from 'express';
 import { S3 } from 'aws-sdk';
-import { buildLogger } from '../../../log-factory';
+import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
 import { createReadStream } from 'fs-extra';
 import { join } from 'path';

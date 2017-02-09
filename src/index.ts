@@ -4,9 +4,8 @@ import * as http from 'http';
 import mkStore from './store';
 import { router as getClientRouter } from './client';
 import mkApi from './api';
-import { init } from './log-factory';
 import { join } from 'path';
-import { getLogger } from './log-factory';
+import { init, getLogger } from 'log-factory';
 import { bootstrap, buildOpts } from './services';
 import * as minimist from 'minimist';
 

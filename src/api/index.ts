@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { PieId, ElementService } from '../services';
-import { buildLogger } from '../log-factory';
+import { buildLogger } from 'log-factory';
 const logger = buildLogger();
 
 import * as _ from 'lodash';
