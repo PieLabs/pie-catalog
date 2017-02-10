@@ -64,6 +64,9 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
         (r as any).demoLink = getDemoLink(id);
         r.schemas = r.schemas || [];
         res.json(r);
+      })
+      .catch(e => {
+        res.status(404).send();
       });
   });
 
