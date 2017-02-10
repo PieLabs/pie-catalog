@@ -49,31 +49,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let info = common.elements.load(window.pie.org, window.pie.repo);
 
-  Promise.all([logic, info])
-    .then(([l, infoResult]) => {
-      document.querySelector('catalog-entry').element = infoResult;
-      document.querySelector('catalog-entry').config = window.pie.config;
-    })
-    .catch((e) => {
-      console.error(e);
-    });
+  /** init loader */
+
+  let container = document.querySelector('catalog-container');
+
   customElements.whenDefined('catalog-container')
     .then(() => {
-      document.querySelector('catalog-container').isLoading(true);
+      container.isLoading(true);
     });
 
-  Promise.all([logic]).then(() => {
-    setTimeout(() => {
-      document.querySelector('catalog-container').isLoading(false);
-    }, 180)
-  });
+  let elementNames = ['catalog-demo'].concat(Object.keys(window.demo.config.elements));
+  let demoElements = elementNames.map(el => customElements.whenDefined(el));
+  let allPromises = [logic, info].concat(demoElements);
 
-  let demoElements = ['catalog-demo'].concat(Object.keys(window.demo.config.elements)).map(el => {
-    return customElements.whenDefined(el);
-  });
+  Promise.all(allPromises)
+    .then(([logic, infoResult]) => {
+      let entry = document.querySelector('catalog-entry');
+      entry.element = infoResult;
+      entry.config = window.pie.config;
 
-  Promise.all(demoElements)
-    .then(() => {
       if (!window.demo.config) {
         throw new Error('config is missing');
       }
@@ -84,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
       demo.config = window.demo.config;
       demo.controllers = window.controllers;
       demo.markup = window.demo.markup;
+      setTimeout(() => {
+        container.isLoading(false);
+      }, 180)
     })
 });
 

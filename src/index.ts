@@ -19,6 +19,11 @@ init(logConfig);
 const logger = getLogger('APP');
 logger.silly('argv: ', argv);
 
+process.on('unhandledRejection', (reason, p: Promise<any>) => {
+  logger.error('Unhandled Rejection at: Promise', p, 'reason:', reason);
+  // application specific logging, throwing an error, or other logic here
+});
+
 let opts = buildOpts(args, process.env);
 
 bootstrap(opts)

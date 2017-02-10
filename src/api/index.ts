@@ -66,7 +66,8 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
         res.json(r);
       })
       .catch(e => {
-        res.status(404).send();
+        logger.info('error loading: ', req.path, e.message);
+        res.status(404).json({ org: org, repo: repo });
       });
   });
 
