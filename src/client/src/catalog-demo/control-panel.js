@@ -10,6 +10,9 @@ export default class ControlPanel extends HTMLElement {
       --select-field-font-family: 'Droid Sans', sans-serif;
       --select-option-selected-color: var(--pie-brand-hover-color);
       margin-bottom: 10px;
+      box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.3));
+      padding: 18px;
+      background-color: #f3f3f3;
     }
 
     #control-panel{

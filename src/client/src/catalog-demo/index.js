@@ -20,9 +20,17 @@ export default class CatalogDemo extends HTMLElement {
         padding-bottom: 10px;
       }
 
+      .pie-panel{
+        border-radius: 10px;
+        box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.3));
+        padding: 10px;
+      }
+
     </style>
     <control-panel></control-panel>
-    <slot></slot> 
+    <div class="pie-panel">
+      <slot></slot> 
+    </div>
     `;
 
     this._registeredPies = {};

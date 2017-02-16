@@ -11,6 +11,7 @@ export default class CatalogEntry extends HTMLElement {
       :host {
         display: block;
         position:relative;
+        padding-top:20px;
       }
 
       .header {
@@ -19,18 +20,17 @@ export default class CatalogEntry extends HTMLElement {
       }
 
       #repo, #version {
-        font-size: 25px;
+        font-size: 18px;
         padding-left: 5px;
       }
 
       #org {
-        padding-left: 5px;
-        font-size: 19px;
-        line-height: 33px;
-        cursor:pointer;
+        padding-left: 15px;
+        font-size: 14px;
+        line-height: 25px;
+        cursor: pointer;
         transition: color ease-in 100ms;
-        color: rgba(0,0,0,0.8);
-        
+        color: rgba(0,0,0,0.8);        
       }
 
       #org:hover{
@@ -72,21 +72,22 @@ export default class CatalogEntry extends HTMLElement {
       <github-avatar size="30"></github-avatar>
     </div>
     <fancy-tabs>
-      <button slot="title">info</button>
-      <button id="schemas-button" slot="title">schemas</button>
+
+      <button slot="title">demo</button>
       <div>
-        <div id="description"></div>
         <div id="demo-holder">
           <slot></slot>
         </div>
+      </div>
+
+      <button id="schemas-button" slot="title">readme</button> 
+      <div>
+        <div id="description"></div>
         <div id="markdown-holder">
           <markdown-element></markdown-element>
         </div>
         <info-panel></info-panel>
         <dependencies-panel></dependencies-panel>
-      </div>
-      <div>
-        <catalog-schemas></catalog-schemas>
       </div>
       
     </fancy-tabs>
@@ -111,7 +112,7 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#version').textContent = e.tag;
-    this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    this.shadowRoot.querySelector('#org').textContent = `${e.org}`;
     this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
 
     this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
@@ -127,11 +128,6 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
-    if (!e.schemas || e.schemas.length === 0) {
-      this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
-    } else {
-      this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
-    }
 
     customElements.whenDefined('dependencies-panel').then(() => {
       this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;

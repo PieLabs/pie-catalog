@@ -6,3 +6,5 @@ lib
 .demo-service
 .avatar-*
 .deployment
+
+*.lock

@@ -28,7 +28,7 @@ export default class FancyTabs extends HTMLElement {
         /* Safari does not support #id prefixes on ::slotted
            See https://bugs.webkit.org/show_bug.cgi?id=160538 */
         #tabs ::slotted(*) {
-          font-size: 13px;
+          font-size: 20px;
           background-color: rgba(0,0,0,0);
           color: #666666;
           padding: 6px;
