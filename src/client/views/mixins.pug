@@ -36,12 +36,9 @@ mixin polyfill(path)
     if(!supportsShadowDom){
       polyfills.push('/polyfills/shadydom/shadydom.min.js');
     }
-    polyfills.push('/polyfills/shadycss/shadycss.min.js');
-      
 
-    //- if(!supportsFetch){
-    //-   polyfills.push('/polyfills/whatwg-fetch/fetch.js');
-    //- }
+    //always add shadycss
+    polyfills.push('/polyfills/shadycss/shadycss.min.js');
      
     let p = polyfills.reduce((acc, path) => {
       return acc.then(() => loadScript(path));

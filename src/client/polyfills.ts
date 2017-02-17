@@ -7,9 +7,7 @@ import { stat, readJson, readFile, exists, createReadStream } from 'fs-extra';
 import * as _ from 'lodash';
 
 const logger = buildLogger();
-
 const router: express.Router = express.Router();
-
 
 let streamNodeModulePath = (p) => {
   let jsPath = join(__dirname, '/node_modules/', p);
@@ -30,14 +28,6 @@ router.get('/:pkg/*', (req, res) => {
   let fullPath = `@webcomponents/${pkg}/${p}`;
   stream(res, fullPath);
 });
-// router.get('/:name.js', (req, res) => {
-//   logger.info(req.params);
-//   let {name} = req.params;
-//   name = name.replace('.min', '');
-//   let jsPath = `@webcomponents/${name}/${name}.min.js`;
-//   logger.info('jsPath: ', jsPath);
-//   stream(res, jsPath);
-// });
 
 router.get('/:name.js.map', (req, res) => {
   logger.info(req.params);
