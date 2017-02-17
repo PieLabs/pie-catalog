@@ -8,3 +8,5 @@ lib
 .deployment
 
 *.lock
+
+*.log

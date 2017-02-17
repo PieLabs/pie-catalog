@@ -13,44 +13,73 @@ export default class FancyTabs extends HTMLElement {
         }
 
         #tabs {
-          display: block; 
-          -webkit-user-select: none;
-          user-select: none;
-          margin-bottom: 10px;
           border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
           border-top: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-        }
-        
-        #tabs slot {
-          display: inline-flex; /* Safari bug. Treats <slot> as a parent */
+          display         : flex;
+          flex-direction  : row;
+          justify-content : center; // ⇾
+          align-content   : space-between; // ||
+          align-items     : flex-start; // ↓
+
+          height          : 48px;
+          padding         : 0 0 0 0;
+          margin          : 0;
+          border-bottom   : 1px solid $tab-border-color;
         }
 
         /* Safari does not support #id prefixes on ::slotted
            See https://bugs.webkit.org/show_bug.cgi?id=160538 */
         #tabs ::slotted(*) {
-          font-size: 20px;
-          background-color: rgba(0,0,0,0);
-          color: #666666;
-          padding: 6px;
+          
+          margin: 0;
+          border: none;
+          padding: 0 24px 0 24px;
+
+          float: left;
+          position: relative;
+          display: block;
+
+          text-decoration: none;
+          height: 48px;
+          line-height: 48px;
+
           text-align: center;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          font-weight: 500;
+          font-size: 20px;
           text-transform: uppercase;
-          overflow: hidden;
+
+          color: #666666;
+          overflow: hidden;  
           cursor: pointer;
           border: none; /* if the user users a <button> */
+
         }
         #tabs ::slotted([aria-selected="true"]) {
           font-weight: 500;
           color: black;
         }
 
+        #tabs ::slotted([aria-selected="true"]):after {
+          content: "hello world";
+          // height: 2px;
+          // width: 100%;
+          // display: block;
+          // content: " ";
+          // bottom: 0px;
+          // left: 0px;
+          // position: absolute;
+          // background: $tab-highlight-color;
+          // animation: border-expand 0.2s cubic-bezier(0.4, 0.0, 0.4, 1) 0.01s alternate forwards;
+          // transition: all 1s cubic-bezier(0.4, 0.0, 1, 1);
+        }
         #tabs ::slotted(:focus) {
           outline: none;
         }
+
         #panels ::slotted([aria-hidden="true"]) {
           display: none;
         }
+
       </style>
       <div id="tabs">
         <slot id="tabsSlot" name="title"></slot>

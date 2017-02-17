@@ -19,18 +19,31 @@ export default class CatalogEntry extends HTMLElement {
         align-items: bottom;
       }
 
-      #repo, #version {
-        font-size: 18px;
+      #repo {
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 36px;
         padding-left: 5px;
       }
-
+      #version {
+        line-height: 36px;
+        font-size: 18px;
+        color: gray;
+        padding-left: 15px;
+      }
+      #description {
+        color: darkgray;
+        font-size: 18px;
+        line-height: 36px;
+        padding-left: 5px;
+      }
       #org {
         padding-left: 15px;
         font-size: 14px;
-        line-height: 25px;
+        line-height: 36px;
         cursor: pointer;
         transition: color ease-in 100ms;
-        color: rgba(0,0,0,0.8);        
+        color: rgba(0,0,0,0.8);      
       }
 
       #org:hover{
@@ -39,6 +52,8 @@ export default class CatalogEntry extends HTMLElement {
 
       #demo-holder{
         margin-bottom: 0px;
+        padding-top: 10px;
+
       }
 
       .header{
@@ -48,10 +63,6 @@ export default class CatalogEntry extends HTMLElement {
       hr {
         border: none;
         border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-      }
-
-      #demo-holder{
-        padding-top: 20px;
       }
 
       
@@ -65,24 +76,27 @@ export default class CatalogEntry extends HTMLElement {
 
 
     </style>
+
+
+    
     <div class="header">
       <div id="repo"></div>
       <div id="version"></div>
       <div id="org"></div>
       <github-avatar size="30"></github-avatar>
     </div>
+    <div id="description"></div>
     <fancy-tabs>
 
-      <button slot="title">demo</button>
+      <div slot="title">demo</div>
       <div>
         <div id="demo-holder">
           <slot></slot>
         </div>
       </div>
 
-      <button id="schemas-button" slot="title">readme</button> 
+      <div id="schemas-button" slot="title">Information</div> 
       <div>
-        <div id="description"></div>
         <div id="markdown-holder">
           <markdown-element></markdown-element>
         </div>
