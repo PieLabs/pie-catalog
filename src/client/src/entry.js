@@ -1,9 +1,9 @@
-console.log('0000000000000000000000 ENTRY.JS');
-
 // require('./index.less');
 
-console.log('before import: ', customElements);
+//console.log('before import: ', customElements);
 import * as common from './common';
+//TODO: defining these in 'common' isn't working in FF - why is that?
+
 import CatalogContainer from './catalog-container';
 import CatalogListings from './listings';
 import CatalogListing from './listing';
@@ -35,7 +35,6 @@ customElements.define('catalog-listing', CatalogListing);
 customElements.define('avatar-service', AvatarService);
 
 let init = () => {
-  console.log('DOMContentLoaded!');
 
   let container = document.querySelector('catalog-container');
 
