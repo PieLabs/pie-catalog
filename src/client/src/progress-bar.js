@@ -1,9 +1,6 @@
-export default class ProgresBar extends HTMLElement {
+const template = document.createElement('template');
 
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+template.innerHTML = `
       <style>
         :host{
           display: block;
@@ -45,7 +42,21 @@ export default class ProgresBar extends HTMLElement {
 
       </style>
       <div id="progress" hidden></div>
-    `
+    `;
+ShadyCSS.prepareTemplate(template, 'progress-bar');
+
+export default class ProgresBar extends HTMLElement {
+
+  constructor() {
+    super();
+
+    ShadyCSS.applyStyle(this);
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      let copy = document.importNode(template, true);
+      this.shadowRoot.appendChild(copy.content);
+    }
   }
 
   enable() {

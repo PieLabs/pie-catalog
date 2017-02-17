@@ -20,7 +20,6 @@ export default class GithubAvatar extends HTMLElement {
   }
 
   attributeChangedCallback(name, oldValue, newValue) {
-    console.log('attr changed:', arguments);
     if (name === 'user' && newValue) {
       //remove the old url
       this.removeAttribute('url');
@@ -35,7 +34,6 @@ export default class GithubAvatar extends HTMLElement {
   loadAvatar() {
     let user = this.getAttribute('user');
     if (user) {
-      console.log('dispatch event ..')
       this.dispatchEvent(new LoadAvatar(user, this));
     }
   }

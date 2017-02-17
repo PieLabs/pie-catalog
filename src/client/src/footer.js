@@ -1,8 +1,6 @@
-export default class CatalogFooter extends HTMLElement {
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const template = document.createElement('template');
+
+template.innerHTML = `
     <style>
     :host{
       padding: 7px;
@@ -17,8 +15,22 @@ export default class CatalogFooter extends HTMLElement {
 
     </style>
     <label id="version"></label> 
-    `;
+`;
 
+ShadyCSS.prepareTemplate(template, 'catalog-footer');
+
+export default class CatalogFooter extends HTMLElement {
+  constructor() {
+    super();
+
+    ShadyCSS.applyStyle(this);
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      let copy = document.importNode(template.content, true);
+      console.log('copy: ', copy);
+      this.shadowRoot.appendChild(copy);
+    }
     this._$version = this.shadowRoot.querySelector('#version');
   }
 

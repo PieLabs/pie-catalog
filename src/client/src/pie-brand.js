@@ -17,6 +17,7 @@ export default class PieBrand extends HTMLElement {
     }
 
     .pie {
+      font-family: 'Patua One', serif;
       color: var(--pie-brand-color, #404042);
       transition:color 100ms linear;
       cursor: pointer;

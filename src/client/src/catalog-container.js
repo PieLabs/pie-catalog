@@ -1,10 +1,6 @@
-export default class CatalogContainer extends HTMLElement {
+const template = document.createElement('template');
 
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
-
+template.innerHTML = `
       <style>
         :host {
           display: flex;
@@ -32,13 +28,28 @@ export default class CatalogContainer extends HTMLElement {
           padding: 10px;
         } 
       </style>
-      <catalog-header></catalog-header>
+      <catalog-header></catalog-header> 
       <progress-bar disabled></progress-bar>
       <div id="content">
         <slot></slot>
       </div>
       <catalog-footer></catalog-footer>
-    `;
+`;
+
+ShadyCSS.prepareTemplate(template, 'catalog-container');
+
+export default class CatalogContainer extends HTMLElement {
+
+  constructor() {
+    super();
+    ShadyCSS.applyStyle(this);
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      let copy = document.importNode(template.content, true);
+      console.log('copy: ', copy);
+      this.shadowRoot.appendChild(copy);
+    }
   }
 
   get _progressBar() {
@@ -55,6 +66,7 @@ export default class CatalogContainer extends HTMLElement {
 
 
   isLoading(loading) {
+    console.log('isLoading? ', loading);
     if (!this._progressBar) {
       return;
     }

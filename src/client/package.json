@@ -9,17 +9,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@webcomponents/custom-elements": "^1.0.0-alpha.3",
+    "@webcomponents/shadycss": "github:webcomponents/shadycss",
+    "@webcomponents/shadydom": "github:webcomponents/shadydom"
   },
   "devDependencies": {
+    "css-loader": "^0.26.1",
     "highlight.js": "^9.9.0",
     "json-schema-element": "PieLabs/json-schema-element#develop",
+    "less": "^2.7.2",
+    "less-loader": "^2.2.3",
     "marked": "^0.3.6",
     "octicons": "^5.0.1",
-    "time-elements": "^0.6.1",
-    "less": "^2.7.2",
-    "css-loader": "^0.26.1",
-    "less-loader": "^2.2.3",
     "raw-loader": "^0.5.1",
-    "style-loader": "^0.13.1"
+    "style-loader": "^0.13.1",
+    "time-elements": "^0.6.1",
+    "webcomponents.js": "^0.7.23"
   }
 }

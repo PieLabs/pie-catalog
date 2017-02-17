@@ -1,16 +1,13 @@
 import * as events from './events';
 import * as styles from './styles';
 
-export default class CatalogListing extends HTMLElement {
+const ShadyCSS = window.ShadyCSS;
+const template = document.createElement('template');
 
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
-
+template.innerHTML = `
     <style>
      :host{
+       background-color: red;
         width: 300px;
         height: 120px;
         max-height: 120px;
@@ -19,6 +16,7 @@ export default class CatalogListing extends HTMLElement {
         padding: 10px;
         background-color: white;
         box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
+        --moz-box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.2);
         transition: box-shadow 200ms ease-in;
       }
 
@@ -27,12 +25,17 @@ export default class CatalogListing extends HTMLElement {
         box-shadow: 0px 0px 4px 1px rgba(0,0,0,0.4);
       } 
 
+
       h4 {
         padding: 0;
         margin: 0;
       }
 
       hr {
+        margin: 0;
+        padding: 0;
+        padding-top: 4px;
+        padding-bottom: 4px;
         border: none;
         border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
       }
@@ -51,12 +54,14 @@ export default class CatalogListing extends HTMLElement {
       
       #org{
         padding: 6px;
+        font-size: 16px;
       }
 
       #repo{
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        font-size: 18px;
       }
 
       #tag{
@@ -75,7 +80,22 @@ export default class CatalogListing extends HTMLElement {
       <github-avatar size="40"></github-avatar>
       <label id="org"></label>
     </div>
-    `;
+`;
+
+ShadyCSS.prepareTemplate(template, 'catalog-listing');
+
+export default class CatalogListing extends HTMLElement {
+
+  constructor() {
+    super();
+
+    ShadyCSS.applyStyle(this);
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      let copy = document.importNode(template, true);
+      this.shadowRoot.appendChild(copy.content);
+    }
 
     this._$org = this.shadowRoot.querySelector('#org');
     this._$repo = this.shadowRoot.querySelector('#repo');
@@ -99,6 +119,9 @@ export default class CatalogListing extends HTMLElement {
   }
 
   connectedCallback() {
+
+
+
     let onRepoClick = (e) => {
       e.preventDefault();
       this.dispatchEvent(events.viewRepo(this._element));

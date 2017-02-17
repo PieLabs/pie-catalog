@@ -1,0 +1,59 @@
+
+mixin polyfill(path)
+  script.
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('... loaded');
+      window._domContentLoaded = true;
+    });
+    
+    let path = '#{path}';
+
+    function loadScript(src) {
+      console.log('[loadScript] src: ', src);
+      return new Promise(function (resolve, reject) {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = resolve;
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
+    }
+
+    const supportsCustomElementsV1 = 'customElements' in window;
+    const supportsShadowDom = 'attachShadow' in document.createElement('div');
+
+    let polyfills = [];
+
+    if(!supportsCustomElementsV1){
+      polyfills.push('/polyfills/custom-elements.min.js');
+      polyfills.push('/polyfills/custom-elements.min.js.map');
+      polyfills.push('/polyfills/custom-elements/src/native-shim.js');
+    } 
+    
+    if(!supportsShadowDom){
+      polyfills.push('/polyfills/shadydom.min.js');
+      polyfills.push('/polyfills/shadydom.min.js.map');
+    }
+      polyfills.push('/polyfills/shadycss.min.js');
+      polyfills.push('/polyfills/shadycss.min.js.map');
+    
+     
+    if(polyfills.length === 0){
+
+    } 
+    let p = polyfills.reduce((acc, path) => {
+      return acc.then(() => loadScript(path));
+    }, Promise.resolve());
+
+    p.then(() => {
+        console.log('loaded polyfills: ', polyfills);
+        loadScript(path)
+          .then(() => {
+            console.log('loaded path: ', path);
+          });
+      })
+      .catch(e => {
+        console.error('loading of polyfills failed', e.target.getAttribute('src'));
+      });

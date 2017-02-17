@@ -1,36 +1,55 @@
 require('./index.less');
 
-import CatalogListings from './listings';
-customElements.define('catalog-listings', CatalogListings);
+console.log('before define function: ', customElements, customElements.define);
+let define = (name, prototype) => {
+  console.log('in define function: ', customElements, customElements.define);
+  if (!('customElements' in window)) {
+    throw new Error('customElements isnt defined');
+  }
 
-import CatalogListing from './listing';
-customElements.define('catalog-listing', CatalogListing);
+  if (typeof customElements.define !== 'function') {
+    console.log(customElements);
+    throw new Error('customElements.define is not defined');
+  }
+  return customElements.define(name, prototype)
+    .catch(e => {
+      console.error('error defining custom element: ', name);
+      console.error(e);
+    });
+}
 
-import CatalogHeader from './header';
-customElements.define('catalog-header', CatalogHeader);
+console.log('before calling define function: ', customElements, customElements.define);
+// import CatalogListings from './listings';
+// define('catalog-listings', CatalogListings);
 
-import CatalogFooter from './footer';
-customElements.define('catalog-footer', CatalogFooter);
+// import CatalogListing from './listing';
+// define('catalog-listing', CatalogListing);
 
-import CatalogOrg from './org';
-customElements.define('catalog-org', CatalogOrg);
+// import CatalogHeader from './header';
+// define('catalog-header', CatalogHeader);
 
-import GithubAvatar from './github-avatar';
-customElements.define('github-avatar', GithubAvatar);
+// import CatalogFooter from './footer';
+// define('catalog-footer', CatalogFooter);
 
-import PieBrand from './pie-brand';
-customElements.define('pie-brand', PieBrand);
+// import CatalogOrg from './org';
+// define('catalog-org', CatalogOrg);
 
-import ProgressBar from './progress-bar';
-customElements.define('progress-bar', ProgressBar);
+// import GithubAvatar from './github-avatar';
+// define('github-avatar', GithubAvatar);
 
-import CatalogContainer from './catalog-container';
-customElements.define('catalog-container', CatalogContainer);
+// import PieBrand from './pie-brand';
+// define('pie-brand', PieBrand);
+
+// import ProgressBar from './progress-bar';
+// define('progress-bar', ProgressBar);
+
+// import CatalogContainer from './catalog-container';
+// define('catalog-container', CatalogContainer);
 
 import { elements } from './client';
 
-import AvatarService from './avatar-service';
-customElements.define('avatar-service', AvatarService);
+// import AvatarService from './avatar-service';
+// define('avatar-service', AvatarService);
 
 export { elements };
 

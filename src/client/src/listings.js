@@ -1,11 +1,7 @@
-export default class CatalogListings extends HTMLElement {
+const template = document.createElement('template');
+const ShadyCSS = window.ShadyCSS;
 
-  constructor() {
-    super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+template.innerHTML = `
     <style>
         :host {
           display: block;
@@ -14,15 +10,34 @@ export default class CatalogListings extends HTMLElement {
         .elements > catalog-listing {
           display: inline-block;
           margin: 4px;
+          float:left;
         }
     </style>
     <div class="elements">
     </div>
-    `;
+    <div style="clear: both;"></div>
+`;
+
+ShadyCSS.prepareTemplate(template, 'catalog-listings');
+
+export default class CatalogListings extends HTMLElement {
+
+  constructor() {
+    super();
+    ShadyCSS.applyStyle(this);
+
+    if (!this.shadowRoot) {
+      this.attachShadow({ mode: 'open' });
+      let copy = document.importNode(template.content, true);
+      console.log('copy: ', copy);
+      this.shadowRoot.appendChild(copy);
+    }
   }
 
   set elements(e) {
+
     this._elements = e;
+
     if (!this._elements) {
       return;
     }
