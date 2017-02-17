@@ -6,13 +6,9 @@ template.innerHTML = `
           display: block;
           overflow: hidden;
         }
-        
-        :host([disabled]) #progress{
-          opacity: 0;
-        }
 
-        #progress {
-          opacity: 1;
+        #progress{
+          opacity: 0;
           width: 100%;
           height: 1px;
           background-color: var(--progress-bar-color, rgba(0,0,0,0.2));
@@ -21,6 +17,10 @@ template.innerHTML = `
           transform-origin: right center;
           -webkit-animation: indeterminate-bar 2s linear infinite;
           animation: indeterminate-bar 2s linear infinite;
+        }
+
+        #progress[loading] {
+          opacity: 1;
         }
         
         @-webkit-keyframes indeterminate-bar {
@@ -39,7 +39,6 @@ template.innerHTML = `
           }
         }
 
-
       </style>
       <div id="progress" hidden></div>
     `;
@@ -57,14 +56,15 @@ export default class ProgresBar extends HTMLElement {
       let copy = document.importNode(template, true);
       this.shadowRoot.appendChild(copy.content);
     }
+    this._$progress = this.shadowRoot.querySelector('#progress');
   }
 
   enable() {
-    this.removeAttribute('disabled');
+    this._$progress.setAttribute('loading', '');
   }
 
   disable() {
-    this.setAttribute('disabled', '');
+    this._$progress.removeAttribute('loading');
   }
 
   connectedCallback() {

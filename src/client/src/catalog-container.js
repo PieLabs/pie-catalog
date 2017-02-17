@@ -72,10 +72,10 @@ export default class CatalogContainer extends HTMLElement {
     }
 
     if (loading) {
-      this._progressBar.removeAttribute('disabled');
+      this._progressBar.enable();
       this._content.setAttribute('loading', '');
     } else {
-      this._progressBar.setAttribute('disabled', '');
+      this._progressBar.disable();
       this._content.removeAttribute('loading');
     }
   }
