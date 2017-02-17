@@ -1,11 +1,12 @@
-const template = document.createElement('template');
+import { prepareTemplate, applyStyle } from './styles';
 
-template.innerHTML = `
+
+const templateHTML = `
     <style>
     :host{
       padding: 7px;
       display: block;
-      background-color: var(--catalog-header-bg, green);
+      background-color: var(--catalog-header-bg, rgba(0,50, 49,0.1));
       border-top: solid 1px var(--shadow-color, #cccccc);
     }
 
@@ -17,20 +18,13 @@ template.innerHTML = `
     <label id="version"></label> 
 `;
 
-ShadyCSS.prepareTemplate(template, 'catalog-footer');
+const template = prepareTemplate(templateHTML, 'catalog-footer');
 
 export default class CatalogFooter extends HTMLElement {
   constructor() {
     super();
-
-    ShadyCSS.applyStyle(this);
-
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      let copy = document.importNode(template.content, true);
-      this.shadowRoot.appendChild(copy);
-    }
-    this._$version = this.shadowRoot.querySelector('#version');
+    let sr = applyStyle(this, template);
+    this._$version = sr.querySelector('#version');
   }
 
   set version(v) {

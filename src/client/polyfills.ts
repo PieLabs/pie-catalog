@@ -22,7 +22,7 @@ let stream = (res, p) => {
 }
 
 router.get('/:pkg/*', (req, res) => {
-  logger.info('params:', req.params);
+  logger.debug('params:', req.params);
   let p = req.params[0];
   let pkg = req.params.pkg;
   let fullPath = `@webcomponents/${pkg}/${p}`;
@@ -30,7 +30,7 @@ router.get('/:pkg/*', (req, res) => {
 });
 
 router.get('/:name.js.map', (req, res) => {
-  logger.info(req.params);
+  logger.debug(req.params);
   let { name } = req.params;
   name = name.replace('.min', '');
   let jsPath = `@webcomponents/${name}/${name}.min.js.map`;

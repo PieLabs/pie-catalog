@@ -9,14 +9,13 @@ export function applyStyle(el, template, isShadow) {
   isShadow = isShadow !== false;
 
   ShadyCSS.applyStyle(el);
-  let copy = document.importNode(template, true);
+  let templateCopy = document.importNode(template.content, true);
   if (isShadow) {
     let shadowRoot = el.attachShadow({ mode: 'open' });
-    console.log('shadowRoot: ', shadowRoot);
-    shadowRoot.appendChild(copy.content);
+    shadowRoot.appendChild(templateCopy);
     return shadowRoot;
   } else {
-    el.appendChild(copy.content);
+    el.appendChild(templateCopy);
   }
 }
 

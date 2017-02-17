@@ -1,10 +1,7 @@
 import * as events from './events';
-import * as styles from './styles';
+import { prepareTemplate, applyStyle, boxShadow } from './styles';
 
-const ShadyCSS = window.ShadyCSS;
-const template = document.createElement('template');
-
-template.innerHTML = `
+const templateHTML = `
     <style>
      :host{
        background-color: red;
@@ -82,26 +79,20 @@ template.innerHTML = `
     </div>
 `;
 
-ShadyCSS.prepareTemplate(template, 'catalog-listing');
+const template = prepareTemplate(templateHTML, 'catalog-listing');
 
 export default class CatalogListing extends HTMLElement {
 
   constructor() {
     super();
 
-    ShadyCSS.applyStyle(this);
+    let sr = applyStyle(this, template);
 
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      let copy = document.importNode(template, true);
-      this.shadowRoot.appendChild(copy.content);
-    }
-
-    this._$org = this.shadowRoot.querySelector('#org');
-    this._$repo = this.shadowRoot.querySelector('#repo');
-    this._$tag = this.shadowRoot.querySelector('#tag');
-    this._$description = this.shadowRoot.querySelector('#description');
-    this._$avatar = this.shadowRoot.querySelector('github-avatar');
+    this._$org = sr.querySelector('#org');
+    this._$repo = sr.querySelector('#repo');
+    this._$tag = sr.querySelector('#tag');
+    this._$description = sr.querySelector('#description');
+    this._$avatar = sr.querySelector('github-avatar');
   }
 
   set element(e) {

@@ -43,14 +43,14 @@ const templateHTML = `
       <div id="progress" hidden></div>
     `;
 
-const template = prepareTemplate(templateHTML, 'progress-bar');
 
+const template = prepareTemplate(templateHTML, 'progress-bar');
 export default class ProgressBar extends HTMLElement {
 
   constructor() {
     super();
-    applyStyle(this, template, true);
-    this._$progress = this.shadowRoot.querySelector('#progress');
+    let sr = applyStyle(this, template, true);
+    this._$progress = sr.querySelector('#progress');
   }
 
   enable() {

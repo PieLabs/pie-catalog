@@ -8,7 +8,7 @@ const templateHTML = `
         min-height: 60px;
         padding-top: 5px;
         padding-left: 5px;
-        background-color: var(--catalog-header-bg, green);
+        background-color: var(--catalog-header-bg, rgba(0,50, 49,0.1));
         border-bottom: solid 1px var(--shadow-color, #cccccc);
       }
       

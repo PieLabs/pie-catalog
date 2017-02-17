@@ -1,7 +1,6 @@
-const template = document.createElement('template');
-const ShadyCSS = window.ShadyCSS;
+import { applyStyle, prepareTemplate } from './styles';
 
-template.innerHTML = `
+const templateHTML = `
     <style>
         :host {
           display: block;
@@ -18,20 +17,13 @@ template.innerHTML = `
     <div style="clear: both;"></div>
 `;
 
-ShadyCSS.prepareTemplate(template, 'catalog-listings');
+const template = prepareTemplate(templateHTML, 'catalog-listings');
 
 export default class CatalogListings extends HTMLElement {
 
   constructor() {
     super();
-    ShadyCSS.applyStyle(this);
-
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      let copy = document.importNode(template.content, true);
-      console.log('copy: ', copy);
-      this.shadowRoot.appendChild(copy);
-    }
+    let sr = applyStyle(this, template);
   }
 
   set elements(e) {

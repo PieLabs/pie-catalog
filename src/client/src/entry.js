@@ -1,8 +1,10 @@
-// require('./index.less');
+require('./index.less');
+
 import 'whatwg-fetch';
 
-//console.log('before import: ', customElements);
 import * as common from './common';
+
+
 //TODO: defining these in 'common' isn't working in FF - why is that?
 
 import CatalogContainer from './catalog-container';
@@ -15,15 +17,7 @@ import CatalogHeader from './header';
 import PieBrand from './pie-brand';
 import ProgressBar from './progress-bar';
 
-// import { VIEW_REPO, VIEW_ORG } from './events';
-// import CatalogContainer from './catalog-container';
-// class CatalogContainer extends HTMLElement {
-//   constructor() {
-//     super();
-//     let sr = this.attachShadow({ mode: 'open' });
-//     sr.innerHTML = `hi!!!`;
-//   }
-// }
+import { VIEW_REPO, VIEW_ORG } from './events';
 
 customElements.define('progress-bar', ProgressBar);
 customElements.define('pie-brand', PieBrand);
@@ -42,15 +36,6 @@ let init = () => {
   const backendData = Promise.all([
     common.elements.list(),
     common.elements.version()]);
-
-  console.log('backend data: ', backendData);
-
-  backendData.then(([list, version]) => {
-    console.log('backend data loaded: ', list, version)
-  })
-    .catch(e => {
-      console.error('error loading backend data: ', e);
-    })
 
   customElements.whenDefined('catalog-container')
     .then(() => {
@@ -75,14 +60,14 @@ if (window._domContentLoaded) {
   document.addEventListener('DOMContentLoaded', init);
 }
 
-// document.addEventListener(VIEW_REPO, (e) => {
-//   console.log('view repo: ', e.detail);
-//   let {org, repo} = event.detail.element;
-//   window.location.href = `/element/${org}/${repo}/`;
-// });
+document.addEventListener(VIEW_REPO, (e) => {
+  console.log('view repo: ', e.detail);
+  let {org, repo} = event.detail.element;
+  window.location.href = `/element/${org}/${repo}/`;
+});
 
-// document.addEventListener(VIEW_ORG, (e) => {
-//   console.log('view repo: ', e.detail);
-//   let {org, repo} = event.detail.element;
-//   window.location.href = `/org/${org}/`;
-// });
+document.addEventListener(VIEW_ORG, (e) => {
+  console.log('view repo: ', e.detail);
+  let {org, repo} = event.detail.element;
+  window.location.href = `/org/${org}/`;
+});
