@@ -1,6 +1,6 @@
-const template = document.createElement('template');
+import { applyStyle, prepareTemplate } from './styles';
 
-template.innerHTML = `
+const templateHTML = `
       <style>
         :host{
           display: block;
@@ -42,20 +42,14 @@ template.innerHTML = `
       </style>
       <div id="progress" hidden></div>
     `;
-ShadyCSS.prepareTemplate(template, 'progress-bar');
 
-export default class ProgresBar extends HTMLElement {
+const template = prepareTemplate(templateHTML, 'progress-bar');
+
+export default class ProgressBar extends HTMLElement {
 
   constructor() {
     super();
-
-    ShadyCSS.applyStyle(this);
-
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      let copy = document.importNode(template, true);
-      this.shadowRoot.appendChild(copy.content);
-    }
+    applyStyle(this, template, true);
     this._$progress = this.shadowRoot.querySelector('#progress');
   }
 
