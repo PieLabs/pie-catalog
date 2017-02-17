@@ -28,7 +28,6 @@ export default class CatalogFooter extends HTMLElement {
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });
       let copy = document.importNode(template.content, true);
-      console.log('copy: ', copy);
       this.shadowRoot.appendChild(copy);
     }
     this._$version = this.shadowRoot.querySelector('#version');

@@ -24,6 +24,8 @@ mixin polyfill(path)
     const supportsCustomElementsV1 = 'customElements' in window;
     const supportsShadowDom = 'attachShadow' in document.createElement('div');
 
+    //- const supportsFetch = 'fetch' in window;
+
     let polyfills = [];
 
     if(!supportsCustomElementsV1){
@@ -36,13 +38,14 @@ mixin polyfill(path)
       polyfills.push('/polyfills/shadydom.min.js');
       polyfills.push('/polyfills/shadydom.min.js.map');
     }
-      polyfills.push('/polyfills/shadycss.min.js');
-      polyfills.push('/polyfills/shadycss.min.js.map');
-    
-     
-    if(polyfills.length === 0){
+    polyfills.push('/polyfills/shadycss.min.js');
+    polyfills.push('/polyfills/shadycss.min.js.map');
+      
 
-    } 
+    //- if(!supportsFetch){
+    //-   polyfills.push('/polyfills/whatwg-fetch/fetch.js');
+    //- }
+     
     let p = polyfills.reduce((acc, path) => {
       return acc.then(() => loadScript(path));
     }, Promise.resolve());
@@ -55,5 +58,5 @@ mixin polyfill(path)
           });
       })
       .catch(e => {
-        console.error('loading of polyfills failed', e.target.getAttribute('src'));
+        console.error('loading of polyfills failed path:', e.target.getAttribute('src'));
       });

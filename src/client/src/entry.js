@@ -1,4 +1,5 @@
 // require('./index.less');
+import 'whatwg-fetch';
 
 //console.log('before import: ', customElements);
 import * as common from './common';
@@ -38,11 +39,24 @@ let init = () => {
 
   let container = document.querySelector('catalog-container');
 
+  const backendData = Promise.all([
+    common.elements.list(),
+    common.elements.version()]);
+
+  console.log('backend data: ', backendData);
+
+  backendData.then(([list, version]) => {
+    console.log('backend data loaded: ', list, version)
+  })
+    .catch(e => {
+      console.error('error loading backend data: ', e);
+    })
+
   customElements.whenDefined('catalog-container')
     .then(() => {
       console.log('catalog-container is defined...');
       container.isLoading(true);
-      return Promise.all([common.elements.list(), common.elements.version()]);
+      return backendData;
     })
     .then(([list, version]) => {
       console.log('list: ', list, 'version: ', version);

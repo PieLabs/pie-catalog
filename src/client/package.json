@@ -11,7 +11,8 @@
   "dependencies": {
     "@webcomponents/custom-elements": "^1.0.0-alpha.3",
     "@webcomponents/shadycss": "github:webcomponents/shadycss",
-    "@webcomponents/shadydom": "github:webcomponents/shadydom"
+    "@webcomponents/shadydom": "github:webcomponents/shadydom",
+    "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
     "css-loader": "^0.26.1",
