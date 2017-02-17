@@ -30,18 +30,18 @@ router.get('/:pkg/*', (req, res) => {
   let fullPath = `@webcomponents/${pkg}/${p}`;
   stream(res, fullPath);
 });
-router.get('/:name.js', (req, res) => {
-  logger.info(req.params);
-  let {name} = req.params;
-  name = name.replace('.min', '');
-  let jsPath = `@webcomponents/${name}/${name}.min.js`;
-  logger.info('jsPath: ', jsPath);
-  stream(res, jsPath);
-});
+// router.get('/:name.js', (req, res) => {
+//   logger.info(req.params);
+//   let {name} = req.params;
+//   name = name.replace('.min', '');
+//   let jsPath = `@webcomponents/${name}/${name}.min.js`;
+//   logger.info('jsPath: ', jsPath);
+//   stream(res, jsPath);
+// });
 
 router.get('/:name.js.map', (req, res) => {
   logger.info(req.params);
-  let {name} = req.params;
+  let { name } = req.params;
   name = name.replace('.min', '');
   let jsPath = `@webcomponents/${name}/${name}.min.js.map`;
   logger.info('jsPath: ', jsPath);

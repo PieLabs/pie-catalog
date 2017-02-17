@@ -29,17 +29,14 @@ mixin polyfill(path)
     let polyfills = [];
 
     if(!supportsCustomElementsV1){
-      polyfills.push('/polyfills/custom-elements.min.js');
-      polyfills.push('/polyfills/custom-elements.min.js.map');
+      polyfills.push('/polyfills/custom-elements/custom-elements.min.js');
       polyfills.push('/polyfills/custom-elements/src/native-shim.js');
     } 
     
     if(!supportsShadowDom){
-      polyfills.push('/polyfills/shadydom.min.js');
-      polyfills.push('/polyfills/shadydom.min.js.map');
+      polyfills.push('/polyfills/shadydom/shadydom.min.js');
     }
-    polyfills.push('/polyfills/shadycss.min.js');
-    polyfills.push('/polyfills/shadycss.min.js.map');
+    polyfills.push('/polyfills/shadycss/shadycss.min.js');
       
 
     //- if(!supportsFetch){
