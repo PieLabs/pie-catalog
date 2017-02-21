@@ -23,7 +23,7 @@ export default class CatalogHeader extends HTMLElement {
       }
 
       a{
-        font-size: 14px;
+        font-size: 12px;
         text-transform: uppercase;
         text-decoration: none;
         color: var(--pie-brand-color, #333333);
@@ -42,7 +42,7 @@ export default class CatalogHeader extends HTMLElement {
 
     </style>
     <pie-brand></pie-brand>
-    <a href="//pielabs.github.io/pie-docs/" target="_blank">Documentation</a>
+    <a href="//pielabs.github.io/pie-docs/" target="_blank">PIE FRAMEWORK</a>
     `;
   }
 
