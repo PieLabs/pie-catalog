@@ -14,7 +14,6 @@ export default class FancyTabs extends HTMLElement {
 
         #tabs {
           border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-          border-top: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
           display         : flex;
           flex-direction  : row;
           justify-content : center; // ⇾
@@ -51,7 +50,9 @@ export default class FancyTabs extends HTMLElement {
           color: #666666;
           overflow: hidden;  
           cursor: pointer;
-          border: none; /* if the user users a <button> */
+          border: none; /* if the user users a <button> ;
+          */
+          
 
         }
         #tabs ::slotted([aria-selected="true"]) {
@@ -59,19 +60,6 @@ export default class FancyTabs extends HTMLElement {
           color: black;
         }
 
-        #tabs ::slotted([aria-selected="true"]):after {
-          content: "hello world";
-          // height: 2px;
-          // width: 100%;
-          // display: block;
-          // content: " ";
-          // bottom: 0px;
-          // left: 0px;
-          // position: absolute;
-          // background: $tab-highlight-color;
-          // animation: border-expand 0.2s cubic-bezier(0.4, 0.0, 0.4, 1) 0.01s alternate forwards;
-          // transition: all 1s cubic-bezier(0.4, 0.0, 1, 1);
-        }
         #tabs ::slotted(:focus) {
           outline: none;
         }
@@ -82,7 +70,7 @@ export default class FancyTabs extends HTMLElement {
 
       </style>
       <div id="tabs">
-        <slot id="tabsSlot" name="title"></slot>
+        <slot id="tabsSlot" name="title"></slot> 
       </div>
       <div id="panels">
         <slot id="panelsSlot"></slot>
@@ -104,7 +92,7 @@ export default class FancyTabs extends HTMLElement {
   }
 
   connectedCallback() {
-    this.setAttribute('role', 'tablist');
+    this.setAttribute('role', 'tablist');   
 
     const tabsSlot = this.shadowRoot.querySelector('#tabsSlot');
     const panelsSlot = this.shadowRoot.querySelector('#panelsSlot');
@@ -120,6 +108,24 @@ export default class FancyTabs extends HTMLElement {
       // panel.setAttribute('tabindex', 0);
     }
 
+    // add bottom line
+    for (let [i, tab] of this.tabs.entries()) {
+      let bottomLineEl = document.createElement("span");
+      bottomLineEl.className = "bottomLine";
+      tab.appendChild(bottomLineEl);
+      bottomLineEl.style = `
+          height: 2px;
+          width: 100%;
+          display: block;
+          content: " ";
+          bottom: 0px;
+          left: 0px;
+          position: absolute;
+          opacity: 0;
+          background: blue;
+          animation: border-expand 0.2s cubic-bezier(0.4, 0.0, 0.4, 1) 0.01s alternate forwards;
+          transition: all .5s cubic-bezier(0.4, 0.0, 1, 1);`;   
+    }
     // Save refer to we can remove listeners later.
     this._boundOnTitleClick = this._onTitleClick.bind(this);
     this._boundOnKeyDown = this._onKeyDown.bind(this);
@@ -183,6 +189,12 @@ export default class FancyTabs extends HTMLElement {
       tab.setAttribute('tabindex', select ? 0 : -1);
       tab.setAttribute('aria-selected', select);
       this.panels[i].setAttribute('aria-hidden', !select);
+      let el = tab.querySelector('span.bottomLine');
+      if (select) {
+        el.style.opacity = '100';
+      } else {
+        el.style.opacity = '0';
+      }
     }
   }
 }
