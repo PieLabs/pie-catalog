@@ -5,8 +5,13 @@ const templateHTML = `
     <style>
 
       :host {
-        display: block;
-        position:relative;
+        display: flex;
+        position: absolute;
+        flex-direction: column;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
       }
 
       .header {
@@ -65,35 +70,10 @@ const templateHTML = `
       <div id="repo"></div>
       <div id="version"></div>
       <div id="org"></div>
-      <github-avatar size="30"></github-avatar>
     </div>
-        <!-- <div id="description"></div>
-         <div id="demo-holder"> -->
-         <div style="height: 100px; background-color: red;">here is the slot</div>
-          <slot></slot>
-        <!-- </div>
-        <div id="markdown-holder">
-          <markdown-element></markdown-element>
-        </div> -->
-    <!-- <fancy-tabs>
-      <button slot="title">info</button>
-      <button id="schemas-button" slot="title">schemas</button>
-      <div>
-        <div id="description"></div>
-        <div id="demo-holder">
-          <slot></slot>
-        </div>
-        <div id="markdown-holder">
-          <markdown-element></markdown-element>
-        </div>
-        <info-panel></info-panel>
-        <dependencies-panel></dependencies-panel>
-      </div>
-      <div>
-        <catalog-schemas></catalog-schemas>
-      </div>
-      
-    </fancy-tabs> -->
+   <div style="height: 100%">
+     <slot></slot>
+   </div>
 `;
 
 export default class CatalogEntry extends HTMLElement {
@@ -120,14 +100,14 @@ export default class CatalogEntry extends HTMLElement {
     }
     let e = this._element;
 
-    this.shadowRoot.querySelector('#repo').textContent = e.repo;
-    this.shadowRoot.querySelector('#version').textContent = e.tag;
-    this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
-    this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
+    // this.shadowRoot.querySelector('#repo').textContent = e.repo;
+    // this.shadowRoot.querySelector('#version').textContent = e.tag;
+    // this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    // this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
 
-    this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
-      this.dispatchEvent(events.viewOrg(this._element));
-    });
+    // this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
+    // this.dispatchEvent(events.viewOrg(this._element));
+    // });
 
     // customElements.whenDefined('info-panel')
     //   .then(() => {

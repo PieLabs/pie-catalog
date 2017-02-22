@@ -20,7 +20,10 @@ template.innerHTML = `
         [loading] {
           opacity: 0;
         }
-                
+        ::slotted(*){
+          height: 100%;
+        }        
+        
         #content { 
           position: relative;
           flex-grow: 1;

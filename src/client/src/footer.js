@@ -4,6 +4,7 @@ import { prepareTemplate, applyStyle } from './styles';
 const templateHTML = `
     <style>
     :host{
+      height: 50px;
       padding: 7px;
       display: block;
       background-color: var(--catalog-header-bg, rgba(0,50, 49,0.1));
