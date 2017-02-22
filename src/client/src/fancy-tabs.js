@@ -16,7 +16,7 @@ export default class FancyTabs extends HTMLElement {
           border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
           display         : flex;
           flex-direction  : row;
-          justify-content : center; // ⇾
+          justify-content : flex-start; 
           align-content   : space-between; // ||
           align-items     : flex-start; // ↓
 
@@ -44,7 +44,7 @@ export default class FancyTabs extends HTMLElement {
 
           text-align: center;
           font-weight: 500;
-          font-size: 20px;
+          font-size: 16px;
           text-transform: uppercase;
 
           color: #666666;
@@ -122,7 +122,7 @@ export default class FancyTabs extends HTMLElement {
           left: 0px;
           position: absolute;
           opacity: 0;
-          background: blue;
+          background: var(--tab-bottom-line, green);
           animation: border-expand 0.2s cubic-bezier(0.4, 0.0, 0.4, 1) 0.01s alternate forwards;
           transition: all .5s cubic-bezier(0.4, 0.0, 1, 1);`;   
     }
