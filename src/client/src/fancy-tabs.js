@@ -13,32 +13,47 @@ export default class FancyTabs extends HTMLElement {
         }
 
         #tabs {
-          display: block; 
-          -webkit-user-select: none;
-          user-select: none;
-          margin-bottom: 10px;
           border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-          border-top: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-        }
-        
-        #tabs slot {
-          display: inline-flex; /* Safari bug. Treats <slot> as a parent */
+          display         : flex;
+          flex-direction  : row;
+          justify-content : flex-start; 
+          align-content   : space-between; // ||
+          align-items     : flex-start; // ↓
+
+          height          : 48px;
+          padding         : 0 0 0 0;
+          margin          : 0;
+          border-bottom   : 1px solid $tab-border-color;
         }
 
         /* Safari does not support #id prefixes on ::slotted
            See https://bugs.webkit.org/show_bug.cgi?id=160538 */
         #tabs ::slotted(*) {
-          font-size: 13px;
-          background-color: rgba(0,0,0,0);
-          color: #666666;
-          padding: 6px;
+          
+          margin: 0;
+          border: none;
+          padding: 0 24px 0 24px;
+
+          float: left;
+          position: relative;
+          display: block;
+
+          text-decoration: none;
+          height: 48px;
+          line-height: 48px;
+
           text-align: center;
-          text-overflow: ellipsis;
-          white-space: nowrap;
+          font-weight: 500;
+          font-size: 16px;
           text-transform: uppercase;
-          overflow: hidden;
+
+          color: #666666;
+          overflow: hidden;  
           cursor: pointer;
-          border: none; /* if the user users a <button> */
+          border: none; /* if the user users a <button> ;
+          */
+          
+
         }
         #tabs ::slotted([aria-selected="true"]) {
           font-weight: 500;
@@ -48,12 +63,14 @@ export default class FancyTabs extends HTMLElement {
         #tabs ::slotted(:focus) {
           outline: none;
         }
+
         #panels ::slotted([aria-hidden="true"]) {
           display: none;
         }
+
       </style>
       <div id="tabs">
-        <slot id="tabsSlot" name="title"></slot>
+        <slot id="tabsSlot" name="title"></slot> 
       </div>
       <div id="panels">
         <slot id="panelsSlot"></slot>
@@ -75,7 +92,7 @@ export default class FancyTabs extends HTMLElement {
   }
 
   connectedCallback() {
-    this.setAttribute('role', 'tablist');
+    this.setAttribute('role', 'tablist');   
 
     const tabsSlot = this.shadowRoot.querySelector('#tabsSlot');
     const panelsSlot = this.shadowRoot.querySelector('#panelsSlot');
@@ -91,6 +108,24 @@ export default class FancyTabs extends HTMLElement {
       // panel.setAttribute('tabindex', 0);
     }
 
+    // add bottom line
+    for (let [i, tab] of this.tabs.entries()) {
+      let bottomLineEl = document.createElement("span");
+      bottomLineEl.className = "bottomLine";
+      tab.appendChild(bottomLineEl);
+      bottomLineEl.style = `
+          height: 2px;
+          width: 100%;
+          display: block;
+          content: " ";
+          bottom: 0px;
+          left: 0px;
+          position: absolute;
+          opacity: 0;
+          background: var(--tab-bottom-line, green);
+          animation: border-expand 0.2s cubic-bezier(0.4, 0.0, 0.4, 1) 0.01s alternate forwards;
+          transition: all .5s cubic-bezier(0.4, 0.0, 1, 1);`;   
+    }
     // Save refer to we can remove listeners later.
     this._boundOnTitleClick = this._onTitleClick.bind(this);
     this._boundOnKeyDown = this._onKeyDown.bind(this);
@@ -154,6 +189,12 @@ export default class FancyTabs extends HTMLElement {
       tab.setAttribute('tabindex', select ? 0 : -1);
       tab.setAttribute('aria-selected', select);
       this.panels[i].setAttribute('aria-hidden', !select);
+      let el = tab.querySelector('span.bottomLine');
+      if (select) {
+        el.style.opacity = '100';
+      } else {
+        el.style.opacity = '0';
+      }
     }
   }
 }
