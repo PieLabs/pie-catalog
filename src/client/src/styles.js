@@ -8,7 +8,7 @@ export function prepareTemplate(templateHTML, elementName) {
 export function applyStyle(el, template, isShadow) {
   isShadow = isShadow !== false;
 
-  ShadyCSS.applyStyle(el);
+  ShadyCSS.styleElement(el);
   let templateCopy = document.importNode(template.content, true);
   if (isShadow) {
     let shadowRoot = el.attachShadow({ mode: 'open' });

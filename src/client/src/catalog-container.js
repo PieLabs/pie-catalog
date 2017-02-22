@@ -42,7 +42,7 @@ export default class CatalogContainer extends HTMLElement {
 
   constructor() {
     super();
-    ShadyCSS.applyStyle(this);
+    ShadyCSS.styleElement(this);
 
     if (!this.shadowRoot) {
       this.attachShadow({ mode: 'open' });

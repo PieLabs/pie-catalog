@@ -6,7 +6,7 @@ import { VIEW_ORG } from './events'
 
 let logic = require.ensure([], () => {
 
-  const {define} = require('json-schema-element');
+  const { define } = require('json-schema-element');
   define();
 
   //load up the select field
@@ -15,8 +15,8 @@ let logic = require.ensure([], () => {
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
 
-  const CatalogSchemas = require('./schemas').default;
-  customElements.define('catalog-schemas', CatalogSchemas);
+  // const CatalogSchemas = require('./schemas').default;
+  // customElements.define('catalog-schemas', CatalogSchemas);
 
   const { default: IframeHolder } = require('./iframe-holder');
   customElements.define('iframe-holder', IframeHolder);
@@ -33,19 +33,19 @@ let logic = require.ensure([], () => {
   customElements.define('github-info-count', GithubInfoCount);
 
   //Note: these elements auto register themselves
-  require('time-elements');
+  // require('time-elements');
 
   const FancyTabs = require('./fancy-tabs').default;
   customElements.define('fancy-tabs', FancyTabs);
 
   const { default: CatalogDemo } = require('./catalog-demo');
   customElements.define('catalog-demo', CatalogDemo);
-  const {default: ControlPanel} = require('./catalog-demo/control-panel');
+  const { default: ControlPanel } = require('./catalog-demo/control-panel');
   customElements.define('control-panel', ControlPanel);
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
+let init = () => {
 
   let info = common.elements.load(window.pie.org, window.pie.repo);
 
@@ -82,8 +82,20 @@ document.addEventListener('DOMContentLoaded', () => {
         container.isLoading(false);
       }, 180)
     })
-});
+};
 
+console.log('readyState: ', document.readyState);
+
+if (document.readyState === 'complete' /*|| document.readyState === 'interactive'*/) {
+  init();
+} else {
+  document.onreadystatechange = (e) => {
+    console.log('readystatechange: ', e, document.readyState);
+    if (document.readyState === 'complete') {
+      init();
+    }
+  }
+}
 
 document.addEventListener(VIEW_ORG, (e) => {
   let org = event.detail.element.org;

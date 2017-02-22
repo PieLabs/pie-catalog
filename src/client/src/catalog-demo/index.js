@@ -1,15 +1,5 @@
-
-export default class CatalogDemo extends HTMLElement {
-  constructor() {
-    super();
-
-    /** Note: can't use shadow root if the inner element is dependentent 
-     * on style definitions that uses markup from inside the element.
-     */
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+import { prepareTemplate, applyStyle } from '../styles';
+const templateHTML = `
     <style>
       :host{
         display: block;
@@ -23,8 +13,18 @@ export default class CatalogDemo extends HTMLElement {
     </style>
     <control-panel></control-panel>
     <slot></slot> 
-    `;
+`;
 
+export default class CatalogDemo extends HTMLElement {
+  constructor() {
+    super();
+
+    /** Note: can't use shadow root if the inner element is dependentent 
+     * on style definitions that uses markup from inside the element.
+     */
+    const template = prepareTemplate(templateHTML, 'catalog-demo');
+
+    let sr = applyStyle(this, template);
     this._registeredPies = {};
     this._sessions = [];
     this._env = {

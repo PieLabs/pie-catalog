@@ -25,7 +25,7 @@ router.get('/:pkg/*', (req, res) => {
   logger.debug('params:', req.params);
   let p = req.params[0];
   let pkg = req.params.pkg;
-  let fullPath = `@webcomponents/${pkg}/${p}`;
+  let fullPath = (pkg === 'whatwg-fetch') ? `${pkg}/${p}` : `@webcomponents/${pkg}/${p}`;
   stream(res, fullPath);
 });
 

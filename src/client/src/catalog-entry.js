@@ -1,11 +1,7 @@
 import * as events from './events';
+import { prepareTemplate, applyStyle } from './styles';
 
-export default class CatalogEntry extends HTMLElement {
-
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const templateHTML = `
     <style>
 
       :host {
@@ -71,7 +67,15 @@ export default class CatalogEntry extends HTMLElement {
       <div id="org"></div>
       <github-avatar size="30"></github-avatar>
     </div>
-    <fancy-tabs>
+        <!-- <div id="description"></div>
+         <div id="demo-holder"> -->
+         <div style="height: 100px; background-color: red;">here is the slot</div>
+          <slot></slot>
+        <!-- </div>
+        <div id="markdown-holder">
+          <markdown-element></markdown-element>
+        </div> -->
+    <!-- <fancy-tabs>
       <button slot="title">info</button>
       <button id="schemas-button" slot="title">schemas</button>
       <div>
@@ -89,8 +93,15 @@ export default class CatalogEntry extends HTMLElement {
         <catalog-schemas></catalog-schemas>
       </div>
       
-    </fancy-tabs>
-    `;
+    </fancy-tabs> -->
+`;
+
+export default class CatalogEntry extends HTMLElement {
+
+  constructor() {
+    super();
+    const template = prepareTemplate(templateHTML, 'catalog-entry');
+    let sr = applyStyle(this, template);
   }
 
   connectedCallback() {
@@ -118,24 +129,24 @@ export default class CatalogEntry extends HTMLElement {
       this.dispatchEvent(events.viewOrg(this._element));
     });
 
-    customElements.whenDefined('info-panel')
-      .then(() => {
-        this.shadowRoot.querySelector('info-panel').github = e.github;
-      });
+    // customElements.whenDefined('info-panel')
+    //   .then(() => {
+    //     this.shadowRoot.querySelector('info-panel').github = e.github;
+    //   });
 
-    this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
+    // this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
 
-    this.shadowRoot.querySelector('#description').textContent = e.package.description;
+    // this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
-    if (!e.schemas || e.schemas.length === 0) {
-      this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
-    } else {
-      this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
-    }
+    // if (!e.schemas || e.schemas.length === 0) {
+    //   this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
+    // } else {
+    //   this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
+    // }
 
-    customElements.whenDefined('dependencies-panel').then(() => {
-      this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
-    });
+    // customElements.whenDefined('dependencies-panel').then(() => {
+    //   this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
+    // });
 
   }
 

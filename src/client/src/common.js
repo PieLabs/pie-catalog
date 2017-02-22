@@ -1,20 +1,16 @@
 require('./index.less');
 
-console.log('before define function: ', customElements, customElements.define);
 let define = (name, prototype) => {
-  console.log('in define function: ', customElements, customElements.define);
   if (!('customElements' in window)) {
     throw new Error('customElements isnt defined');
   }
 
   if (typeof customElements.define !== 'function') {
-    console.log(customElements);
     throw new Error('customElements.define is not defined');
   }
   return customElements.define(name, prototype)
 }
 
-console.log('before calling define function: ', customElements, customElements.define);
 import CatalogListings from './listings';
 define('catalog-listings', CatalogListings);
 

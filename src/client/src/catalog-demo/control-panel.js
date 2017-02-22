@@ -1,9 +1,5 @@
-export default class ControlPanel extends HTMLElement {
-  constructor() {
-    super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+import { prepareTemplate, applyStyle } from '../styles';
+const templateHTML = `
     <style>
     :host{
       padding-bottom: 6px;
@@ -35,7 +31,14 @@ export default class ControlPanel extends HTMLElement {
     </select-field>
 
     <span id="langs-holder"></span>
-    `;
+`;
+
+
+export default class ControlPanel extends HTMLElement {
+  constructor() {
+    super();
+    const template = prepareTemplate(templateHTML, 'control-panel');
+    let sr = applyStyle(this, template);
   }
 
   set env(e) {

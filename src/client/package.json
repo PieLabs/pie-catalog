@@ -12,7 +12,8 @@
     "@webcomponents/custom-elements": "^1.0.0-alpha.3",
     "@webcomponents/shadycss": "github:webcomponents/shadycss",
     "@webcomponents/shadydom": "github:webcomponents/shadydom",
-    "whatwg-fetch": "^2.0.2"
+    "whatwg-fetch": "^2.0.2",
+    "material-elements": "../../../material-elements"
   },
   "devDependencies": {
     "css-loader": "^0.26.1",
@@ -24,7 +25,7 @@
     "octicons": "^5.0.1",
     "raw-loader": "^0.5.1",
     "style-loader": "^0.13.1",
-    "time-elements": "^0.6.1",
+    "time-elements": "github/time-elements#custom-elements-v1",
     "webcomponents.js": "^0.7.23"
   }
 }

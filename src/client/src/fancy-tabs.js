@@ -1,12 +1,8 @@
 //lifted from: https://gist.github.com/ebidel/2d2bb0cdec3f2a16cf519dbaa791ce1b
-export default class FancyTabs extends HTMLElement {
+import { prepareTemplate, applyStyle } from './styles';
 
 
-  constructor() {
-    super();
-    // Create shadow DOM for the component.
-    let shadowRoot = this.attachShadow({ mode: 'open' });
-    shadowRoot.innerHTML = `
+const templateHTML = `
       <style>
         :host{
           display: block;
@@ -55,10 +51,19 @@ export default class FancyTabs extends HTMLElement {
       <div id="tabs">
         <slot id="tabsSlot" name="title"></slot>
       </div>
-      <div id="panels">
+      <!-- <div id="panels">
         <slot id="panelsSlot"></slot>
-      </div>
-    `;
+      </div> -->
+`;
+export default class FancyTabs extends HTMLElement {
+
+
+  constructor() {
+    super();
+    const template = prepareTemplate(templateHTML, 'fancy-tabs');
+
+    // Create shadow DOM for the component.
+    let shadowRoot = applyStyle(this, template);
   }
 
   get selected() {
