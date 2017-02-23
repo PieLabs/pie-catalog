@@ -7,6 +7,7 @@
   "main": "lib/index.js",
   "scripts": {
     "test": "./node_modules/.bin/gulp test",
+    "test-client": "wct test/unit/client/catalog-demo/index.test.html",
     "postinstall": "./node_modules/.bin/gulp postinstall",
     "prepublish": "npm run build",
     "build": "gulp build",
@@ -69,6 +70,7 @@
     "temp": "^0.8.3",
     "ts-node": "^2.0.0",
     "typescript": "^2.1.5",
+    "web-component-tester": "^5.0.0",
     "webpack": "^2.2.0-rc.3",
     "webpack-dev-middleware": "^1.9.0",
     "webpack-stream": "^3.2.0"

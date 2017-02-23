@@ -33,7 +33,7 @@ gulp.task('watch-ts', () => watch('ts'));
 gulp.task('watch-pug', () => watch('pug'));
 
 gulp.task('unit', ['build'], () => {
-  return gulp.src('test/unit/**/*.js', { read: false })
+  return gulp.src(['test/unit/**/*.js', '!test/unit/client/**/*.js'], { read: false })
     .pipe(mocha({ require: ['babel-register'] }));
 });
 
