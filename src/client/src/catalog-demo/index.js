@@ -29,6 +29,14 @@ export default class CatalogDemo extends HTMLElement {
         margin-top: 20px;
       }
 
+      .pie-panel.black-on-rose {
+        background-color: mistyrose;
+      }
+
+      .pie-panel.white-on-black {
+        background-color: black;
+        color: white;
+      }
     </style>
     <control-panel></control-panel>
     <div class="pie-panel">
@@ -51,6 +59,7 @@ export default class CatalogDemo extends HTMLElement {
 
   connectedCallback() {
     this.$controlPanel = this.shadowRoot.querySelector('control-panel');
+    this.$piePanel = this.shadowRoot.querySelector('.pie-panel');
 
     customElements.whenDefined('control-panel')
       .then(() => {
@@ -58,6 +67,17 @@ export default class CatalogDemo extends HTMLElement {
       });
 
     this.$controlPanel.addEventListener('env-changed', e => {
+       let classFromEnv = (e) => {
+        const colorMap = {
+          black_on_rose: 'black-on-rose',
+          white_on_black: 'white-on-black',
+          black_on_white: 'default'
+        };
+        if (e.accessibility && e.accessibility.colorContrast && colorMap[e.accessibility.colorContrast]) {
+          return colorMap[e.accessibility.colorContrast];
+        }
+      };
+      this.$piePanel.setAttribute('class', `pie-panel ${classFromEnv(e.detail.env)}`);
       this._updatePies();
     });
   }
