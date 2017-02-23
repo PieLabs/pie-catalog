@@ -3,7 +3,11 @@ include ./mixins
 doctype html
 html
   head
-
+    style.
+      body{
+        margin: 0;
+        padding: 0;
+      }
     script. 
       window.demo = window.demo || {};
       window.demo.config = !{demo.config ? JSON.stringify(demo.config) : '{}'};
@@ -19,12 +23,12 @@ html
       window.pie.org = '!{org}';
       window.pie.repo = '!{repo}';
 
-    avatar-service(url-template=config.avatarUrl)
+    //- avatar-service(url-template=config.avatarUrl)
     catalog-container
       catalog-entry
         catalog-demo 
-        //- div(style="height: 10%; background-color: orange") 
-        //-   | test text
+        //-  div(style="height: 10%; background-color: orange") 
+        //-    | test text
 
     +polyfill(['/repo.js'].concat(js || []).concat(demo.js))
     //- script.

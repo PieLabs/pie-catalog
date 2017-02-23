@@ -4,15 +4,10 @@ const templateHTML = `
       :host{
         display: block;
       }
-
-      control-panel{
-        display: block;
-        padding-bottom: 10px;
-      }
-
     </style>
-    <control-panel></control-panel>
-    <slot></slot> 
+    <div>
+      <slot></slot> 
+    </div>
 `;
 
 export default class CatalogDemo extends HTMLElement {
@@ -39,16 +34,16 @@ export default class CatalogDemo extends HTMLElement {
   }
 
   connectedCallback() {
-    this.$controlPanel = this.shadowRoot.querySelector('control-panel');
+    // this.$controlPanel = this.shadowRoot.querySelector('control-panel');
 
-    customElements.whenDefined('control-panel')
-      .then(() => {
-        this.$controlPanel.env = this._env;
-      });
+    // customElements.whenDefined('control-panel')
+    //   .then(() => {
+    //     this.$controlPanel.env = this._env;
+    //   });
 
-    this.$controlPanel.addEventListener('env-changed', e => {
-      this._updatePies();
-    });
+    // this.$controlPanel.addEventListener('env-changed', e => {
+    //   this._updatePies();
+    // });
   }
 
   set markup(m) {
@@ -60,7 +55,7 @@ export default class CatalogDemo extends HTMLElement {
 
     customElements.whenDefined('control-panel')
       .then(() => {
-        this.$controlPanel.langs = this._config.langs;
+        //this.$controlPanel.langs = this._config.langs;
       });
 
     this._updatePies();

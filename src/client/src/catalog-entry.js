@@ -4,21 +4,16 @@ import { prepareTemplate, applyStyle } from './styles';
 const templateHTML = `
     <style>
 
-      :host {
-        display: flex;
-        position: absolute;
-        flex-direction: column;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
+      :host { 
+        display: block;
       }
-
+      
       .header {
         display: flex;
         align-items: bottom;
+        font-size: 20px;
       }
-
+      
       #repo, #version {
         font-size: 25px;
         padding-left: 5px;
@@ -38,42 +33,23 @@ const templateHTML = `
         color: rgba(0,0,0,0.5);
       }
 
-      #demo-holder{
-        margin-bottom: 0px;
-      }
-
-      .header{
-        font-size: 20px;
-      }
-
-      hr {
-        border: none;
-        border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-      }
-
-      #demo-holder{
-        padding-top: 20px;
-      }
-
-      
-      fancy-tabs{
-        margin-top: 10px;
-      }
-      
-      github-avatar{
-        padding-left: 6px;
-      }
-
 
     </style>
-    <div class="header">
-      <div id="repo"></div>
-      <div id="version"></div>
-      <div id="org"></div>
-    </div>
-   <div style="height: 100%">
-     <slot></slot>
-   </div>
+   <div>
+     <div class="header">
+       <div id="repo">Repo</div>
+       <div id="version">Version</div>
+       <div id="org">Org</div>
+       <github-avatar size="30"></github-avatar>
+     </div>
+     <fancy-tabs>
+       <button slot="title">info</button>
+       <div>
+          <div id="description">Description</div>
+          <slot></slot>
+       </div>
+     </fancy-tabs>
+  </div>
 `;
 
 export default class CatalogEntry extends HTMLElement {

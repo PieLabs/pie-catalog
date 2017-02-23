@@ -1,7 +1,6 @@
 const template = document.createElement('template');
-
-template.innerHTML = `
-      <style>
+/**
+ * 
         :host {
           display: flex;
           flex-direction: column;
@@ -37,6 +36,29 @@ template.innerHTML = `
         <slot></slot>
       </div>
       <catalog-footer></catalog-footer>
+      <style> 
+      :host {
+        display: flex;
+        flex-direction: column;
+        margin: 0;
+        padding: 0;
+      }
+
+      .content{
+        flex: 1;
+      }
+      </style>
+      <div class="content"><slot></slot></div>
+  // :host {
+  //   display: flex;
+  //   flex-direction: column;
+  // }
+ */
+template.innerHTML = `
+  <catalog-header></catalog-header> 
+  <progress-bar disabled></progress-bar>
+  <slot></slot>
+  <catalog-footer></catalog-footer>
 `;
 
 ShadyCSS.prepareTemplate(template, 'catalog-container');
@@ -75,10 +97,10 @@ export default class CatalogContainer extends HTMLElement {
 
     if (loading) {
       this._progressBar.enable();
-      this._content.setAttribute('loading', '');
+      // this._content.setAttribute('loading', '');
     } else {
       this._progressBar.disable();
-      this._content.removeAttribute('loading');
+      // this._content.removeAttribute('loading');
     }
   }
 }
