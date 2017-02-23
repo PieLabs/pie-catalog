@@ -1,12 +1,5 @@
 import { prepareTemplate, applyStyle, noSelect } from '../styles';
-/**
- * 
-      // position: absolute;
-      // left: 0;
-      // top: 0;
-      // bottom: 0; 
-      // right: 0;
- */
+
 const tabsHtml = ` 
   <style>
     :host{
@@ -145,10 +138,7 @@ export class CTab extends HTMLElement {
   }
 }
 
-export class CTabTitle extends HTMLElement {
-  constructor() {
-    super();
-    let sr = applyStyle(this, prepareTemplate(`
+const titleTemplate = prepareTemplate(`
     <style>
       :host{
         position: relative;
@@ -174,7 +164,12 @@ export class CTabTitle extends HTMLElement {
       }
     </style>
     <div><slot></slot></div>
-    `, 'c-tab-title'));
+    `, 'c-tab-title');
+
+export class CTabTitle extends HTMLElement {
+  constructor() {
+    super();
+    let sr = applyStyle(this, titleTemplate);
   }
 
   connectedCallback() {
