@@ -42,13 +42,14 @@ const templateHTML = `
        <div id="org">Org</div>
        <github-avatar size="30"></github-avatar>
      </div>
-     <fancy-tabs>
-       <button slot="title">info</button>
-       <div>
-          <div id="description">Description</div>
-          <slot></slot>
-       </div>
-     </fancy-tabs>
+     <c-tabs>
+       <c-tab title="demo">
+         <slot></slot>
+       </c-tab>
+       <c-tab title="other">
+         other 
+       </c-tab>
+    </c-tabs>
   </div>
 `;
 

@@ -35,8 +35,12 @@ let logic = require.ensure([], () => {
   //Note: these elements auto register themselves
   // require('time-elements');
 
-  const FancyTabs = require('./fancy-tabs').default;
-  customElements.define('fancy-tabs', FancyTabs);
+  // const FancyTabs = require('./fancy-tabs').default;
+  // customElements.define('fancy-tabs', FancyTabs);
+  const ctabs = require('./c-tabs');
+  customElements.define('c-tabs', ctabs.CTabs);
+  customElements.define('c-tab', ctabs.CTab);
+  customElements.define('c-tab-title', ctabs.CTabTitle);
 
   const { default: CatalogDemo } = require('./catalog-demo');
   customElements.define('catalog-demo', CatalogDemo);

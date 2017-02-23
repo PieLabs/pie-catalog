@@ -1,59 +1,5 @@
 const template = document.createElement('template');
-/**
- * 
-        :host {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          right: 0;
 
-        }
-
-        progress-bar{
-          height: 2px;
-        }
-
-        [loading] {
-          opacity: 0;
-        }
-        ::slotted(*){
-          height: 100%;
-        }        
-        
-        #content { 
-          position: relative;
-          flex-grow: 1;
-          transition: opacity 300ms linear;
-          padding: 10px;
-        } 
-      </style>
-      <catalog-header></catalog-header> 
-      <progress-bar disabled></progress-bar>
-      <div id="content">
-        <slot></slot>
-      </div>
-      <catalog-footer></catalog-footer>
-      <style> 
-      :host {
-        display: flex;
-        flex-direction: column;
-        margin: 0;
-        padding: 0;
-      }
-
-      .content{
-        flex: 1;
-      }
-      </style>
-      <div class="content"><slot></slot></div>
-  // :host {
-  //   display: flex;
-  //   flex-direction: column;
-  // }
- */
 template.innerHTML = `
   <catalog-header></catalog-header> 
   <progress-bar disabled></progress-bar>
