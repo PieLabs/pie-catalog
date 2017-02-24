@@ -5,6 +5,13 @@
 npm install 
 ```
 
+## Supported Browsers
+
+* Firefox 51+
+* chrome
+* Safari 10.1+
+
+
 ### backend dependencies
 
 * mongodb - for storing metadata about the element from github and from the archive
