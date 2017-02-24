@@ -54,10 +54,12 @@ export default class ProgressBar extends HTMLElement {
   }
 
   enable() {
+    console.log('enable');
     this._$progress.setAttribute('loading', '');
   }
 
   disable() {
+    console.log('disable');
     this._$progress.removeAttribute('loading');
   }
 

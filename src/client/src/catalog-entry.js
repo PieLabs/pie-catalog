@@ -58,9 +58,9 @@ const templateHTML = `
     </style>
    <div>
      <div class="header">
-       <div id="repo">Repo</div>
-       <div id="version">Version</div>
-       <div id="org">Org</div>
+       <div id="repo"></div>
+       <div id="version"></div>
+       <div id="org"></div>
        <github-avatar size="30"></github-avatar>
      </div>
      <c-tabs>
@@ -79,11 +79,12 @@ const templateHTML = `
   </div>
 `;
 
+const template = prepareTemplate(templateHTML, 'catalog-entry');
+
 export default class CatalogEntry extends HTMLElement {
 
   constructor() {
     super();
-    const template = prepareTemplate(templateHTML, 'catalog-entry');
     let sr = applyStyle(this, template);
   }
 

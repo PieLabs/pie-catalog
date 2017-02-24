@@ -1,3 +1,6 @@
+//init shadycss polyfill
+require('@webcomponents/shadycss/entrypoints/scoping-shim');
+
 export function prepareTemplate(templateHTML, elementName) {
   const template = document.createElement('template');
   template.innerHTML = templateHTML;

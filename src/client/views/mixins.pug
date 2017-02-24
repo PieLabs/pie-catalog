@@ -6,7 +6,7 @@ mixin polyfill(paths)
       console.log('[loadScript] src: ', src);
       var script = document.createElement('script');
       script.src = src;
-      script.onload = () => {
+      script.onload = function() {
         console.log('[loadScript] src: ', src, 'COMPLETE');
         done();
       }
@@ -53,9 +53,6 @@ mixin polyfill(paths)
       if(!('fetch' in window)){
         polyfills.push('/polyfills/whatwg-fetch/fetch.js');
       }
-
-      //always add shadycss
-      polyfills.push('/polyfills/shadycss/scoping-shim.min.js');
       
       var polyfillsPromise = urlsToPromise(polyfills); 
 
