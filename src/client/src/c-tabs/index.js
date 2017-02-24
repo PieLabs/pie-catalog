@@ -99,32 +99,15 @@ export class CTabs extends HTMLElement {
   }
 }
 
-// display: none;
-/**
- * 
-    :host{
-      flex: 0.2;
-      -webkit-flex: 0.2;
-      overflow: hidden;
-    }
-    :host([selected]){
-      flex: 1;
-      -webkit-flex: 1;
-    }
-     display: inline-block;
- * 
- */
 const tabHtml = ` 
   <style>
   :host{
-    overflow: hidden;
-    position: absolute;
-    width: 0px;
-    opacity: 0.0;
+    position: relative;
+    display: none;
   }
   :host([selected]){
     opacity: 1.0;
-    width: auto;
+    display: block;
   }
   </style>
   <slot></slot>
@@ -159,7 +142,7 @@ const titleTemplate = prepareTemplate(`
 
       :host([selected]){
         color: black;
-        border-bottom: solid 1px red;
+        border-bottom: solid 1px var(--ctab-selected-tab-border, rgba(50, 170, 50, 0.7));
       }
     </style>
     <div><slot></slot></div>

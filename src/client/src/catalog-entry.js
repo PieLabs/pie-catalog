@@ -26,7 +26,6 @@ const templateHTML = `
         cursor:pointer;
         transition: color ease-in 100ms;
         color: rgba(0,0,0,0.8);
-        
       }
 
       #org:hover{
@@ -46,8 +45,13 @@ const templateHTML = `
        <c-tab title="demo">
          <slot></slot>
        </c-tab>
-       <c-tab title="other">
-         other 
+       <c-tab title="information">
+         <div id="description"></div>
+         <div id="markdown-holder">
+          <markdown-element></markdown-element>
+        </div>
+        <info-panel></info-panel>
+        <dependencies-panel></dependencies-panel> 
        </c-tab>
     </c-tabs>
   </div>
@@ -77,34 +81,26 @@ export default class CatalogEntry extends HTMLElement {
     }
     let e = this._element;
 
-    // this.shadowRoot.querySelector('#repo').textContent = e.repo;
-    // this.shadowRoot.querySelector('#version').textContent = e.tag;
-    // this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
-    // this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
+    this.shadowRoot.querySelector('#repo').textContent = e.repo;
+    this.shadowRoot.querySelector('#version').textContent = e.tag;
+    this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
 
-    // this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
-    // this.dispatchEvent(events.viewOrg(this._element));
-    // });
+    this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {
+      this.dispatchEvent(events.viewOrg(this._element));
+    });
 
-    // customElements.whenDefined('info-panel')
-    //   .then(() => {
-    //     this.shadowRoot.querySelector('info-panel').github = e.github;
-    //   });
+    customElements.whenDefined('info-panel')
+      .then(() => {
+        this.shadowRoot.querySelector('info-panel').github = e.github;
+      });
 
-    // this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
+    this.shadowRoot.querySelector('markdown-element').markdown = e.readme;
 
-    // this.shadowRoot.querySelector('#description').textContent = e.package.description;
+    this.shadowRoot.querySelector('#description').textContent = e.package.description;
 
-    // if (!e.schemas || e.schemas.length === 0) {
-    //   this.shadowRoot.querySelector('#schemas-button').setAttribute('hidden', '');
-    // } else {
-    //   this.shadowRoot.querySelector('catalog-schemas').schemas = e.schemas;
-    // }
-
-    // customElements.whenDefined('dependencies-panel').then(() => {
-    //   this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
-    // });
-
+    customElements.whenDefined('dependencies-panel').then(() => {
+      this.shadowRoot.querySelector('dependencies-panel').dependencies = e.package.dependencies;
+    });
   }
-
 }

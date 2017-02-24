@@ -6,20 +6,11 @@ import { VIEW_ORG } from './events'
 
 let logic = require.ensure([], () => {
 
-  const { define } = require('json-schema-element');
-  define();
-
-  //load up the select field
   require('material-elements/src/select-field');
 
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
 
-  // const CatalogSchemas = require('./schemas').default;
-  // customElements.define('catalog-schemas', CatalogSchemas);
-
-  const { default: IframeHolder } = require('./iframe-holder');
-  customElements.define('iframe-holder', IframeHolder);
 
   const CatalogEntry = require('./catalog-entry').default;
   customElements.define('catalog-entry', CatalogEntry);
@@ -33,10 +24,8 @@ let logic = require.ensure([], () => {
   customElements.define('github-info-count', GithubInfoCount);
 
   //Note: these elements auto register themselves
-  // require('time-elements');
+  //require('time-elements');
 
-  // const FancyTabs = require('./fancy-tabs').default;
-  // customElements.define('fancy-tabs', FancyTabs);
   const ctabs = require('./c-tabs');
   customElements.define('c-tabs', ctabs.CTabs);
   customElements.define('c-tab', ctabs.CTab);

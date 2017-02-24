@@ -1,62 +1,40 @@
-// const template = document.createElement('template');
 import { prepareTemplate, applyStyle } from './styles';
 
-//display: flex;
-
-/**
- * 
-  :host { 
-    flex-direction: column;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-  }
-
-  .big{
-    flex: 1;
-  }
-
-  catalog-header{
-    flex: 0 0 auto;
-    height: 40px;
-  }
-  catalog-footer{
-    height: 40px;
-  }
-
-  </style>
-    // ::slotted(*){
-    //   display: block;
-    //   flex: 1;
-    // }
- * 
- */
 const template = prepareTemplate(`
   <style>
     :host{
       display: flex;
       flex-direction: column; 
+      position: absolute;
       left: 0;
       top: 0;
       bottom: 0;
       right: 0;
     }
-    
+
+    ::slotted(*){
+      padding: 10px;
+      flex: 1;
+    } 
+
     catalog-header{
       flex: 0 0 auto;
       height: 40px;
     }
+    
+    progress-bar{
+      flex: 0;
+    } 
+    
     catalog-footer{
-      height: 40px;
+      min-height: 40px;
+      flex: 0;
     }
+
   </style>
   <catalog-header></catalog-header> 
   <progress-bar disabled></progress-bar>
-  <div>
   <slot></slot> 
-  </div>
   <catalog-footer></catalog-footer>
 `, 'catalog-container');
 

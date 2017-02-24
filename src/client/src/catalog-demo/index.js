@@ -1,14 +1,30 @@
-import { prepareTemplate, applyStyle } from '../styles';
+import { prepareTemplate, applyStyle, boxShadow } from '../styles';
 const templateHTML = `
     <style>
       :host{
         display: block;
       }
+
+      control-panel{
+        display: block;
+        padding-bottom: 10px;
+      }
+
+      .pie-panel{
+        border-radius: 10px;
+        ${boxShadow}
+        box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.3));
+        padding: 10px;
+        margin-top: 20px;
+      }
+
     </style>
-    <div>
+    <control-panel></control-panel>
+    <div class="pie-panel">
       <slot></slot> 
     </div>
 `;
+
 
 export default class CatalogDemo extends HTMLElement {
   constructor() {
@@ -34,16 +50,16 @@ export default class CatalogDemo extends HTMLElement {
   }
 
   connectedCallback() {
-    // this.$controlPanel = this.shadowRoot.querySelector('control-panel');
+    this.$controlPanel = this.shadowRoot.querySelector('control-panel');
 
-    // customElements.whenDefined('control-panel')
-    //   .then(() => {
-    //     this.$controlPanel.env = this._env;
-    //   });
+    customElements.whenDefined('control-panel')
+      .then(() => {
+        this.$controlPanel.env = this._env;
+      });
 
-    // this.$controlPanel.addEventListener('env-changed', e => {
-    //   this._updatePies();
-    // });
+    this.$controlPanel.addEventListener('env-changed', e => {
+      this._updatePies();
+    });
   }
 
   set markup(m) {

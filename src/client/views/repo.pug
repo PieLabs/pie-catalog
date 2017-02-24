@@ -23,21 +23,9 @@ html
       window.pie.org = '!{org}';
       window.pie.repo = '!{repo}';
 
-    //- avatar-service(url-template=config.avatarUrl)
+    avatar-service(url-template=config.avatarUrl)
     catalog-container
       catalog-entry
         catalog-demo 
-        //-  div(style="height: 10%; background-color: orange") 
-        //-    | test text
 
     +polyfill(['/repo.js'].concat(js || []).concat(demo.js))
-    //- script.
-    //-   //Note: we want to load these scripts synchronously to ensure the load order, but we dont want to block document rendering.
-    //-   let scripts = !{js ? JSON.stringify(js) : '[]'};
-    //-   scripts.push('!{demo.js}');
-    //-   scripts.forEach(function(src) {
-    //-     let script = document.createElement('script');
-    //-     script.src = src;
-    //-     script.async = false;
-    //-     document.head.appendChild(script);
-    //-   }); 

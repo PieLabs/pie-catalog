@@ -13,7 +13,7 @@
     "@webcomponents/shadycss": "github:webcomponents/shadycss",
     "@webcomponents/shadydom": "github:webcomponents/shadydom",
     "whatwg-fetch": "^2.0.2",
-    "material-elements": "../../../material-elements"
+    "material-elements": "PieLabs/material-elements#feature/shadycss"
   },
   "devDependencies": {
     "css-loader": "^0.26.1",
