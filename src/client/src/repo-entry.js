@@ -11,7 +11,6 @@ let logic = require.ensure([], () => {
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
 
-
   const CatalogEntry = require('./catalog-entry').default;
   customElements.define('catalog-entry', CatalogEntry);
 
@@ -22,9 +21,6 @@ let logic = require.ensure([], () => {
   const { default: InfoPanel, GithubInfoCount } = require('./info-panel');
   customElements.define('info-panel', InfoPanel);
   customElements.define('github-info-count', GithubInfoCount);
-
-  //Note: these elements auto register themselves
-  //require('time-elements');
 
   const ctabs = require('./c-tabs');
   customElements.define('c-tabs', ctabs.CTabs);

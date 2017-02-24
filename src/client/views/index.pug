@@ -4,7 +4,6 @@ doctype html
 html
   head 
 
-    +polyfill('/index.js')
 
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
@@ -22,4 +21,6 @@ html
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container
-      catalog-listings    
+      catalog-listings   
+
+    +polyfill('/index.js')
