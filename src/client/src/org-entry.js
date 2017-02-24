@@ -9,7 +9,10 @@ let init = () => {
       return common.elements.listByOrg(window.pie.org);
     })
     .then((list) => {
-      document.querySelector('catalog-org').org = list;
+      customElements.whenDefined('catalog-org')
+        .then(() => {
+          document.querySelector('catalog-org').org = list;
+        });
       document.querySelector('catalog-container').isLoading(false);
     });
 };
@@ -25,6 +28,7 @@ if (document.readyState === 'complete' /*|| document.readyState === 'interactive
     }
   }
 }
+
 document.addEventListener(VIEW_REPO, (e) => {
   console.log('view repo: ', e.detail);
   let {org, repo} = event.detail.element;

@@ -111,8 +111,6 @@ export default class CatalogListing extends HTMLElement {
 
   connectedCallback() {
 
-
-
     let onRepoClick = (e) => {
       e.preventDefault();
       this.dispatchEvent(events.viewRepo(this._element));
