@@ -1,25 +1,71 @@
-const template = document.createElement('template');
+// const template = document.createElement('template');
+import { prepareTemplate, applyStyle } from './styles';
 
-template.innerHTML = `
+//display: flex;
+
+/**
+ * 
+  :host { 
+    flex-direction: column;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+  }
+
+  .big{
+    flex: 1;
+  }
+
+  catalog-header{
+    flex: 0 0 auto;
+    height: 40px;
+  }
+  catalog-footer{
+    height: 40px;
+  }
+
+  </style>
+    // ::slotted(*){
+    //   display: block;
+    //   flex: 1;
+    // }
+ * 
+ */
+const template = prepareTemplate(`
+  <style>
+    :host{
+      display: flex;
+      flex-direction: column; 
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+    }
+    
+    catalog-header{
+      flex: 0 0 auto;
+      height: 40px;
+    }
+    catalog-footer{
+      height: 40px;
+    }
+  </style>
   <catalog-header></catalog-header> 
   <progress-bar disabled></progress-bar>
-  <slot></slot>
+  <div>
+  <slot></slot> 
+  </div>
   <catalog-footer></catalog-footer>
-`;
+`, 'catalog-container');
 
-ShadyCSS.prepareTemplate(template, 'catalog-container');
 
 export default class CatalogContainer extends HTMLElement {
 
   constructor() {
     super();
-    ShadyCSS.styleElement(this);
-
-    if (!this.shadowRoot) {
-      this.attachShadow({ mode: 'open' });
-      let copy = document.importNode(template.content, true);
-      this.shadowRoot.appendChild(copy);
-    }
+    let sr = applyStyle(this, template)
   }
 
   get _progressBar() {
@@ -41,12 +87,8 @@ export default class CatalogContainer extends HTMLElement {
       return;
     }
 
-    if (loading) {
-      this._progressBar.enable();
-      // this._content.setAttribute('loading', '');
-    } else {
+    loading ?
+      this._progressBar.enable() :
       this._progressBar.disable();
-      // this._content.removeAttribute('loading');
-    }
   }
 }

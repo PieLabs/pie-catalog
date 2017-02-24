@@ -118,9 +118,8 @@ const tabHtml = `
   <style>
   :host{
     overflow: hidden;
+    position: absolute;
     width: 0px;
-    display: inline;
-    float: left;
     opacity: 0.0;
   }
   :host([selected]){

@@ -1,22 +1,26 @@
 export function prepareTemplate(templateHTML, elementName) {
-  const template = document.createElement('template');
-  template.innerHTML = templateHTML;
-  ShadyCSS.prepareTemplate(template, elementName);
-  return template;
+  // const template = document.createElement('template');
+  // template.innerHTML = templateHTML;
+  // ShadyCSS.prepareTemplate(template, elementName);
+  return templateHTML;
 }
 
 export function applyStyle(el, template, isShadow) {
-  isShadow = isShadow !== false;
+  // isShadow = isShadow !== false;
 
-  ShadyCSS.styleElement(el);
-  let templateCopy = document.importNode(template.content, true);
-  if (isShadow) {
-    let shadowRoot = el.attachShadow({ mode: 'open' });
-    shadowRoot.appendChild(templateCopy);
-    return shadowRoot;
-  } else {
-    el.appendChild(templateCopy);
-  }
+  let shadowRoot = el.attachShadow({ mode: 'open' });
+  shadowRoot.innerHTML = template;
+  return shadowRoot;
+  //(templateCopy);
+  // ShadyCSS.styleElement(el);
+  // let templateCopy = document.importNode(template.content, true);
+  // if (isShadow) {
+  //   let shadowRoot = el.attachShadow({ mode: 'open' });
+  //   shadowRoot.appendChild(templateCopy);
+  //   return shadowRoot;
+  // } else {
+  //   el.appendChild(templateCopy);
+  // }
 }
 
 export let noSelect = `
