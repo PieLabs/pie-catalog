@@ -77,13 +77,10 @@ let init = () => {
     })
 };
 
-console.log('readyState: ', document.readyState);
-
 if (document.readyState === 'complete' || document.readyState === 'interactive') {
   init();
 } else {
   document.onreadystatechange = (e) => {
-    console.log('readystatechange: ', e, document.readyState);
     if (document.readyState === 'complete') {
       init();
     }

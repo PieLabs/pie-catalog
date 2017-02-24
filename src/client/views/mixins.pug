@@ -3,11 +3,9 @@ mixin polyfill(paths)
   script.
     
     function loadScript(src, done) {
-      console.log('[loadScript] src: ', src);
       var script = document.createElement('script');
       script.src = src;
       script.onload = function() {
-        console.log('[loadScript] src: ', src, 'COMPLETE');
         done();
       }
       script.onerror = done.bind(null, new Error('script load failed for ' + src));
@@ -39,7 +37,6 @@ mixin polyfill(paths)
       function loadMainPolyfills(){
 
         var paths = !{ JSON.stringify((typeof paths === 'string') ? [paths] : paths)};
-        console.log('paths', paths);
         var supportsCustomElementsV1 = 'customElements' in window;
         var supportsShadowDom = 'attachShadow' in document.createElement('div');
         var polyfills = [];
@@ -60,7 +57,6 @@ mixin polyfill(paths)
         var polyfillsPromise = urlsToPromise(polyfills); 
 
         polyfillsPromise.then(function() {
-            console.log('loaded polyfills: ', polyfills);
             return urlsToPromise(paths)
               .then(function()  {
                 console.log('loaded paths: ', paths);

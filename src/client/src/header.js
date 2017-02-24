@@ -41,15 +41,13 @@ const templateHTML = `
     `;
 
 
-// const template = prepareTemplate(templateHTML, 'catalog-header');
+const template = prepareTemplate(templateHTML, 'catalog-header');
 
 export default class CatalogHeader extends HTMLElement {
 
   constructor() {
     super();
-    const template = prepareTemplate(templateHTML, CatalogHeader.TAG_NAME);
     let sr = applyStyle(this, template);
-    console.log('sr: ', sr);
     this._$brand = this.shadowRoot.querySelector('pie-brand');
   }
 

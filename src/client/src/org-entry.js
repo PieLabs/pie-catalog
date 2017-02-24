@@ -18,11 +18,10 @@ let init = () => {
 };
 
 //For now be cautios and dont init on interactive...
-if (document.readyState === 'complete' /*|| document.readyState === 'interactive'*/) {
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
   init();
 } else {
   document.onreadystatechange = (e) => {
-    console.log('readystatechange: ', e, document.readyState);
     if (document.readyState === 'complete') {
       init();
     }
@@ -30,8 +29,7 @@ if (document.readyState === 'complete' /*|| document.readyState === 'interactive
 }
 
 document.addEventListener(VIEW_REPO, (e) => {
-  console.log('view repo: ', e.detail);
-  let {org, repo} = e.detail.element;
+  let { org, repo } = e.detail.element;
   window.location.href = `/element/${org}/${repo}/`;
 });
 

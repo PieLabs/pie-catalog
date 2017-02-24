@@ -70,7 +70,6 @@ export default class CatalogContainer extends HTMLElement {
 
 
   isLoading(loading) {
-    console.log('isLoading? ', loading);
     if (!this._progressBar) {
       return;
     }

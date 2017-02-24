@@ -10,6 +10,7 @@ npm install
 * Firefox 51+
 * chrome
 * Safari 10.1+
+* IE Edge
 
 
 ### backend dependencies
