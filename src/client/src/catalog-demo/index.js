@@ -1,16 +1,5 @@
-import * as styles from '../styles.js';
-
-export default class CatalogDemo extends HTMLElement {
-  constructor() {
-    super();
-
-    /** Note: can't use shadow root if the inner element is dependentent 
-     * on style definitions that uses markup from inside the element.
-     */
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+import { prepareTemplate, applyStyle, boxShadow } from '../styles';
+const templateHTML = `
     <style>
       :host{
         display: block;
@@ -23,8 +12,7 @@ export default class CatalogDemo extends HTMLElement {
 
       .pie-panel{
         border-radius: 10px;
-        ${styles.boxShadow}
-        box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.3));
+        ${boxShadow}
         padding: 10px;
         margin-top: 20px;
       }
@@ -34,8 +22,19 @@ export default class CatalogDemo extends HTMLElement {
     <div class="pie-panel">
       <slot></slot> 
     </div>
-    `;
+`;
 
+
+export default class CatalogDemo extends HTMLElement {
+  constructor() {
+    super();
+
+    /** Note: can't use shadow root if the inner element is dependentent 
+     * on style definitions that uses markup from inside the element.
+     */
+    const template = prepareTemplate(templateHTML, 'catalog-demo');
+
+    let sr = applyStyle(this, template);
     this._registeredPies = {};
     this._sessions = [];
     this._env = {
@@ -71,7 +70,7 @@ export default class CatalogDemo extends HTMLElement {
 
     customElements.whenDefined('control-panel')
       .then(() => {
-        this.$controlPanel.langs = this._config.langs;
+        //this.$controlPanel.langs = this._config.langs;
       });
 
     this._updatePies();

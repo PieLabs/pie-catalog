@@ -1,12 +1,7 @@
 import * as octicons from 'octicons';
-import * as styles from './styles';
+import { boxShadow, prepareTemplate, applyStyle } from './styles';
 
-export class GithubInfoCount extends HTMLElement {
-
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const infoCountTemplate = prepareTemplate(`
       <style>
         :host {
           display: none;
@@ -18,7 +13,13 @@ export class GithubInfoCount extends HTMLElement {
       </style>
       <span class="icon"></span>
       <label></label>
-    `;
+`, 'github-info-count');
+
+export class GithubInfoCount extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, infoCountTemplate);
   }
 
   connectedCallback() {
@@ -40,12 +41,7 @@ export class GithubInfoCount extends HTMLElement {
   }
 }
 
-export default class InfoPanel extends HTMLElement {
-
-  constructor() {
-    super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const infoPanelTemplate = prepareTemplate(`
       <style>
         [hidden]{
           display: none;
@@ -57,7 +53,7 @@ export default class InfoPanel extends HTMLElement {
           margin-bottom: 10px;
           padding: 10px;
           background-color: white;
-          ${styles.boxShadow}
+          ${boxShadow}
         }
 
         github-info-count{
@@ -88,7 +84,13 @@ export default class InfoPanel extends HTMLElement {
         icon="issue-opened" 
         label="open issues"
         data-key="open_issues_count"></github-info-count>
-    `;
+`, 'info-panel');
+
+export default class InfoPanel extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, infoPanelTemplate);
   }
 
   set github(g) {

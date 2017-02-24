@@ -1,17 +1,13 @@
-import * as styles from '../styles.js';
-export default class ControlPanel extends HTMLElement {
-  constructor() {
-    super();
+import { prepareTemplate, applyStyle, boxShadow } from '../styles';
 
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
+const templateHTML = `
     <style>
     :host{
       padding-bottom: 6px;
       --select-field-font-family: 'Droid Sans', sans-serif;
       --select-option-selected-color: var(--pie-brand-hover-color);
       margin-bottom: 10px;
-      ${styles.boxShadow}
+      ${boxShadow}
       padding: 18px;
       background-color: #f3f3f3;
     }
@@ -39,7 +35,13 @@ export default class ControlPanel extends HTMLElement {
     </select-field>
 
     <span id="langs-holder"></span>
-    `;
+`;
+
+export default class ControlPanel extends HTMLElement {
+  constructor() {
+    super();
+    const template = prepareTemplate(templateHTML, 'control-panel');
+    let sr = applyStyle(this, template);
   }
 
   set env(e) {
@@ -104,6 +106,5 @@ export default class ControlPanel extends HTMLElement {
         this._dispatchEnvChanged();
       }
     });
-
   }
 }

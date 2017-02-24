@@ -18,9 +18,7 @@ export default class AvatarService extends HTMLElement {
       console.error('service is missing url-template attribute');
     }
 
-    console.log('avatar-service connected', LoadAvatar.TYPE);
     document.addEventListener(LoadAvatar.TYPE, e => {
-      console.log('load avatar: ', e.element);
       let url = this.template.replace(':user', e.user);
       e.element.setAttribute('url', url);
     });

@@ -1,44 +1,59 @@
+import { prepareTemplate, applyStyle } from './styles';
+
+const template = prepareTemplate(`
+  <style>
+    :host{
+      display: flex;
+      flex-direction: column; 
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 0;
+    }
+
+    catalog-header{
+      flex: 0 0 auto;
+      height: 40px;
+    }
+    
+    progress-bar{
+      flex: 0;
+      min-height: 1px;
+    } 
+    
+    catalog-footer{
+      min-height: 20px;
+      flex: 0;
+    }
+
+    #slot-holder[loading]{
+      opacity: 0.0;
+    }
+    
+    #slot-holder{
+      transition: opacity 200ms linear;
+      opacity: 1;
+      padding: 10px;
+      flex: 1;
+    }
+
+  </style>
+  <catalog-header></catalog-header> 
+  <progress-bar></progress-bar>
+  <div id="slot-holder" loading>
+    <slot></slot> 
+  </div>
+  <catalog-footer></catalog-footer>
+`, 'catalog-container');
+
+
 export default class CatalogContainer extends HTMLElement {
 
   constructor() {
     super();
-    let sr = this.attachShadow({ mode: 'open' });
-    sr.innerHTML = `
-
-      <style>
-        :host {
-          display: flex;
-          flex-direction: column;
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          right: 0;
-
-        }
-
-        progress-bar{
-          height: 2px;
-        }
-
-        [loading] {
-          opacity: 0;
-        }
-                
-        #content { 
-          position: relative;
-          flex-grow: 1;
-          transition: opacity 300ms linear;
-          padding: 10px;
-        } 
-      </style>
-      <catalog-header></catalog-header>
-      <progress-bar disabled></progress-bar>
-      <div id="content">
-        <slot></slot>
-      </div>
-      <catalog-footer></catalog-footer>
-    `;
+    let sr = applyStyle(this, template)
+    this._$slotHolder = sr.querySelector('#slot-holder');
   }
 
   get _progressBar() {
@@ -59,12 +74,11 @@ export default class CatalogContainer extends HTMLElement {
       return;
     }
 
-    if (loading) {
-      this._progressBar.removeAttribute('disabled');
-      this._content.setAttribute('loading', '');
-    } else {
-      this._progressBar.setAttribute('disabled', '');
-      this._content.removeAttribute('loading');
-    }
+    loading ?
+      this._progressBar.enable() :
+      this._progressBar.disable();
+
+    loading ? this._$slotHolder.setAttribute('loading', '') :
+      this._$slotHolder.removeAttribute('loading');
   }
 }

@@ -7,11 +7,11 @@ import * as r from 'resolve';
 import { AvatarService, ElementService } from '../services';
 import * as gzip from './middleware/gzip';
 import { lookup } from 'mime-types';
-import { stat, readJson, readFile, exists } from 'fs-extra';
+import { stat, readJson, readFile, exists, createReadStream } from 'fs-extra';
 import * as jsesc from 'jsesc';
 import * as _ from 'lodash';
 import * as bluebird from 'bluebird';
-
+import polyfills from './polyfills';
 
 
 const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
@@ -171,6 +171,14 @@ export function router(
   router.get('/org/*', (req, res, next) => {
     render(res);
   });
+
+
+  let streamNodeModulePath = (p) => {
+    let jsPath = join(__dirname, '/node_modules/', p);
+    return createReadStream(jsPath);
+  }
+
+  router.use('/polyfills', polyfills);
 
   let views = join(__dirname, 'views');
   return { router, views }
