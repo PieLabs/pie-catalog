@@ -6,20 +6,10 @@ import { VIEW_ORG } from './events'
 
 let logic = require.ensure([], () => {
 
-  const {define} = require('json-schema-element');
-  define();
-
-  //load up the select field
   require('material-elements/src/select-field');
 
   const MarkdownElement = require('./markdown-element').default;
   customElements.define('markdown-element', MarkdownElement);
-
-  const CatalogSchemas = require('./schemas').default;
-  customElements.define('catalog-schemas', CatalogSchemas);
-
-  const { default: IframeHolder } = require('./iframe-holder');
-  customElements.define('iframe-holder', IframeHolder);
 
   const CatalogEntry = require('./catalog-entry').default;
   customElements.define('catalog-entry', CatalogEntry);
@@ -32,20 +22,19 @@ let logic = require.ensure([], () => {
   customElements.define('info-panel', InfoPanel);
   customElements.define('github-info-count', GithubInfoCount);
 
-  //Note: these elements auto register themselves
-  require('time-elements');
-
-  const FancyTabs = require('./fancy-tabs').default;
-  customElements.define('fancy-tabs', FancyTabs);
+  const ctabs = require('./c-tabs');
+  customElements.define('c-tabs', ctabs.CTabs);
+  customElements.define('c-tab', ctabs.CTab);
+  customElements.define('c-tab-title', ctabs.CTabTitle);
 
   const { default: CatalogDemo } = require('./catalog-demo');
   customElements.define('catalog-demo', CatalogDemo);
-  const {default: ControlPanel} = require('./catalog-demo/control-panel');
+  const { default: ControlPanel } = require('./catalog-demo/control-panel');
   customElements.define('control-panel', ControlPanel);
 });
 
 
-document.addEventListener('DOMContentLoaded', () => {
+let init = () => {
 
   let info = common.elements.load(window.pie.org, window.pie.repo);
 
@@ -82,8 +71,17 @@ document.addEventListener('DOMContentLoaded', () => {
         container.isLoading(false);
       }, 180)
     })
-});
+};
 
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  init();
+} else {
+  document.onreadystatechange = (e) => {
+    if (document.readyState === 'complete') {
+      init();
+    }
+  }
+}
 
 document.addEventListener(VIEW_ORG, (e) => {
   let org = event.detail.element.org;

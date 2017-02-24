@@ -1,7 +1,9 @@
+include ./mixins
+
 doctype html
 html
   head 
-    script(type="text/javascript" src="/org.js")
+    +polyfill('/org.js')
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
   body

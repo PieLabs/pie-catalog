@@ -1,10 +1,6 @@
-export default class PieBrand extends HTMLElement {
-  constructor() {
-    super();
+import { prepareTemplate, applyStyle } from './styles';
 
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+const templateHTML = `
     <style>
     
     :host{
@@ -12,11 +8,9 @@ export default class PieBrand extends HTMLElement {
        font-family: 'Patua One', serif;
     }
 
-    * {
-       font-size: 39px;
-    }
-
     .pie {
+      font-size: 39px;
+      font-family: 'Patua One', serif;
       color: var(--pie-brand-color, #404042);
       transition:color 100ms linear;
       cursor: pointer;
@@ -32,6 +26,11 @@ export default class PieBrand extends HTMLElement {
     
     </style>
     <span class="pie">pie catalog</span>
-    `;
+`;
+
+export default class PieBrand extends HTMLElement {
+  constructor() {
+    super();
+    applyStyle(this, prepareTemplate(templateHTML, 'pie-brand'));
   }
 }

@@ -1,11 +1,17 @@
+include ./mixins
+
 doctype html
 html
   head 
-    script(type="text/javascript" src="/index.js")
+
+
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
     style.
-      
+      body{
+        margin: 0;
+        padding: 0;
+      }
 
   body
 
@@ -14,5 +20,7 @@ html
       window.pie.config = !{config ? JSON.stringify(config) : '{}'};
 
     avatar-service(url-template=config.avatarUrl)
-    catalog-container(hidden)
-      catalog-listings
+    catalog-container
+      catalog-listings   
+
+    +polyfill('/index.js')

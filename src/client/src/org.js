@@ -1,12 +1,6 @@
-export default class CatalogOrg extends HTMLElement {
+import { prepareTemplate, applyStyle } from './styles';
 
-  constructor() {
-    super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
-
+const template = prepareTemplate(`
     <style>
 
       :host{
@@ -27,11 +21,17 @@ export default class CatalogOrg extends HTMLElement {
     <hr/>
     <div class="elements">
     </div>
-    `;
+`, 'catalog-org');
+
+export default class CatalogOrg extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, template);
   }
 
-
   set org(o) {
+    console.log('set org: ', o);
     this._org = o;
 
     this.shadowRoot.querySelector('#org').textContent = o.org;
@@ -42,9 +42,12 @@ export default class CatalogOrg extends HTMLElement {
 
     this.shadowRoot.querySelector('.elements').innerHTML = markup.join('\n');
 
-    this.shadowRoot.querySelectorAll('catalog-listing').forEach((n, i) => {
-      let index = parseInt(n.getAttribute('data-index'));
-      n.element = o.elements[index];
-    });
+    customElements.whenDefined('catalog-listing')
+      .then(() => {
+        this.shadowRoot.querySelectorAll('catalog-listing').forEach((n, i) => {
+          let index = parseInt(n.getAttribute('data-index'));
+          n.element = o.elements[index];
+        });
+      });
   }
 }

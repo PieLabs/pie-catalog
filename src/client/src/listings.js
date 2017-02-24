@@ -1,11 +1,6 @@
-export default class CatalogListings extends HTMLElement {
+import { applyStyle, prepareTemplate } from './styles';
 
-  constructor() {
-    super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
+const templateHTML = `
     <style>
         :host {
           display: block;
@@ -14,15 +9,27 @@ export default class CatalogListings extends HTMLElement {
         .elements > catalog-listing {
           display: inline-block;
           margin: 4px;
+          float:left;
         }
     </style>
     <div class="elements">
     </div>
-    `;
+    <div style="clear: both;"></div>
+`;
+
+const template = prepareTemplate(templateHTML, 'catalog-listings');
+
+export default class CatalogListings extends HTMLElement {
+
+  constructor() {
+    super();
+    let sr = applyStyle(this, template);
   }
 
   set elements(e) {
+
     this._elements = e;
+
     if (!this._elements) {
       return;
     }
