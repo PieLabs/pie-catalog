@@ -35,38 +35,53 @@ mixin polyfill(paths)
     }
 
     function loadPolyfills(){
-      var paths = !{ JSON.stringify((typeof paths === 'string') ? [paths] : paths)};
-      console.log('paths', paths);
-      var supportsCustomElementsV1 = 'customElements' in window;
-      var supportsShadowDom = 'attachShadow' in document.createElement('div');
-      var polyfills = [];
 
-      if(!supportsCustomElementsV1){
-        polyfills.push('/polyfills/custom-elements/custom-elements.min.js');
-        polyfills.push('/polyfills/custom-elements/src/native-shim.js');
-      } 
-      
-      if(!supportsShadowDom){
-        polyfills.push('/polyfills/shadydom/shadydom.min.js');
+      function loadMainPolyfills(){
+
+        var paths = !{ JSON.stringify((typeof paths === 'string') ? [paths] : paths)};
+        console.log('paths', paths);
+        var supportsCustomElementsV1 = 'customElements' in window;
+        var supportsShadowDom = 'attachShadow' in document.createElement('div');
+        var polyfills = [];
+
+        if(!supportsCustomElementsV1){
+          polyfills.push('/polyfills/custom-elements/custom-elements.min.js');
+          polyfills.push('/polyfills/custom-elements/src/native-shim.js');
+        } 
+        
+        if(!supportsShadowDom){
+          polyfills.push('/polyfills/shadydom/shadydom.min.js');
+        }
+
+        if(!('fetch' in window)){
+          polyfills.push('/polyfills/whatwg-fetch/fetch.js');
+        }
+        
+        var polyfillsPromise = urlsToPromise(polyfills); 
+
+        polyfillsPromise.then(function() {
+            console.log('loaded polyfills: ', polyfills);
+            return urlsToPromise(paths)
+              .then(function()  {
+                console.log('loaded paths: ', paths);
+              });
+          })
+          .catch(function(e) {
+            console.error('loading of polyfills failed path:', e.message);
+          });
       }
 
-      if(!('fetch' in window)){
-        polyfills.push('/polyfills/whatwg-fetch/fetch.js');
-      }
-      
-      var polyfillsPromise = urlsToPromise(polyfills); 
-
-      polyfillsPromise.then(function() {
-          console.log('loaded polyfills: ', polyfills);
-          return urlsToPromise(paths)
-            .then(function()  {
-              console.log('loaded paths: ', paths);
-            });
-        })
-        .catch(function(e) {
-          console.error('loading of polyfills failed path:', e.message);
+      if(!('Promise' in window)){
+        loadScript('//cdnjs.cloudflare.com/ajax/libs/es6-promise/4.0.5/es6-promise.auto.min.js', function(err){
+          if(!err){
+            loadMainPolyfills()
+          }
         });
-    }
+      } else {
+        loadMainPolyfills();
+      }
 
+    }
+    
     loadPolyfills(); 
     
