@@ -28,10 +28,16 @@ let init = () => {
     });
 }
 
-if (document.readyState === 'complete') {
+//For now be cautios and dont init on interactive...
+if (document.readyState === 'complete' /*|| document.readyState === 'interactive'*/) {
   init();
 } else {
-  document.addEventListener('DOMContentLoaded', init);
+  document.onreadystatechange = (e) => {
+    console.log('readystatechange: ', e, document.readyState);
+    if (document.readyState === 'complete') {
+      init();
+    }
+  }
 }
 
 document.addEventListener(VIEW_REPO, (e) => {
