@@ -1,4 +1,5 @@
-import { prepareTemplate, applyStyle } from '../styles';
+import { prepareTemplate, applyStyle, boxShadow } from '../styles';
+
 const templateHTML = `
     <style>
     :host{
@@ -6,6 +7,9 @@ const templateHTML = `
       --select-field-font-family: 'Droid Sans', sans-serif;
       --select-option-selected-color: var(--pie-brand-hover-color);
       margin-bottom: 10px;
+      ${boxShadow}
+      padding: 18px;
+      background-color: #f3f3f3;
     }
 
     #control-panel{
@@ -32,7 +36,6 @@ const templateHTML = `
 
     <span id="langs-holder"></span>
 `;
-
 
 export default class ControlPanel extends HTMLElement {
   constructor() {
@@ -103,6 +106,5 @@ export default class ControlPanel extends HTMLElement {
         this._dispatchEnvChanged();
       }
     });
-
   }
 }

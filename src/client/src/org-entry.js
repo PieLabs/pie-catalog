@@ -31,7 +31,7 @@ if (document.readyState === 'complete' /*|| document.readyState === 'interactive
 
 document.addEventListener(VIEW_REPO, (e) => {
   console.log('view repo: ', e.detail);
-  let {org, repo} = event.detail.element;
+  let {org, repo} = e.detail.element;
   window.location.href = `/element/${org}/${repo}/`;
 });
 

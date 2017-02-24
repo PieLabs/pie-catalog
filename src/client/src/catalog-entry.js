@@ -1,37 +1,59 @@
 import * as events from './events';
-import { prepareTemplate, applyStyle } from './styles';
+import { prepareTemplate, applyStyle, boxShadow } from './styles';
 
 const templateHTML = `
     <style>
 
       :host { 
         display: block;
+        position:relative;
+        padding-top:20px;
       }
       
       .header {
         display: flex;
-        align-items: bottom;
+        align-items: baseline;
         font-size: 20px;
       }
       
       #repo, #version {
-        font-size: 25px;
+        font-size: 28px;
+        font-weight: 600;
+        line-height: 36px;
+        padding-left: 5px;
+      }
+
+      #version {
+        line-height: 36px;
+        font-size: 18px;
+        color: gray;
+        padding-left: 15px;
+      }
+
+      #description {
+        color: darkgray;
+        font-size: 18px;
+        line-height: 36px;
         padding-left: 5px;
       }
 
       #org {
-        padding-left: 5px;
-        font-size: 19px;
-        line-height: 33px;
-        cursor:pointer;
+        padding-left: 15px;
+        font-size: 14px;
+        line-height: 36px;
+        cursor: pointer;
         transition: color ease-in 100ms;
         color: rgba(0,0,0,0.8);
+        color: rgba(0,0,0,0.8);      
       }
 
       #org:hover{
         color: rgba(0,0,0,0.5);
       }
 
+      github-avatar{
+        padding-left: 5px;
+      }
 
     </style>
    <div>
@@ -83,7 +105,7 @@ export default class CatalogEntry extends HTMLElement {
 
     this.shadowRoot.querySelector('#repo').textContent = e.repo;
     this.shadowRoot.querySelector('#version').textContent = e.tag;
-    this.shadowRoot.querySelector('#org').textContent = `by ${e.org}`;
+    this.shadowRoot.querySelector('#org').textContent = `${e.org}`;
     this.shadowRoot.querySelector('github-avatar').setAttribute('user', e.org);
 
     this.shadowRoot.querySelector('#org').addEventListener('click', (e) => {

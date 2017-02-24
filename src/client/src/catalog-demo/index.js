@@ -13,7 +13,6 @@ const templateHTML = `
       .pie-panel{
         border-radius: 10px;
         ${boxShadow}
-        box-shadow: 0 1px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.1)), 0 0px 4px 0 var(--shadow-color, hsla(0, 0%, 0%, 0.3));
         padding: 10px;
         margin-top: 20px;
       }

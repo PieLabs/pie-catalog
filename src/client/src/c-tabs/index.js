@@ -128,7 +128,7 @@ const titleTemplate = prepareTemplate(`
         padding: 10px;
         color: #dddddd;
         text-transform: uppercase;
-        font-size: 13px;
+        font-size: 14px;
         border-bottom: solid 1px #dddddd;
         transition: 200ms border linear, 200ms color linear;
         -webkit-transition:  200ms border linear, 200ms color linear;

@@ -1,17 +1,12 @@
-import * as styles from './styles';
+import { boxShadow, prepareTemplate, applyStyle } from './styles';
+
+const dependencyElTemplate = prepareTemplate(` <label class="name">name</label>@<label class="semver">version</label> `, 'dependency-el');
 
 export class DependencyEl extends HTMLElement {
 
   constructor() {
     super();
-
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
-    <style>
-    </style>
-    <label class="name">name</label>@<label class="semver">version</label>
-    `;
+    let sr = applyStyle(this, dependencyElTemplate);
   }
 
   connectedCallback() {
@@ -22,19 +17,14 @@ export class DependencyEl extends HTMLElement {
   }
 }
 
-export default class DependenciesPanel extends HTMLElement {
-  constructor() {
-    super();
+const panelTemplate = prepareTemplate(`
 
-    let sr = this.attachShadow({ mode: 'open' });
-
-    sr.innerHTML = `
       <style>
         :host {
           display: block;
           background-color: white;
           padding: 10px;
-          ${styles.boxShadow}
+          ${boxShadow}
         }
         
         dependency-el{
@@ -50,7 +40,12 @@ export default class DependenciesPanel extends HTMLElement {
       </style>
       <label>Dependencies</label>
       <div class="holder"></div>
-    `;
+`, 'dependencies-panel');
+
+export default class DependenciesPanel extends HTMLElement {
+  constructor() {
+    super();
+    let sr = applyStyle(this, panelTemplate);
   }
 
   set dependencies(d) {
@@ -60,8 +55,6 @@ export default class DependenciesPanel extends HTMLElement {
         return `<dependency-el name="${k}" semver="${val}"></dependency-el>`;
       });
       this.shadowRoot.querySelector('.holder').innerHTML = markup.join('\n');
-    } else {
-
     }
   }
 }
