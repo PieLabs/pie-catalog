@@ -28,7 +28,7 @@ const template = prepareTemplate(`
     }
 
     #slot-holder[loading]{
-      opacity: 0.1;
+      opacity: 0.0;
     }
     
     #slot-holder{
