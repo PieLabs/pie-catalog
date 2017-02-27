@@ -73,7 +73,8 @@ export function router(
 
   if (env === 'dev') {
 
-    const cfg = require('./webpack.config');
+    const cfg = require('pie-catalog-client/webpack.config');
+
     cfg.output.publicPath = '/';
     let compiler = webpack(cfg);
     let middleware = webpackMiddleware(compiler, {
@@ -153,7 +154,10 @@ export function router(
           }
         })
       })
-      .catch(e => res.status(400).send(e.message));
+      .catch(e => {
+        logger.error(e.stack);
+        res.status(400).send(e.message);
+      });
   });
 
   router.get('/element/:org/:repo/*', (req, res, next) => {
