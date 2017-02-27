@@ -4,6 +4,7 @@ doctype html
 html
   head 
     +polyfill('/org.js')
+    +pre_defined
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
   body
@@ -13,4 +14,7 @@ html
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container(hidden)
+      span(slot="header")
+        | pie catalog
+      catalog-listings   
       catalog-org(org=org) 
