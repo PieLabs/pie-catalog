@@ -1,18 +1,19 @@
-import * as express from 'express';
-import { resolve, join, extname } from 'path';
-import { buildLogger } from 'log-factory';
-import * as webpackMiddleware from 'webpack-dev-middleware';
-import * as webpack from 'webpack';
-import * as r from 'resolve';
-import { AvatarService, ElementService } from '../services';
-import * as gzip from './middleware/gzip';
-import { lookup } from 'mime-types';
-import { stat, readJson, readFile, exists, createReadStream } from 'fs-extra';
-import * as jsesc from 'jsesc';
 import * as _ from 'lodash';
 import * as bluebird from 'bluebird';
-import polyfills from './polyfills';
+import * as express from 'express';
+import * as gzip from './middleware/gzip';
+import * as jsesc from 'jsesc';
+import * as r from 'resolve';
+import * as webpack from 'webpack';
+import * as webpackMiddleware from 'webpack-dev-middleware';
 
+import { AvatarService, ElementService } from '../services';
+import { createReadStream, exists, readFile, readJson, stat } from 'fs-extra';
+import { extname, join, resolve } from 'path';
+
+import { buildLogger } from 'log-factory';
+import { lookup } from 'mime-types';
+import polyfills from './polyfills';
 
 const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
 const existsAsync = (p) => new Promise((resolve) => {
@@ -73,7 +74,7 @@ export function router(
 
   if (env === 'dev') {
 
-    const cfg = require('pie-catalog-client/webpack.config');
+    const cfg = require('./webpack.config');
 
     cfg.output.publicPath = '/';
     let compiler = webpack(cfg);
@@ -132,7 +133,7 @@ export function router(
 
     logger.debug('element page: ', req.params);
 
-    let {org, repo} = req.params;
+    let { org, repo } = req.params;
     elementService.load(org, repo)
       .then(el => {
         res.render('repo', {
@@ -161,7 +162,7 @@ export function router(
   });
 
   router.get('/element/:org/:repo/*', (req, res, next) => {
-    let {org, repo} = req.params;
+    let { org, repo } = req.params;
     logger.info(req.params);
     elementService.tag(org, repo)
       .then(tag => {

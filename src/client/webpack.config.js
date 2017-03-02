@@ -1,14 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-var CompressionPlugin = require("compression-webpack-plugin");
-
+const CompressionPlugin = require('compression-webpack-plugin');
+const BabiliPlugin = require('babili-webpack-plugin');
 module.exports = {
-  // devtool: 'eval',
   context: path.join(__dirname),
   entry: {
-    index: './src/entry.js',
-    repo: './src/repo-entry.js',
-    org: './src/org-entry.js'
+    index: './src/index.js',
+    repo: './src/repo.js',
+    org: './src/org.js'
   },
   output: {
     publicPath: '/',
@@ -17,7 +16,6 @@ module.exports = {
     chunkFilename: '[chunkhash].[id].js'
   },
   module: {
-
     loaders: [
       { test: /\.css$/, use: ['raw-loader'] },
       {
@@ -32,6 +30,12 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js']
+  },
+  resolveLoader: {
+    modules: [
+      path.resolve('../../node_modules'),
+      'node_modules'
+    ]
   },
   plugins: [
     new CompressionPlugin({
