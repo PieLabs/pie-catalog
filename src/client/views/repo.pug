@@ -3,11 +3,8 @@ include ./mixins
 doctype html
 html
   head
-    style.
-      body{
-        margin: 0;
-        padding: 0;
-      }
+    +pre_defined
+
     script. 
       window.demo = window.demo || {};
       window.demo.config = !{demo.config ? JSON.stringify(demo.config) : '{}'};
@@ -25,6 +22,8 @@ html
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container
+      span(slot="header")
+        | pie catalog
       catalog-entry
         catalog-demo 
 

@@ -1,53 +1,35 @@
-import { prepareTemplate, applyStyle } from './styles';
+import { VIEW_REPO } from 'pie-catalog-client/src/events';
+import { common } from 'pie-catalog-client/src/bootstrap/org';
+import { elements } from './client';
 
-const template = prepareTemplate(`
-    <style>
+let init = () => {
 
-      :host{
-        display: block;
-      }
-      .elements > catalog-listing {
-        display: inline-block;
-        margin: 4px;
-      }
-
-      hr{
-        border: none;
-        border-bottom: solid 1px var(--shadow-color, hsla(0, 0%, 0%, 0.1));
-      } 
-
-    </style>
-    <div id="org"></div>
-    <hr/>
-    <div class="elements">
-    </div>
-`, 'catalog-org');
-
-export default class CatalogOrg extends HTMLElement {
-
-  constructor() {
-    super();
-    let sr = applyStyle(this, template);
-  }
-
-  set org(o) {
-    console.log('set org: ', o);
-    this._org = o;
-
-    this.shadowRoot.querySelector('#org').textContent = o.org;
-
-    let markup = o.elements.map((e, i) => {
-      return `<catalog-listing data-index="${i}"></catalog-listing>`;
-    });
-
-    this.shadowRoot.querySelector('.elements').innerHTML = markup.join('\n');
-
-    customElements.whenDefined('catalog-listing')
-      .then(() => {
-        this.shadowRoot.querySelectorAll('catalog-listing').forEach((n, i) => {
-          let index = parseInt(n.getAttribute('data-index'));
-          n.element = o.elements[index];
+  common
+    .then(() => {
+      document.querySelector('catalog-container').isLoading(true);
+      return elements.listByOrg(window.pie.org);
+    })
+    .then((list) => {
+      customElements.whenDefined('catalog-org')
+        .then(() => {
+          document.querySelector('catalog-org').org = list;
         });
-      });
+      document.querySelector('catalog-container').isLoading(false);
+    });
+};
+
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  init();
+} else {
+  document.onreadystatechange = (e) => {
+    if (document.readyState === 'complete') {
+      init();
+    }
   }
 }
+
+document.addEventListener(VIEW_REPO, (e) => {
+  let { org, repo } = e.detail.element;
+  window.location.href = `/element/${org}/${repo}/`;
+});
+
