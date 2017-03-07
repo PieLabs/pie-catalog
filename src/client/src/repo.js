@@ -50,6 +50,8 @@ let init = () => {
       demo.controllers = window.controllers;
       demo.markup = window.demo.markup;
 
+      demo.configureMap = window.demo.configureMap;
+
       setTimeout(() => {
         const container = document.querySelector('catalog-container');
         container.isLoading(false);

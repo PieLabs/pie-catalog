@@ -147,7 +147,8 @@ export function router(
           demo: {
             js: `/demo/${el.org}/${el.repo}/${el.tag}/pie-catalog.bundle.js`,
             config: el.demo.config,
-            markup: jsesc(el.demo.markup)
+            markup: jsesc(el.demo.markup),
+            configureMap: el.configureMap
           },
           pretty: true,
           config: {

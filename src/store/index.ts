@@ -1,11 +1,13 @@
-import { Router } from 'express';
-import { buildLogger } from 'log-factory';
-import * as tar from 'tar-stream';
-import { Readable, Writable } from 'stream';
-import * as gunzip from 'gunzip-maybe';
 import * as _ from 'lodash';
-import { PieId, ElementService } from '../services';
+import * as gunzip from 'gunzip-maybe';
+import * as tar from 'tar-stream';
+
+import { ElementService, PieId } from '../services';
+import { Readable, Writable } from 'stream';
+
+import { Router } from 'express';
 import { StringTransform } from './transforms';
+import { buildLogger } from 'log-factory';
 import { normalize } from 'path';
 
 const logger = buildLogger();
@@ -66,6 +68,10 @@ export let writeStream = (id: PieId, elementService: ElementService, stream: Rea
       .pipe(new StringTransform())
       .pipe(withJson(json => elementService.saveSchema(id, name, json)));
 
+  } else if (name === 'pie-pkg/configure-map.json') {
+    return stream
+      .pipe(new StringTransform())
+      .pipe(withJson(json => elementService.saveConfigureMap(id, json)));
   } else if (header.type === 'file') {
     let p = elementService.demo.upload(id, name, stream);
     let w = new Writable();
@@ -111,7 +117,7 @@ export default (elementService: ElementService): Router => {
 
     let writeStreams = [];
     let extractComplete = false;
-    let {org, repo, tag} = req.params;
+    let { org, repo, tag } = req.params;
     let id = PieId.build(org, repo, tag);
 
 
@@ -123,7 +129,7 @@ export default (elementService: ElementService): Router => {
         return;
       }
 
-      let {done, pending, error} = _.extend({ done: [], pending: [], error: [] }, _.groupBy(writeStreams, 'status'));
+      let { done, pending, error } = _.extend({ done: [], pending: [], error: [] }, _.groupBy(writeStreams, 'status'));
 
       logger.debug('[respond] name: ', name, 'pending streams count: ', pending.length);
 
