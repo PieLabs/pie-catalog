@@ -54,7 +54,7 @@ describe('s3-service', () => {
     });
 
     before(function() {
-      this.timeout(10000);
+      this.timeout(2000);
       let file = path.join(__dirname, testImage);
       let filesize = fs.statSync(file).size;
       let id = { org: 'org', repo: 'repo', tag: '1.0.0' };
