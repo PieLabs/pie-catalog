@@ -38,7 +38,7 @@ gulp.task('unit', ['build'], () => {
 });
 
 gulp.task('it', ['build'], () => {
-  return gulp.src('test/integration/**/*-test.js', { read: false })
+  return gulp.src('test/it/**/*-test.js', { read: false })
     .pipe(mocha({ require: ['babel-register'] }));
 });
 

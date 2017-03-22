@@ -9,14 +9,14 @@ const _ = require('lodash');
 const fs = require('fs-extra');
 const s3 = new AWS.S3();
 
-const mod = require('../../../../lib/element/demo/s3-service');
+const mod = require('../../../../lib/services/element/demo/s3-service');
 const Service = mod.default;
 const SERVICE_PREFIX = mod.SERVICE_PREFIX;
 
 const chai = require('chai');
 const path = require('path');
 
-require('../../../../lib/log-factory').init('silly');
+require('log-factory').init('silly');
 
 describe('s3-service', () => {
   let service;
@@ -53,33 +53,20 @@ describe('s3-service', () => {
       });
     });
 
-    before((done) => {
-      new Promise((resolve, reject) => {
-        let file = path.join(__dirname, testImage);
-        let filesize = fs.statSync(file).size;
-        let id = { org: 'org', repo: 'repo', tag: '1.0.0' };
-        let rs = fs.createReadStream(file);
-        service.upload(id, testImage, rs, (err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve();
-          }
-        });
-      })
-        .then(() => {
-          s3.headObject({ Bucket: 'pie-catalog', Key: key }, (err, o) => {
-            headResult = o;
-            headErr = err;
-            done();
-          });
-        })
-        .catch(e => done(e));
-
+    before(function() {
+      this.timeout(10000);
+      let file = path.join(__dirname, testImage);
+      let filesize = fs.statSync(file).size;
+      let id = { org: 'org', repo: 'repo', tag: '1.0.0' };
+      let rs = fs.createReadStream(file);
+      return service.upload(id, testImage, rs)
+        .then(() => s3.headObject({ Bucket: 'pie-catalog', Key: key }).promise())
+        .then(o => headResult = o)
+        .catch(e => headErr = e);
     });
 
-    it('headObject on uploaded asset is null', () => {
-      chai.expect(headErr).to.be.null;
+    it('headErr on uploaded asset is null', () => {
+      chai.expect(headErr).to.be.undefined;
     });
 
     it('returns a content type of image/jpeg', () => {
