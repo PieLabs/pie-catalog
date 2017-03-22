@@ -55,7 +55,7 @@ gulp.task('custom-react', (done) => {
 
 gulp.task('client', (done) => {
   let cfg = require('./src/client/webpack.config');
-  cfg.output.path = './lib/client/public';
+  cfg.output.path = path.resolve('./lib/client/public');
   webpack(cfg, done);
 });
 
