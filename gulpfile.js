@@ -66,6 +66,10 @@ gulp.task('install-custom-react', (done) => {
   });
 });
 
+gulp.task('install-client-dependencies', (done) => {
+  exec('cd src/client && npm install && cd ..', done); 
+});
+
 gulp.task('polyfills', () => {
   gulp.src(['src/client/node_modules/@webcomponents/**/*']).pipe(gulp.dest('lib/client/node_modules/@webcomponents'));
 });
@@ -76,4 +80,4 @@ gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);
 
-gulp.task('postinstall', done => runSequence('install-custom-react', done));
+gulp.task('postinstall', done => runSequence('install-custom-react', 'install-client-dependencies', done));
