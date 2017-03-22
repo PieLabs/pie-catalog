@@ -59,11 +59,6 @@ gulp.task('client', (done) => {
   webpack(cfg, done);
 });
 
-gulp.task('install-client-deps', (done) => {
-  exec('cd src/client && npm install && cd ..', (err) => {
-    done(err);
-  });
-});
 
 gulp.task('install-custom-react', (done) => {
   exec('cd custom-react-build && npm install && cd ..', (err) => {
@@ -81,4 +76,4 @@ gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);
 
-gulp.task('postinstall', done => runSequence('install-client-deps', 'install-custom-react', done));
+gulp.task('postinstall', done => runSequence('install-custom-react', done));

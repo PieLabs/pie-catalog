@@ -1,17 +1,19 @@
+import * as _ from 'lodash';
+
 import {
-  DeleteResult,
-  ElementLite,
-  Element,
-  ListOpts,
-  KeyMap,
-  PieId,
-  DemoService,
   ElementService as Api,
-  GithubService
+  DeleteResult,
+  DemoService,
+  Element,
+  ElementLite,
+  GithubService,
+  KeyMap,
+  ListOpts,
+  PieId,
 } from './service';
+
 import { Collection } from 'mongodb';
 import { buildLogger } from 'log-factory';
-import * as _ from 'lodash';
 
 const logger = buildLogger();
 
@@ -25,6 +27,7 @@ let idToQuery = (id: PieId) => {
 const liteFields = { org: 1, repo: 1, tag: 1, 'package.description': 1 };
 
 export default class ElementService implements Api {
+
 
   constructor(
     private collection: Collection,
@@ -73,6 +76,12 @@ export default class ElementService implements Api {
   reset(id: PieId) {
     //TODO - wipe schemas here? back up document?
     return Promise.resolve(true);
+  }
+
+  saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean> {
+
+    let update = { $set: { configureMap } };
+    return this.update(id, update);
   }
 
   saveSchema(id: PieId, name: string, schema: KeyMap) {
