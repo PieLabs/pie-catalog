@@ -1,7 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
-const BabiliPlugin = require('babili-webpack-plugin');
+
 module.exports = {
   context: path.join(__dirname),
   entry: {
