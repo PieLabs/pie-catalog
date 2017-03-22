@@ -1,7 +1,10 @@
+include ./mixins
+
 doctype html
 html
   head 
-    script(type="text/javascript" src="/org.js")
+    +polyfill('/org.js')
+    +pre_defined
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
   body
@@ -11,4 +14,7 @@ html
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container(hidden)
+      span(slot="header")
+        | pie catalog
+      catalog-listings   
       catalog-org(org=org) 

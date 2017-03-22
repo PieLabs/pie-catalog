@@ -1,0 +1,110 @@
+mixin pre_defined
+    style.
+      body{
+        margin: 0;
+        padding: 0;
+      }
+      
+      catalog-container:not(:defined) {
+        opacity: 1.0;
+        transition: opacity 0.3s ease-in-out;
+        background-color: rgba(0, 50, 49, 0.0980392);
+        height: 65px;
+        width: 100%;
+        display: block;
+        color: rgba(0,0,0,0); 
+        border-bottom: solid 1px rgb(204, 204, 204);
+      }
+
+      catalog-header {
+        transition: opacity 3s linear;
+      }
+      
+      catalog-header:not(:defined) {
+        opacity: 0;
+        transition: opacity 3s linear;
+      }
+
+
+mixin polyfill(paths)
+  script.
+    
+    function loadScript(src, done) {
+      var script = document.createElement('script');
+      script.src = src;
+      script.onload = function() {
+        done();
+      }
+      script.onerror = done.bind(null, new Error('script load failed for ' + src));
+      document.head.appendChild(script);
+    }
+
+    function loadScriptPromise(src){
+      return new Promise(function(resolve, reject){
+        loadScript(src, function(err){
+          if(err){
+            reject(err);
+          } else {
+            resolve();
+          }
+        });
+      });
+    }
+
+    function urlsToPromise(urls){
+      return urls.reduce(function(acc, path)  {
+        return acc.then(function() {
+          return loadScriptPromise(path);
+        });
+      }, Promise.resolve());
+    }
+
+    function loadPolyfills(){
+
+      function loadMainPolyfills(){
+
+        var paths = !{ JSON.stringify((typeof paths === 'string') ? [paths] : paths)};
+        var supportsCustomElementsV1 = 'customElements' in window;
+        var supportsShadowDom = 'attachShadow' in document.createElement('div');
+        var polyfills = [];
+
+        if(!supportsCustomElementsV1){
+          polyfills.push('/polyfills/custom-elements/custom-elements.min.js');
+          polyfills.push('/polyfills/custom-elements/src/native-shim.js');
+        } 
+        
+        if(!supportsShadowDom){
+          polyfills.push('/polyfills/shadydom/shadydom.min.js');
+        }
+
+        if(!('fetch' in window)){
+          polyfills.push('/polyfills/whatwg-fetch/fetch.js');
+        }
+        
+        var polyfillsPromise = urlsToPromise(polyfills); 
+
+        polyfillsPromise.then(function() {
+            return urlsToPromise(paths)
+              .then(function()  {
+                console.log('loaded paths: ', paths);
+              });
+          })
+          .catch(function(e) {
+            console.error('loading of polyfills failed path:', e.message);
+          });
+      }
+
+      if(!('Promise' in window)){
+        loadScript('//cdnjs.cloudflare.com/ajax/libs/es6-promise/4.0.5/es6-promise.auto.min.js', function(err){
+          if(!err){
+            loadMainPolyfills()
+          }
+        });
+      } else {
+        loadMainPolyfills();
+      }
+
+    }
+    
+    loadPolyfills(); 
+    

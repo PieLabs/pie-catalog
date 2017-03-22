@@ -1,17 +1,19 @@
-import {
-  DeleteResult,
-  ElementLite,
-  Element,
-  ListOpts,
-  KeyMap,
-  PieId,
-  DemoService,
-  ElementService as Api,
-  GithubService
-} from './service';
-import { Collection } from 'mongodb';
-import { buildLogger } from '../../log-factory';
 import * as _ from 'lodash';
+
+import {
+  ElementService as Api,
+  DeleteResult,
+  DemoService,
+  Element,
+  ElementLite,
+  GithubService,
+  KeyMap,
+  ListOpts,
+  PieId,
+} from './service';
+
+import { Collection } from 'mongodb';
+import { buildLogger } from 'log-factory';
 
 const logger = buildLogger();
 
@@ -25,6 +27,7 @@ let idToQuery = (id: PieId) => {
 const liteFields = { org: 1, repo: 1, tag: 1, 'package.description': 1 };
 
 export default class ElementService implements Api {
+
 
   constructor(
     private collection: Collection,
@@ -73,6 +76,12 @@ export default class ElementService implements Api {
   reset(id: PieId) {
     //TODO - wipe schemas here? back up document?
     return Promise.resolve(true);
+  }
+
+  saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean> {
+
+    let update = { $set: { configureMap } };
+    return this.update(id, update);
   }
 
   saveSchema(id: PieId, name: string, schema: KeyMap) {
@@ -137,11 +146,16 @@ export default class ElementService implements Api {
   async load(org: string, repo: string) {
     let r = await this.collection.findOne({ org: org, repo: repo });
 
-    //TODO: should we store this in the db instead of getting it from the demo service?
-    let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
-    let out = _.merge(r, { demo: demo });
-    logger.silly('[load] out: ', out);
-    return out;
+    if (r) {
+
+      //TODO: should we store this in the db instead of getting it from the demo service?
+      let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
+      let out = _.merge(r, { demo: demo });
+      logger.silly('[load] out: ', out);
+      return out;
+    } else {
+      throw new Error(`cant find org/repo: ${org}/${repo}`);
+    }
   }
 
   async list(opts: ListOpts = { skip: 0, limit: 0 }) {

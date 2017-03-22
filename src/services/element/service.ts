@@ -1,4 +1,5 @@
-import { PieId, KeyMap } from '../../types';
+import { KeyMap, PieId } from '../../types';
+
 import { DemoService } from './demo/service';
 import { GithubService } from '../github';
 
@@ -23,7 +24,8 @@ export type Element = {
   demo: {
     config: any,
     markup: string
-  }
+  },
+  configureMap: { [key: string]: string }
 }
 
 export type DeleteResult = {
@@ -36,6 +38,7 @@ export interface ElementService {
   readonly demo: DemoService;
   reset(id: PieId): Promise<boolean>;
   saveSchema(id: PieId, name: string, schema: KeyMap): Promise<boolean>;
+  saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean>;
   saveReadme(id: PieId, readme: string): Promise<boolean>;
   saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
   savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;

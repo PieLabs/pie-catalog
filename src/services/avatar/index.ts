@@ -3,7 +3,7 @@ import { dirname } from 'path';
 import { createWriteStream, createReadStream, exists, ensureDirSync } from 'fs-extra';
 import fetch, { } from 'node-fetch';
 import * as http from 'http';
-import { buildLogger } from '../../log-factory';
+import { buildLogger } from 'log-factory';
 import * as url from 'url';
 import * as _ from 'lodash';
 import { GithubService } from '../github';

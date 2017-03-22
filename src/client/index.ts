@@ -1,18 +1,19 @@
-import * as express from 'express';
-import { resolve, join, extname } from 'path';
-import { buildLogger } from '../log-factory';
-import * as webpackMiddleware from 'webpack-dev-middleware';
-import * as webpack from 'webpack';
-import * as r from 'resolve';
-import { AvatarService, ElementService } from '../services';
-import * as gzip from './middleware/gzip';
-import { lookup } from 'mime-types';
-import { stat, readJson, readFile, exists } from 'fs-extra';
-import * as jsesc from 'jsesc';
 import * as _ from 'lodash';
 import * as bluebird from 'bluebird';
+import * as express from 'express';
+import * as gzip from './middleware/gzip';
+import * as jsesc from 'jsesc';
+import * as r from 'resolve';
+import * as webpack from 'webpack';
+import * as webpackMiddleware from 'webpack-dev-middleware';
 
+import { AvatarService, ElementService } from '../services';
+import { createReadStream, exists, readFile, readJson, stat } from 'fs-extra';
+import { extname, join, resolve } from 'path';
 
+import { buildLogger } from 'log-factory';
+import { lookup } from 'mime-types';
+import polyfills from './polyfills';
 
 const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
 const existsAsync = (p) => new Promise((resolve) => {
@@ -63,8 +64,8 @@ export function router(
     logger.debug('load version info...');
     let pkg = await tryToLoad('../../package.json');
     let sha = await tryToLoad('../../.git-version').then(s => s ? s.trim() : null);
-    logger.info(`got pkg: ${pkg}`);
-    logger.info(`got sha: ${sha}`);
+    logger.silly(`got pkg: ${pkg}`);
+    logger.silly(`got sha: ${sha}`);
     let version = pkg ? JSON.parse(pkg).version : null;
     return { version, sha }
   }
@@ -74,6 +75,7 @@ export function router(
   if (env === 'dev') {
 
     const cfg = require('./webpack.config');
+
     cfg.output.publicPath = '/';
     let compiler = webpack(cfg);
     let middleware = webpackMiddleware(compiler, {
@@ -131,7 +133,7 @@ export function router(
 
     logger.debug('element page: ', req.params);
 
-    let {org, repo} = req.params;
+    let { org, repo } = req.params;
     elementService.load(org, repo)
       .then(el => {
         res.render('repo', {
@@ -145,7 +147,8 @@ export function router(
           demo: {
             js: `/demo/${el.org}/${el.repo}/${el.tag}/pie-catalog.bundle.js`,
             config: el.demo.config,
-            markup: jsesc(el.demo.markup)
+            markup: jsesc(el.demo.markup),
+            configureMap: el.configureMap
           },
           pretty: true,
           config: {
@@ -153,12 +156,14 @@ export function router(
           }
         })
       })
-      .catch(e => res.status(400).send(e.message));
+      .catch(e => {
+        logger.error(e.stack);
+        res.status(400).send(e.message);
+      });
   });
 
   router.get('/element/:org/:repo/*', (req, res, next) => {
-    let {org, repo} = req.params;
-    logger.info(req.headers);
+    let { org, repo } = req.params;
     logger.info(req.params);
     elementService.tag(org, repo)
       .then(tag => {
@@ -172,6 +177,14 @@ export function router(
   router.get('/org/*', (req, res, next) => {
     render(res);
   });
+
+
+  let streamNodeModulePath = (p) => {
+    let jsPath = join(__dirname, '/node_modules/', p);
+    return createReadStream(jsPath);
+  }
+
+  router.use('/polyfills', polyfills);
 
   let views = join(__dirname, 'views');
   return { router, views }

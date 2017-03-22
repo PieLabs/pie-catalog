@@ -1,14 +1,16 @@
+include ./mixins
+
 doctype html
 html
   head
+    +pre_defined
 
     script. 
       window.demo = window.demo || {};
       window.demo.config = !{demo.config ? JSON.stringify(demo.config) : '{}'};
       window.demo.markup = '!{demo.markup ? demo.markup : ''}';
-
+      window.demo.configureMap = !{demo.configureMap ? JSON.stringify(demo.configureMap) : 'undefined'};
       
-    script(type="text/javascript" src="/repo.js")
     link(href="https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono|Patua+One" rel="stylesheet")
 
   body
@@ -20,15 +22,9 @@ html
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container
+      span(slot="header")
+        | pie catalog
       catalog-entry
         catalog-demo 
-    script.
-      //Note: we want to load these scripts synchronously to ensure the load order, but we dont want to block document rendering.
-      let scripts = !{js ? JSON.stringify(js) : '[]'};
-      scripts.push('!{demo.js}');
-      scripts.forEach(function(src) {
-        let script = document.createElement('script');
-        script.src = src;
-        script.async = false;
-        document.head.appendChild(script);
-      }); 
+
+    +polyfill(['/repo.js'].concat(js || []).concat(demo.js))

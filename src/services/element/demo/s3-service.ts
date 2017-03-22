@@ -1,7 +1,7 @@
 import { PieId, DemoService as Api } from './service';
 import { Readable, Writable } from 'stream';
 import { dirname, join } from 'path';
-import { buildLogger } from '../../../log-factory';
+import { buildLogger } from 'log-factory';
 import { config, S3 } from 'aws-sdk';
 import * as bluebird from 'bluebird';
 import * as _ from 'lodash';

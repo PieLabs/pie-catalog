@@ -1,7 +1,8 @@
 const { MongoClient, Db } = require('mongodb');
-const ElementService = require('../../../lib/element/mongo-service').default;
+const ElementService = require('../../../lib/services/element/mongo-service').default;
 const { expect } = require('chai');
 const _ = require('lodash');
+const { stub } = require('sinon');
 
 const mongoUri = process.env.IT_MONGO_URI || 'mongodb://localhost:27017/pie-catalog-it';
 
@@ -26,7 +27,9 @@ describe('element-service', () => {
   beforeEach(() => {
     return coll.remove()
       .then(() => {
-        service = new ElementService(coll, {});
+        service = new ElementService(coll, {
+          configAndMarkup: stub().returns(Promise.resolve({ config: {}, markup: ''}))
+        });
       });
   });
 

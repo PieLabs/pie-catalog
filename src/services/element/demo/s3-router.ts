@@ -1,7 +1,7 @@
 import { DemoRouter as Router } from './service';
 import * as express from 'express';
 import { S3 } from 'aws-sdk';
-import { buildLogger } from '../../../log-factory';
+import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
 import { createReadStream } from 'fs-extra';
 import { join } from 'path';
@@ -74,7 +74,7 @@ export default class S3Router implements Router {
       this.s3.getObject(params, (err, data) => {
 
         if (err) {
-          logger.error(err);
+          logger.error(err.toString());
           res.status(500).send('Error loading example.html');
         } else {
           let markup = data.Body.toString();

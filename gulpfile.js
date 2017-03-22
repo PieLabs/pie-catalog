@@ -38,7 +38,7 @@ gulp.task('unit', ['build'], () => {
 });
 
 gulp.task('it', ['build'], () => {
-  return gulp.src('test/integration/**/*-test.js', { read: false })
+  return gulp.src('test/it/**/*-test.js', { read: false })
     .pipe(mocha({ require: ['babel-register'] }));
 });
 
@@ -55,15 +55,10 @@ gulp.task('custom-react', (done) => {
 
 gulp.task('client', (done) => {
   let cfg = require('./src/client/webpack.config');
-  cfg.output.path = './lib/client/public';
+  cfg.output.path = path.resolve('./lib/client/public');
   webpack(cfg, done);
 });
 
-gulp.task('install-client-deps', (done) => {
-  exec('cd src/client && npm install && cd ..', (err) => {
-    done(err);
-  });
-});
 
 gulp.task('install-custom-react', (done) => {
   exec('cd custom-react-build && npm install && cd ..', (err) => {
@@ -71,10 +66,18 @@ gulp.task('install-custom-react', (done) => {
   });
 });
 
-gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client', 'custom-react'], done));
+gulp.task('install-client-dependencies', (done) => {
+  exec('cd src/client && npm install && cd ..', done); 
+});
+
+gulp.task('polyfills', () => {
+  gulp.src(['src/client/node_modules/@webcomponents/**/*']).pipe(gulp.dest('lib/client/node_modules/@webcomponents'));
+});
+
+gulp.task('build', done => runSequence('clean', ['pug', 'ts', 'client', 'polyfills', 'custom-react'], done));
 
 gulp.task('dev', ['build', 'watch-pug', 'watch-ts']);
 
 gulp.task('test', ['unit']);
 
-gulp.task('postinstall', done => runSequence('install-client-deps', 'install-custom-react', done));
+gulp.task('postinstall', done => runSequence('install-custom-react', 'install-client-dependencies', done));
