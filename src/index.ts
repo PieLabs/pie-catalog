@@ -1,20 +1,25 @@
 import * as express from 'express';
 import * as http from 'http';
-
-import mkStore from './store';
-import { router as getClientRouter } from './client';
-import mkApi from './api';
-import { join } from 'path';
-import { init, getLogger } from 'log-factory';
-import { bootstrap, buildOpts } from './services';
 import * as minimist from 'minimist';
+
+import { bootstrap, buildOpts } from './services';
+import { getLogger, init } from 'log-factory';
+
+import { router as getClientRouter } from './client';
+import { join } from 'path';
+import mkApi from './api';
+import mkStore from './store';
 
 var argv = require('minimist')(process.argv.slice(2));
 
 let raw = process.argv.slice(2);
 let args: any = minimist(raw);
 let logConfig = process.env['LOG_CONFIG'] || args.logConfig || 'info';
-init(logConfig);
+
+init({
+  console: true,
+  log: logConfig
+});
 
 const logger = getLogger('APP');
 logger.silly('argv: ', argv);
@@ -27,7 +32,7 @@ process.on('unhandledRejection', (reason, p: Promise<any>) => {
 let opts = buildOpts(args, process.env);
 
 bootstrap(opts)
-  .then(({demoService, avatar, element, onError, demoRouter}) => {
+  .then(({ demoService, avatar, element, onError, demoRouter }) => {
 
     const app = express();
     const client = getClientRouter(avatar, element);
