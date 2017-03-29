@@ -16,7 +16,10 @@ const SERVICE_PREFIX = mod.SERVICE_PREFIX;
 const chai = require('chai');
 const path = require('path');
 
-require('log-factory').init('silly');
+require('log-factory').init({
+  console: true,
+  log: 'silly'
+});
 
 describe('s3-service', () => {
   let service;
@@ -53,7 +56,7 @@ describe('s3-service', () => {
       });
     });
 
-    before(function() {
+    before(function () {
       this.timeout(2000);
       let file = path.join(__dirname, testImage);
       let filesize = fs.statSync(file).size;

@@ -1,5 +1,7 @@
 # pie-catalog
 
+[![Build Status](https://travis-ci.org/PieLabs/pie-catalog.svg?branch=master)](https://travis-ci.org/PieLabs/pie-catalog)
+
 ## install 
 ```
 npm install 
