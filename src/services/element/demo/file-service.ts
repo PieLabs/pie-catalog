@@ -1,16 +1,30 @@
-import { PieId, DemoService as Api, DemoRouter as Router } from './service';
-import { Readable, Writable } from 'stream';
-import { remove, readFile, readJson, createReadStream, ensureDirSync, createWriteStream } from 'fs-extra';
-import { dirname, join } from 'path';
-import * as express from 'express';
-import { buildLogger } from 'log-factory';
 import * as bluebird from 'bluebird';
+import * as express from 'express';
+
+import { DemoService as Api, PieId, DemoRouter as Router } from './service';
+import { Readable, Writable } from 'stream';
+import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove } from 'fs-extra';
+import { dirname, join } from 'path';
+
+import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
+
 const logger = buildLogger();
 
 let readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
 let readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
 
+const removePromise = (dir: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    remove(dir, e => {
+      if (e) {
+        reject(e);
+      } else {
+        resolve(dir);
+      }
+    })
+  });
+}
 export default class DemoService implements Api, Router {
 
   constructor(readonly root: string) {
@@ -34,14 +48,14 @@ export default class DemoService implements Api, Router {
   async deleteAll(org: string, repo: string): Promise<boolean> {
     logger.debug('[deleteAll], org: ', org, 'repo: ', repo);
     let dir = join(this.root, `${org}/${repo}`);
-    let result = await bluebird.promisify(remove)(dir);
+    let result = await removePromise(dir);
     return true;
   }
 
   async delete(id: PieId): Promise<boolean> {
     logger.debug('[delete], id: ', id);
     let dir = join(this.root, this.repoRoot(id));
-    let result = await bluebird.promisify(remove)(dir);
+    let result = await removePromise(dir);
     return true;
   }
 

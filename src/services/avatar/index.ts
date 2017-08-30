@@ -1,12 +1,14 @@
-import { Readable, Writable } from 'stream';
-import { dirname } from 'path';
-import { createWriteStream, createReadStream, exists, ensureDirSync } from 'fs-extra';
-import fetch, { } from 'node-fetch';
-import * as http from 'http';
-import { buildLogger } from 'log-factory';
-import * as url from 'url';
 import * as _ from 'lodash';
+import * as http from 'http';
+import * as url from 'url';
+
+import { Readable, Writable } from 'stream';
+import { createReadStream, createWriteStream, ensureDirSync, exists, existsSync } from 'fs-extra';
+import { dirname, resolve } from 'path';
+
 import { GithubService } from '../github';
+import { buildLogger } from 'log-factory';
+import fetch from 'node-fetch';
 
 const logger = buildLogger();
 
@@ -26,16 +28,23 @@ export class FileBackend implements AvatarBackend {
     return `${this.root}/${path}`;
   }
 
-  exists(path: string) {
+  exists(path: string): Promise<string> {
     return new Promise((resolve, reject) => {
       exists(this.resolve(path), (exists) => {
-        resolve(exists);
+        resolve(path);
       });
     });
   }
 
   readStream(path: string) {
-    return Promise.resolve(createReadStream(this.resolve(path)));
+    const resolved = this.resolve(path);
+    if (existsSync(resolved)) {
+      return Promise.resolve(createReadStream(this.resolve(path)));
+    } else {
+      logger.debug('cant find avatar return a puppy');
+      return fetch('http://www.greatdanelady.com/Images/image0067.jpg')
+        .then(response => response.body as Readable);
+    }
   }
 
   writeStream(path: string) {
@@ -53,7 +62,7 @@ export default class AvatarService {
     return this.backend.writeStream(path).then(ws => {
       return new Promise<string>((resolve, reject) => {
         ws.on('error', reject);
-        ws.on('close', () => { resolve(path) });
+        ws.on('close', () => resolve(path));
         body.pipe(ws);
       });
     });
@@ -66,6 +75,7 @@ export default class AvatarService {
       let response = await this.github.avatar(user);
       await this.streamUrlToFile(response.body, path);
     }
+    logger.info('[stream] host: ', host, 'user: ', user);
     return this.backend.readStream(path);
   }
 }

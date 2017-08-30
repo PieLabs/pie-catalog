@@ -1,10 +1,11 @@
-import { DemoRouter as Router } from './service';
 import * as express from 'express';
+
+import { DemoRouter as Router } from './service';
 import { S3 } from 'aws-sdk';
 import { buildLogger } from 'log-factory';
-import { replaceReact } from './utils';
 import { createReadStream } from 'fs-extra';
 import { join } from 'path';
+import { replaceReact } from './utils';
 
 const logger = buildLogger();
 /**
@@ -101,7 +102,7 @@ export default class S3Router implements Router {
 
       if (req.headers['if-modified-since']) {
         try {
-          params.IfModifiedSince = Date.parse(req.headers['if-modified-since']);
+          params.IfModifiedSince = Date.parse(req.header('if-modified-since'));
         } catch (e) {
           logger.warn('failed to parse: if-modified-since header as date: ', req.headers['if-modified-since']);
         }
