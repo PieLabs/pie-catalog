@@ -42,7 +42,8 @@ export class FileBackend implements AvatarBackend {
       return Promise.resolve(createReadStream(this.resolve(path)));
     } else {
       logger.debug('cant find avatar return a puppy');
-      return Promise.resolve(createReadStream(resolve(__dirname, 'puppy.jpg')));
+      return fetch('http://www.greatdanelady.com/Images/image0067.jpg')
+        .then(response => response.body as Readable);
     }
   }
 
@@ -61,7 +62,7 @@ export default class AvatarService {
     return this.backend.writeStream(path).then(ws => {
       return new Promise<string>((resolve, reject) => {
         ws.on('error', reject);
-        ws.on('close', () => { resolve(path) });
+        ws.on('close', () => resolve(path));
         body.pipe(ws);
       });
     });
