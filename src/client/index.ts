@@ -15,7 +15,8 @@ import { buildLogger } from 'log-factory';
 import { lookup } from 'mime-types';
 import polyfills from './polyfills';
 
-const readJsonAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readJson);
+const readJsonAsync: (p: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
+
 const existsAsync = (p) => new Promise((resolve) => {
   exists(p, (e) => resolve(e));
 });

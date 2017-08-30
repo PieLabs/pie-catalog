@@ -1,9 +1,11 @@
 import * as express from 'express';
-import { stat, createReadStream } from 'fs-extra';
-import { join } from 'path';
-import { lookup } from 'mime-types';
+
+import { createReadStream, stat } from 'fs-extra';
+
 import { buildLogger } from 'log-factory';
 import { extname } from 'path';
+import { join } from 'path';
+import { lookup } from 'mime-types';
 
 const logger = buildLogger();
 
@@ -11,7 +13,7 @@ export function staticFiles(dir: string): express.Handler {
   return (req, res, next) => {
     logger.debug('req: ', req.path);
 
-    let accepts: string = req.headers['accept-encoding'];
+    let accepts: string = req.header('accept-encoding');
 
     if (accepts && accepts.includes('gzip')) {
       let p = req.path;

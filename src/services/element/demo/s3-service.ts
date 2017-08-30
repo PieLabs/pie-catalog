@@ -1,14 +1,16 @@
-import { PieId, DemoService as Api } from './service';
-import { Readable, Writable } from 'stream';
-import { dirname, join } from 'path';
-import { buildLogger } from 'log-factory';
-import { config, S3 } from 'aws-sdk';
-import * as bluebird from 'bluebird';
 import * as _ from 'lodash';
-import { statSync } from 'fs-extra';
+import * as bluebird from 'bluebird';
 import * as stream from 'stream';
-import { lookup } from 'mime-types';
+
+import { DemoService as Api, PieId } from './service';
+import { Readable, Writable } from 'stream';
+import { S3, config } from 'aws-sdk';
+import { dirname, join } from 'path';
+
+import { buildLogger } from 'log-factory';
 import { extname } from 'path';
+import { lookup } from 'mime-types';
+import { statSync } from 'fs-extra';
 
 const logger = buildLogger();
 
@@ -35,7 +37,7 @@ let bucketExists = (s3, bucket) => {
 };
 
 function hasSetAwsEnvVars(): boolean {
-  return process.env['AWS_SECRET_ACCESS_KEY'] && process.env['AWS_ACCESS_KEY_ID'];
+  return process.env.AWS_SECRET_ACCESS_KEY !== undefined && process.env.AWS_ACCESS_KEY_ID !== undefined;
 }
 
 function hasCredentials() {
