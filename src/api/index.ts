@@ -1,9 +1,12 @@
+import * as _ from 'lodash';
+
+import { ElementService, PieId } from '../services';
+
 import { Router } from 'express';
-import { PieId, ElementService } from '../services';
 import { buildLogger } from 'log-factory';
+
 const logger = buildLogger();
 
-import * as _ from 'lodash';
 
 export default function mkApi(service: ElementService, getDemoLink: (PieId) => string) {
 
@@ -18,7 +21,7 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
     service.list({ skip: 0, limit: 0 })
       .then(result => {
 
-        result.elements = _.map(result.elements, r => {
+        result.elements = _.map(result.elements, (r: any) => {
           r.repoLink = `/element/${r.org}/${r.repo}`
           return r;
         });
@@ -55,7 +58,7 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
 
   r.get('/element/:org/:repo', (req, res) => {
 
-    let {org, repo} = req.params;
+    let { org, repo } = req.params;
 
     service.load(org, repo)
       .then(r => {

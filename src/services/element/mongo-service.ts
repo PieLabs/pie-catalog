@@ -1,4 +1,5 @@
 import * as _ from 'lodash';
+import * as lodash from 'lodash';
 
 import {
   ElementService as Api,
@@ -25,6 +26,13 @@ let idToQuery = (id: PieId) => {
 }
 
 const liteFields = { org: 1, repo: 1, tag: 1, 'package.description': 1 };
+
+const toKeyValueArray = (dependencies: KeyMap): { key: string, value: string }[] => _.map(dependencies, (value, key) => ({ value, key }));
+
+const toKeyMap = (keyValues: { key: string, value: string }[]): KeyMap => _.reduce(keyValues, (acc, { key, value }) => {
+  acc[key] = value;
+  return acc;
+}, {});
 
 export default class ElementService implements Api {
 
@@ -118,7 +126,9 @@ export default class ElementService implements Api {
   }
 
   async savePkg(id: PieId, pkg: KeyMap) {
-
+    //convert to [{key,value}, ...] to prevent invalid field names being inserted.
+    pkg.dependencies = toKeyValueArray(pkg.dependencies);
+    pkg.devDependencies = toKeyValueArray(pkg.devDependencies);
     let update = {
       $set: {
         'package': pkg,
@@ -150,6 +160,8 @@ export default class ElementService implements Api {
 
       //TODO: should we store this in the db instead of getting it from the demo service?
       let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
+      r.package.dependencies = toKeyMap(r.package.dependencies);
+      r.package.devDependencies = toKeyMap(r.package.devDependencies);
       let out = _.merge(r, { demo: demo });
       logger.silly('[load] out: ', out);
       return out;

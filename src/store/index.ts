@@ -171,15 +171,18 @@ export default (elementService: ElementService): Router => {
         let ws = writeStream(id, elementService, stream, name, header);
 
         if (ws) {
-          let writeStatus = { name: name, stream: ws, status: 'pending' };
+          let writeStatus = { name: name, stream: ws, status: 'pending', error: undefined };
+
+          logger.silly('name: ', name);
+
           ws.on('finish', () => {
             writeStatus.status = 'done';
             respond(name);
           });
 
           ws.on('error', (e) => {
-            writeStatus[name].status = 'error';
-            writeStatus[name].error = e;
+            writeStatus.status = 'error';
+            writeStatus.error = e;
             respond(name);
           });
 
