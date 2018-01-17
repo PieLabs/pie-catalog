@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as lodash from 'lodash';
+import {escape as mongoEscape, unescape as mongoUnescape} from './mongo-escape';
 
 import {
   ElementService as Api,
@@ -92,26 +93,9 @@ export default class ElementService implements Api {
     return this.update(id, update);
   }
 
-  mongoEscape(data: KeyMap): KeyMap {
-    return _.reduce(data, (acc, value, key) => {
-      if (key.startsWith('$')) {
-        acc[`_ms_${key}`] = _.isObject(value) ? this.mongoEscape(value) : value;
-        return acc;
-      }
-    }, {});
-  }
-
-  mongoUnescape(data: KeyMap): KeyMap {
-    return _.reduce(data, (acc, value, key) => {
-      if (key.startsWith('_ms_')) {
-        acc[key.replace('_ms_', '')] = _.isObject(value) ? this.mongoEscape(value) : value;
-        return acc;
-      }
-    }, {});
-  }
 
   saveSchema(id: PieId, name: string, schema: KeyMap) {
-    const safeSchema = this.mongoEscape(schema);
+    const safeSchema = mongoEscape(schema);
     let update = {
       $addToSet: {
         'schemas': {
@@ -181,7 +165,7 @@ export default class ElementService implements Api {
       r.package.dependencies = toKeyMap(r.package.dependencies);
       r.package.devDependencies = toKeyMap(r.package.devDependencies);
 
-      r.schemas = _.map(r.schemas, s => this.mongoUnescape(s));
+      r.schemas = _.map(r.schemas, s => mongoUnescape(s));
 
       let out = _.merge(r, { demo: demo });
       logger.silly('[load] out: ', out);
