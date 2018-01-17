@@ -14,6 +14,7 @@ import { extname, join, resolve } from 'path';
 import { buildLogger } from 'log-factory';
 import { lookup } from 'mime-types';
 import polyfills from './polyfills';
+import { PackageId } from '../types/index';
 
 const readJsonAsync: (p: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
 
@@ -125,7 +126,8 @@ export function router(
     });
   });
 
-  router.get('/element/:org/:repo/', (req, res, next) => {
+
+  const handler = nameFn => (req, res, next) => {
 
     if (!req.path.endsWith('/')) {
       res.redirect(req.path + '/');
@@ -134,22 +136,26 @@ export function router(
 
     logger.debug('element page: ', req.params);
 
-    let { org, repo } = req.params;
-    elementService.load(org, repo)
+    const name = nameFn(req.params);
+    const id = new PackageId(name);
+    elementService.load(id)
       .then(el => {
         res.render('repo', {
-          js: _.concat(el.externals ? el.externals.js : [], [
+          js: _.concat(Array.isArray(el.demo.externals.js) ? el.demo.externals.js : [], [
             '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js',
-            '/demo/react.min.js'
+            '//cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js',
+            '//cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js'
+            // '/demo/react.min.js'
           ]),
-          css: el.externals ? el.externals.css : [],
-          org: org,
-          repo: repo,
+          css: el.demo.externals ? el.demo.externals.css : [],
+          org: el.repository.user,
+          repo: el.repository.project,
+          name: id.name,
           demo: {
-            js: `/demo/${el.org}/${el.repo}/${el.tag}/pie-catalog.bundle.js`,
+            js: `/demo/${el.name}/pie-catalog.bundle.js`,
             config: el.demo.config,
             markup: jsesc(el.demo.markup),
-            configureMap: el.configureMap
+            configureMap: el.demo.configureMap
           },
           pretty: true,
           config: {
@@ -161,19 +167,21 @@ export function router(
         logger.error(e.stack);
         res.status(400).send(e.message);
       });
-  });
+  };
+  router.get('/element/:name/', handler(p => `${p.name}`));
+  router.get('/element/:scope/:name/', handler(p => `${p.scope}/${p.name}`));
 
-  router.get('/element/:org/:repo/*', (req, res, next) => {
-    let { org, repo } = req.params;
-    logger.info(req.params);
-    elementService.tag(org, repo)
-      .then(tag => {
-        res.redirect(`/demo/${org}/${repo}/${tag}/${req.params[0]}`);
-      })
-      .catch(e => {
-        res.status(404).send();
-      });
-  });
+  // router.get('/element/:org/:repo/*', (req, res, next) => {
+  //   let { org, repo } = req.params;
+  //   logger.info(req.params);
+  //   elementService.tag(org, repo)
+  //     .then(tag => {
+  //       res.redirect(`/demo/${org}/${repo}/${tag}/${req.params[0]}`);
+  //     })
+  //     .catch(e => {
+  //       res.status(404).send();
+  //     });
+  // });
 
   router.get('/org/*', (req, res, next) => {
     render(res);

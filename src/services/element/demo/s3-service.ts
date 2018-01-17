@@ -2,7 +2,7 @@ import * as _ from 'lodash';
 import * as bluebird from 'bluebird';
 import * as stream from 'stream';
 
-import { DemoService as Api, PieId } from './service';
+import { DemoService as Api, PackageId } from './service';
 import { Readable, Writable } from 'stream';
 import { S3, config } from 'aws-sdk';
 import { dirname, join } from 'path';
@@ -153,7 +153,7 @@ export default class S3DemoService implements Api {
   }
 
 
-  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
+  configAndMarkup(id: PackageId): Promise<{ config: any, markup: string }> {
 
     let markupRequest = this.client.getObject({ Bucket: this.bucket, Key: this.getKey(id, 'index.html') });
     let configRequest = this.client.getObject({ Bucket: this.bucket, Key: this.getKey(id, 'config.json') });
@@ -172,18 +172,18 @@ export default class S3DemoService implements Api {
     );
   }
 
-  delete(id: PieId): Promise<boolean> {
+  delete(id: PackageId): Promise<boolean> {
     logger.debug('[delete] id: ', id);
     return this.withPromise(
       emptyDir.bind(this, this.client, this.bucket, this.getRoot(id))
     );
   }
 
-  private idToPath(id: PieId) {
-    return `${id.org}/${id.repo}/${id.tag}`;
+  private idToPath(id: PackageId) {
+    return id.name;
   }
 
-  private getRoot(id: PieId) {
+  private getRoot(id: PackageId) {
     return `${this.servicePrefix}/${this.idToPath(id)}`
   }
 
@@ -191,11 +191,11 @@ export default class S3DemoService implements Api {
     return `${this.prefix}/${SERVICE_PREFIX}`;
   }
 
-  private getKey(id: PieId, name: string) {
+  private getKey(id: PackageId, name: string) {
     return `${this.getRoot(id)}/${name}`
   }
 
-  upload(id: PieId, name: string, stream: Readable): Promise<any> {
+  upload(id: PackageId, name: string, stream: Readable): Promise<any> {
     let params = {
       Bucket: this.bucket,
       Key: this.getKey(id, name),
@@ -208,7 +208,7 @@ export default class S3DemoService implements Api {
   }
 
   //TODO - how do we set up cloudfront?
-  getDemoLink(id: PieId): string {
+  getDemoLink(id: PackageId): string {
     return `/demo/${this.idToPath(id)}/example.html`;
   }
 

@@ -22,7 +22,7 @@ import { elements } from './client';
 
 let init = () => {
 
-  let info = elements.load(window.pie.org, window.pie.repo);
+  let info = elements.load(window.pie.name);
   let elementNames = Object.keys(window.demo.config.elements);
   let demoElements = Promise.all(elementNames.map(el => customElements.whenDefined(el)));
 
