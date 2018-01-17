@@ -91,6 +91,8 @@ npm test
 
 To deploy a preview version of the app for others to look at run: 
 
+> Note you may need a `HEROKU_AUTH_TOKEN` exported.
+
 ```
 gulp build
 ./deploy $name_of_heroku_app

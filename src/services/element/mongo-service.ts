@@ -92,13 +92,31 @@ export default class ElementService implements Api {
     return this.update(id, update);
   }
 
-  saveSchema(id: PieId, name: string, schema: KeyMap) {
+  mongoEscape(data: KeyMap): KeyMap {
+    return _.reduce(data, (acc, value, key) => {
+      if (key.startsWith('$')) {
+        acc[`_ms_${key}`] = _.isObject(value) ? this.mongoEscape(value) : value;
+        return acc;
+      }
+    }, {});
+  }
 
+  mongoUnescape(data: KeyMap): KeyMap {
+    return _.reduce(data, (acc, value, key) => {
+      if (key.startsWith('_ms_')) {
+        acc[key.replace('_ms_', '')] = _.isObject(value) ? this.mongoEscape(value) : value;
+        return acc;
+      }
+    }, {});
+  }
+
+  saveSchema(id: PieId, name: string, schema: KeyMap) {
+    const safeSchema = this.mongoEscape(schema);
     let update = {
       $addToSet: {
         'schemas': {
-          name: name,
-          schema: schema
+          name,
+          schema: safeSchema
         }
       }
     }
@@ -162,6 +180,9 @@ export default class ElementService implements Api {
       let demo = await this.demo.configAndMarkup(new PieId(r.org, r.repo, r.tag));
       r.package.dependencies = toKeyMap(r.package.dependencies);
       r.package.devDependencies = toKeyMap(r.package.devDependencies);
+
+      r.schemas = _.map(r.schemas, s => this.mongoUnescape(s));
+
       let out = _.merge(r, { demo: demo });
       logger.silly('[load] out: ', out);
       return out;
