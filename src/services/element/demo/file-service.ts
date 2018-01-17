@@ -3,16 +3,17 @@ import * as express from 'express';
 
 import { DemoService as Api, PieId, DemoRouter as Router } from './service';
 import { Readable, Writable } from 'stream';
-import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove } from 'fs-extra';
+import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove, exists } from 'fs-extra';
 import { dirname, join } from 'path';
 
 import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
-
+import {loadJs} from './js-reader';
 const logger = buildLogger();
 
-let readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
-let readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
+const readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
+const readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
+const existsAsync: (n: string) => bluebird<any> = bluebird.promisify(exists);
 
 const removePromise = (dir: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -83,10 +84,19 @@ export default class DemoService implements Api, Router {
     return `${this.prefix()}/${this.toPath(id, 'example.html')}`;
   }
 
+  loadConfig(id:PieId) : Promise<any> {
+    const jsonPath = this.getFilePath(id, 'config.json');
+    if(await existsAsync(jsonPath)){
+      return readJsonAsync(jsonPath);
+    } else if(await existsAsync(jsPath)){
+      return loadJs(jsPath);
+    }
+  }
+
   configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
     return Promise.all(
       [
-        readJsonAsync(this.getFilePath(id, 'config.json'), 'utf8'),
+        loadConfig(id), 
         readFileAsync(this.getFilePath(id, 'index.html'), 'utf8')
       ]).then(([config, markup]) => {
         return { config, markup };
