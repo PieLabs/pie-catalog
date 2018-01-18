@@ -103,3 +103,12 @@ You'll have to have the following set up on that heroku app:
 * `MONGO_URI` - a mongo uri to connect to.
 
 This app uses the mongo db + a local `.file-store` so you'll need to have called `ingest` with a pie archive for this to run.
+
+
+# ingest changes
+
+1. config can be a js or json file now and can have a different name
+1. when building add name of markup and config file
+1. when ingesting - read this metadata file first to get all the info we need
+1. store config in db 
+1. store markup in db

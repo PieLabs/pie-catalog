@@ -8,7 +8,7 @@ import { dirname, join } from 'path';
 
 import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
-import {loadJs} from './js-reader';
+import { loadJs } from './js-reader';
 const logger = buildLogger();
 
 const readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
@@ -84,19 +84,20 @@ export default class DemoService implements Api, Router {
     return `${this.prefix()}/${this.toPath(id, 'example.html')}`;
   }
 
-  loadConfig(id:PieId) : Promise<any> {
+  loadConfig(id: PieId): Promise<any> {
     const jsonPath = this.getFilePath(id, 'config.json');
-    if(await existsAsync(jsonPath)){
-      return readJsonAsync(jsonPath);
-    } else if(await existsAsync(jsPath)){
-      return loadJs(jsPath);
-    }
+    return Promise.reject('')
+    // if(await existsAsync(jsonPath)){
+    //   return readJsonAsync(jsonPath);
+    // } else if(await existsAsync(jsPath)){
+    //   return loadJs(jsPath);
+    // }
   }
 
   configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
     return Promise.all(
       [
-        loadConfig(id), 
+        loadConfig(id),
         readFileAsync(this.getFilePath(id, 'index.html'), 'utf8')
       ]).then(([config, markup]) => {
         return { config, markup };
