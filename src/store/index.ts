@@ -46,108 +46,6 @@ let withJson = (fn: (j: { [key: string]: any }) => Promise<any>): Writable => {
   });
 }
 
-type Parts = {
-  pkg: any | undefined,
-  readme: any | undefined
-}
-
-class PendingElement {
-
-  private name: string;
-  private version: string;
-  private id: PieId | undefined;
-
-  private promise: Promise<any>;
-  private resolve: (d: any) => any;
-  private reject: (e: Error) => any;
-  private results: Parts;
-  private pending: Parts;
-
-  constructor(private service: ElementService) {
-    this.id = undefined;
-    this.results = {
-      pkg: undefined,
-      readme: undefined
-    }
-
-    this.pending = {
-      pkg: undefined,
-      readme: undefined
-    }
-
-    this.promise = new Promise<any>((resolve, reject) => {
-      this.resolve = resolve;
-      this.reject = reject;
-    });
-  }
-
-  savePkg(pkg: any): void {
-    this.name = pkg.name;
-    this.version = pkg.version;
-    this.id = PieId.build("org", "repo", this.version);
-    this.pending.pkg = pkg;
-    this.saveAll();
-    this.service.savePkg(this.id, pkg)
-      .then(v => {
-        this.results.pkg = v;
-        this.flushPending();
-        this.flushPromise();
-      })
-      .catch(e => {
-        this.results.pkg = e;
-        this.flushPromise();
-      });
-  }
-  saveAll() {
-    if (Object.keys(this.pending).every(k => this.pending[k] !== undefined)) { }
-  }
-  flushPromise() {
-    const allResultsIn = Object.keys(this.results).every(k => this.results[k] !== undefined);
-    if (allResultsIn) {
-      const hasErrors = Object.keys(this.results).some(k => this.results[k] instanceof Error);
-
-      if (hasErrors) {
-        this.reject(new Error('pending failed'))
-      } else {
-        this.resolve({});
-      }
-    }
-  }
-
-  flushPending() {
-    if (this.pending.readme) {
-      this.saveReadme(this.pending.readme);
-    }
-  }
-
-  saveReadme(contents: string): any {
-    if (this.id === undefined) {
-      this.pending.readme = contents;
-    } else {
-      this.service.saveReadme(this.id, contents)
-        .then(d => {
-          this.results.readme = d;
-          this.flushPromise();
-        })
-        .catch(e => {
-          this.results.readme = e;
-          this.flushPromise();
-        })
-    }
-  }
-
-  saveSchema(name: string, json: any) {
-
-  }
-
-  saveConfigureMap(json: any) {
-
-  }
-
-  getPromise(): Promise<any> {
-    return this.promise;
-  }
-}
 
 export let writeStream = (id: PieId, elementService: ElementService, stream: Readable, name: string, header: any): Writable | void => {
   if (name === 'pie-pkg/package.json') {
@@ -275,6 +173,7 @@ export default (elementService: ElementService): Router => {
         });
 
         let name = normalize(header.name);
+
         let ws = writeStream(id, elementService, stream, name, header);
 
         if (ws) {
@@ -302,7 +201,7 @@ export default (elementService: ElementService): Router => {
         res.status(500).json({ success: false, error: e.message });
       });
 
-      extract.on('finish', function () {
+      extract.on('finish', () => {
         logger.info('all files in tar listed - done!');
         extractComplete = true;
         respond('');
@@ -310,7 +209,6 @@ export default (elementService: ElementService): Router => {
 
       req
         .pipe(gunzip())
-        .pipe(extractJson('package.json', pkg => console.log('got pkg')))
         .pipe(extract);
 
     }
@@ -318,32 +216,4 @@ export default (elementService: ElementService): Router => {
   });
 
   return router;
-}
-
-function extractJson(name: string, fn: (a: any) => void) {
-  return stream => {
-    const extract = tar.extract();
-    extract.on('entry', (header, stream, next) => {
-
-      stream.on('end', () => {
-        next();
-      });
-
-      stream.on('error', e => {
-        next(e);
-      });
-
-      if (header.name === name) {
-        fn(stream);
-      } else {
-        stream.resume();
-      }
-
-    });
-    extract.on('finish', () => {
-
-    });
-    stream.pipe(extract);
-  }
-
 }
