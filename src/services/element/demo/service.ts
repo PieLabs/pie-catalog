@@ -1,15 +1,15 @@
-import { PieId } from '../../../types';
+import { PackageId } from '../../../types';
 import { Readable, Writable } from 'stream';
 import * as express from 'express';
 
-export { PieId }
+export { PackageId }
 
 export interface DemoService {
-  upload(id: PieId, name: string, stream: Readable): Promise<any>;
-  delete(id: PieId): Promise<boolean>;
+  upload(id: PackageId, name: string, stream: Readable): Promise<any>;
+  delete(id: PackageId): Promise<boolean>;
   deleteAll(org: string, repo: string): Promise<boolean>;
-  getDemoLink(id: PieId): string;
-  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }>
+  getDemoLink(id: PackageId): string;
+  // configAndMarkup(id: PieId): Promise<{ config: any, markup: string }>
 }
 
 export interface DemoRouter {

@@ -2,6 +2,10 @@ import * as semver from 'semver';
 
 export type KeyMap = { [key: string]: any }
 
+export class PackageId {
+  constructor(readonly name: string) { }
+}
+
 export class PieId {
   constructor(
     readonly org: string,

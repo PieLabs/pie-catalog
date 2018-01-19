@@ -1,4 +1,4 @@
-import { KeyMap, PieId } from '../../types';
+import { KeyMap, PieId, PackageId } from '../../types';
 
 import { DemoService } from './demo/service';
 import { GithubService } from '../github';
@@ -7,25 +7,18 @@ export { GithubService, PieId, KeyMap, DemoService }
 
 export type ListOpts = { limit: number, skip: number };
 
-export type ElementLite = { org: string, repo: string, description: string, tag: string }
+export type ElementLite = { name: string, description: string }
 
 export type Element = {
-  org: string,
-  repo: string,
-  description: string,
-  tag: string,
+  name: string,
   readme: string,
   pkg: any,
   schemas: any[],
-  externals?: {
-    js: string[],
-    css: string[]
-  },
   demo: {
     config: any,
+    configureMap: { [key: string]: string },
     markup: string
-  },
-  configureMap: { [key: string]: string }
+  }
 }
 
 export type DeleteResult = {
@@ -36,16 +29,17 @@ export type DeleteResult = {
 
 export interface ElementService {
   readonly demo: DemoService;
-  reset(id: PieId): Promise<boolean>;
-  saveSchema(id: PieId, name: string, schema: KeyMap): Promise<boolean>;
-  saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean>;
-  saveReadme(id: PieId, readme: string): Promise<boolean>;
-  saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
-  savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
+  saveBundle(id: PackageId, data: any): Promise<PackageId>;
+  reset(id: PackageId): Promise<boolean>;
+  // saveSchema(id: PieId, name: string, schema: KeyMap): Promise<boolean>;
+  // saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean>;
+  // saveReadme(id: PieId, readme: string): Promise<boolean>;
+  // saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
+  // savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
-  listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
+  // listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
 
-  delete(org: string, repo: string): Promise<DeleteResult>;
-  tag(org: string, repo: string): Promise<string>;
-  load(org: string, repo: string): Promise<Element>;
+  delete(id: PackageId): Promise<DeleteResult>;
+  // tag(id: PackageId): Promise<string>;
+  load(id: PackageId): Promise<Element>;
 }
