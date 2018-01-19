@@ -141,14 +141,22 @@ export default (elementService: ElementService): Router => {
         }
 
         //TODO: for now pie id is just the package name
-        pieId = dataBundle.package.name;
-        await elementService.reset(pieId);
-        elementService.saveBundle(pieId, dataBundle)
-          .then(id => {
-            pieId = id;
-            next();
-          })
-          .catch(next);
+        pieId = new PackageId(dataBundle.package.name);
+
+        if (!pieId || pieId.name === null) {
+          stream.resume();
+          next(new Error('no pie id'));
+        } else {
+          await elementService.delete(pieId);
+          elementService.saveBundle(pieId, dataBundle)
+            .then(id => {
+              pieId = id;
+              next();
+            })
+            .catch(next);
+
+        }
+
       });
 
       stream.on('error', function (e) {
