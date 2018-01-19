@@ -52,11 +52,10 @@ export default class ElementService implements Api {
     logger.debug(`[delete], name: ${id.name}`);
 
     let query = { name: id.name };
-    let removeResult = await this.collection.findOneAndDelete(query);
-    logger.silly('[delete] removeResult: ', removeResult);
+    let removeResult = await this.collection.deleteOne(query);
+    logger.silly('[delete] removeResult: ', removeResult.result);
 
-    if (removeResult.ok && removeResult.value) {
-      // let id = new PieId(org, repo, removeResult.value.tag);
+    if (removeResult.result.ok) {
       let demoDeleteResult = await this.demo.delete(id);
       if (demoDeleteResult) {
         return { ok: true }
