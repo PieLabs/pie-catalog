@@ -3,7 +3,7 @@ import * as express from 'express';
 
 import { DemoService as Api, PackageId, DemoRouter as Router } from './service';
 import { Readable, Writable } from 'stream';
-import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove, exists } from 'fs-extra';
+import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove, exists, existsSync } from 'fs-extra';
 import { dirname, join } from 'path';
 
 import { buildLogger } from 'log-factory';
@@ -62,16 +62,19 @@ export default class DemoService implements Api, Router {
 
   upload(id: PackageId, name: string, stream: Readable): Promise<any> {
     return new Promise((resolve, reject) => {
-      logger.silly('[stream], id', id, name);
+      logger.silly('[upload], id', id, name);
       let path = this.getFilePath(id, name);
-      logger.silly('[stream] path: ', path);
+      logger.silly('[upload] path: ', path);
       ensureDirSync(dirname(path));
       let ws = createWriteStream(path);
       ws.on('error', (e) => {
         logger.error('error writing the file: ', e);
         reject(e);
       });
-      ws.on('close', resolve);
+      ws.on('close', () => {
+        logger.info(`[upload] uploaded to: ${path}, ${existsSync(path)}`)
+        resolve();
+      });
       stream.pipe(ws);
     });
   }
