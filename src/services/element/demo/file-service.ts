@@ -8,7 +8,6 @@ import { dirname, join } from 'path';
 
 import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
-import { loadJs } from './js-reader';
 const logger = buildLogger();
 
 const readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);

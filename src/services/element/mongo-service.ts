@@ -95,6 +95,9 @@ export default class ElementService implements Api {
   }
 
 
+  async listByRepoUser(user: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }> {
+    return this._list({ 'repository.user': user }, opts)
+  }
 
   async load(id: PackageId) {
     const r = await this.collection.findOne({ name: id.name });
@@ -102,7 +105,7 @@ export default class ElementService implements Api {
       const unescaped = mongoUnescape(r);
       return unescaped as Element;
     } else {
-      throw new Error(`cant find package with name: ${name}`);
+      throw new Error(`cant find package with name: ${id.name}`);
     }
   }
 

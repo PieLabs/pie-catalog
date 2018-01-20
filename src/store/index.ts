@@ -140,7 +140,6 @@ export default (elementService: ElementService): Router => {
           dataBundle = JSON.parse(bundleString);
           pieId = new PackageId(dataBundle.package.name);
           await elementService.delete(pieId);
-          logger.info('delete completed --------------- now save');
           elementService.saveBundle(pieId, dataBundle)
             .then(id => {
               pieId = id;
@@ -155,10 +154,6 @@ export default (elementService: ElementService): Router => {
             next();
           }
         }
-
-        //TODO: for now pie id is just the package name
-
-
       });
 
       stream.on('error', function (e) {

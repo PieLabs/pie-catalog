@@ -4,6 +4,7 @@ import { ElementService, PieId } from '../services';
 
 import { Router } from 'express';
 import { buildLogger } from 'log-factory';
+import { PackageId } from '../types/index';
 
 const logger = buildLogger();
 
@@ -22,7 +23,7 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       .then(result => {
 
         result.elements = _.map(result.elements, (r: any) => {
-          r.repoLink = `/element/${r.org}/${r.repo}`
+          r.repoLink = `/element/${r.name}`
           return r;
         });
 
@@ -30,9 +31,11 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       });
   });
 
-  r.get('/org/:org', (req, res) => {
+  r.get('/user/:user', (req, res) => {
 
-    service.listByOrg(req.params.org, { skip: 0, limit: 0 })
+    const { user } = req.params;
+
+    service.listByRepoUser(user, { skip: 0, limit: 0 })
       .then(result => {
         res.json({
           count: result.count,
@@ -42,8 +45,10 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       });
   });
 
-  r.delete('/element/:org/:repo', (req, res) => {
-    service.delete(req.params.org, req.params.repo)
+  r.delete('/element/:name', (req, res) => {
+    const { name } = req.params;
+    const id = new PackageId(name)
+    service.delete(id)
       .then((result) => {
         if (result.ok) {
           res.json({ success: true });
@@ -56,23 +61,26 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       })
   });
 
-  r.get('/element/:org/:repo', (req, res) => {
+  const handler = nameFn => (req, res) => {
 
-    let { org, repo } = req.params;
-
-    service.load(org, repo)
+    const name = nameFn(req.params);
+    logger.silly('[load] name: ', name);
+    const id = new PackageId(name);
+    service.load(new PackageId(name))
       .then(r => {
-        logger.debug(`[/element/${org}/${repo}] got result`);
-        let id = new PieId(r.org, r.repo, r.tag);
+        logger.debug(`[/element/${name}] got result`);
         (r as any).demoLink = getDemoLink(id);
         r.schemas = r.schemas || [];
         res.json(r);
       })
       .catch(e => {
         logger.info('error loading: ', req.path, e.message);
-        res.status(404).json({ org: org, repo: repo });
+        res.status(404).json({ name: id.name });
       });
-  });
+  };
+
+  r.get('/element/:scope/:name', handler(p => `${p.scope}/${p.name}`));
+  r.get('/element/:name', handler(p => `${p.name}`));
 
   return r;
 }

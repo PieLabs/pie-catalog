@@ -28,8 +28,8 @@ class Elements {
       });
   }
 
-  load(org, repo) {
-    return fetch(`/api/element/${org}/${repo}`)
+  load(name) {
+    return fetch(`/api/element/${name}`)
       .then(status)
       .then(json)
       .catch(e => {

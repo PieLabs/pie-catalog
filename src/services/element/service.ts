@@ -14,10 +14,20 @@ export type Element = {
   readme: string,
   pkg: any,
   schemas: any[],
+  repository: {
+    user: string,
+    project: string,
+    type: string
+  }
   demo: {
     config: any,
     configureMap: { [key: string]: string },
-    markup: string
+    markup: string,
+    externals: {
+      css: string[],
+      js: string[]
+
+    }
   }
 }
 
@@ -36,6 +46,7 @@ export interface ElementService {
   // saveReadme(id: PieId, readme: string): Promise<boolean>;
   // saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
   // savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
+  listByRepoUser(user: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   // listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
 

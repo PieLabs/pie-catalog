@@ -19,6 +19,7 @@ html
       window.pie = window.pie || {};
       window.pie.org = '!{org}';
       window.pie.repo = '!{repo}';
+      window.pie.name = '!{name}'
 
     avatar-service(url-template=config.avatarUrl)
     catalog-container
@@ -26,5 +27,5 @@ html
         | pie catalog
       catalog-entry
         catalog-demo 
-
+    // #{js}
     +polyfill(['/repo.js'].concat(js || []).concat(demo.js))
