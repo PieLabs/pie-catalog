@@ -8,24 +8,23 @@ export function escape(data: KeyMap | any[]): KeyMap {
 
   if (Array.isArray(data)) {
     return data.map(escape)
+  } else if (_.isObject(data)) {
+    return _.reduce(data, (acc, value, key) => {
+      if (key) {
+        const finalKey = _.startsWith(key, '$') ? escapeKey(key) : key;
+        acc[finalKey] = _.isObject(value) ? escape(value) : value;
+      }
+      return acc;
+    }, {});
   } else {
-
+    return data;
   }
-  return _.reduce(data, (acc, value, key) => {
-    if (key) {
-      const finalKey = _.startsWith(key, '$') ? escapeKey(key) : key;
-      acc[finalKey] = _.isObject(value) ? escape(value) : value;
-    }
-    return acc;
-  }, {});
 }
 
 export function unescape(data: KeyMap): KeyMap {
-
   if (Array.isArray(data)) {
     return data.map(unescape);
-  } else {
-
+  } else if (_.isObject(data)) {
     return _.reduce(data, (acc, value, key) => {
       if (key) {
         const finalKey = _.startsWith(key, '_ms_') ? unescapeKey(key) : key;
@@ -33,5 +32,7 @@ export function unescape(data: KeyMap): KeyMap {
       }
       return acc;
     }, {});
+  } else {
+    return data;
   }
 }

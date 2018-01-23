@@ -10,12 +10,23 @@ describe('mongo-escape', () => {
   beforeEach(() => {
     mod = require('../../../../lib/services/element/mongo-escape');
   });
+  it('does not escape an array of string', () => {
+    expect(mod.escape({ a: ['apple', 'banana'] })).to.eql({ a: ['apple', 'banana'] });
+  });
 
-  it.only('escapes arrays at root', () => {
+  it('does not escape an array of numbers', () => {
+    expect(mod.escape({ a: [1, 2] })).to.eql({ a: [1, 2] });
+  });
+
+  it('escapes a mixed array', () => {
+    expect(mod.escape({ a: [1, { $hi: 'hi' }] })).to.eql({ a: [1, { _ms_$hi: 'hi' }] });
+  });
+
+  it('escapes arrays at root', () => {
     expect(mod.escape([{ $a: 'a' }])).to.eql([{ _ms_$a: 'a' }]);
   });
 
-  it.only('escapes arrays', () => {
+  it('escapes arrays', () => {
     expect(mod.escape({ a: [{ $a: 'a' }] })).to.eql({ a: [{ _ms_$a: 'a' }] });
   });
 
@@ -31,10 +42,14 @@ describe('mongo-escape', () => {
     });
   });
 
-  it.only('unescapes arrays at root', () => {
+  it('does not unescape arrays of strings', () => {
+    expect(mod.unescape({ a: ['apple', 'banana'] })).to.eql({ a: ['apple', 'banana'] });
+  });
+
+  it('unescapes arrays at root', () => {
     expect(mod.unescape([{ _ms_$hi: 'hi' }])).to.eql([{ $hi: 'hi' }]);
   })
-  it.only('unescapes arrays', () => {
+  it('unescapes arrays', () => {
     expect(mod.unescape({ a: [{ _ms_$hi: 'hi' }] })).to.eql({ a: [{ $hi: 'hi' }] });
   })
 
