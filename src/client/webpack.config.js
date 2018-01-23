@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
+  devtool: process.env.NODE_ENV !== 'production' ? 'cheap-module-eval-source-map' : undefined,
   context: path.join(__dirname),
   entry: {
     index: './src/index.js',
