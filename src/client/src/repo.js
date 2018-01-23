@@ -1,7 +1,4 @@
-import * as events from 'pie-catalog-client/src/events';
-
-import { common, elementsDefined } from 'pie-catalog-client/src/bootstrap/repo';
-
+import { defineRepoElements } from 'pie-catalog-client';
 import { elements } from './client';
 
 /**
@@ -26,7 +23,7 @@ let init = () => {
   let elementNames = Object.keys(window.demo.config.elements);
   let demoElements = Promise.all(elementNames.map(el => customElements.whenDefined(el)));
 
-  common.then(() => {
+  defineRepoElements().then(() => {
     const container = document.querySelector('catalog-container');
     container.isLoading(true);
   });
@@ -69,7 +66,3 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   }
 }
 
-document.addEventListener(events.VIEW_ORG, (e) => {
-  let org = event.detail.element.org;
-  window.location.href = `/org/${org}/`;
-});

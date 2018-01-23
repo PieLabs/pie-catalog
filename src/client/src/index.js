@@ -1,11 +1,12 @@
-import { VIEW_ORG, VIEW_REPO } from 'pie-catalog-client/src/events';
+import * as client from 'pie-catalog-client';
 
-import { common } from 'pie-catalog-client/src/bootstrap/index';
+console.log(client);
+const { ELEMENT_CLICK } = client.events;
 import { elements } from './client';
 
 let init = () => {
 
-  common
+  client.defineCommonElements()
     .then(() => {
       let container = document.querySelector('catalog-container');
       container.isLoading(true);
@@ -14,6 +15,7 @@ let init = () => {
     })
     .then(([list, version]) => {
       let listings = document.querySelector('catalog-listings');
+      //TODO: shouldn't have to map
       listings.elements = list.elements;
       const container = document.querySelector('catalog-container');
       container.version = version;
@@ -32,14 +34,9 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
   }
 }
 
-document.addEventListener(VIEW_REPO, (e) => {
+document.addEventListener(ELEMENT_CLICK, (e) => {
   console.log('view repo: ', e.detail);
   let { name } = e.detail.element;
   window.location.href = `/element/${name}/`;
 });
 
-document.addEventListener(VIEW_ORG, (e) => {
-  console.log('view repo: ', e.detail);
-  let { org, repo } = e.detail.element;
-  window.location.href = `/org/${org}/`;
-});
