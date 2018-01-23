@@ -92,7 +92,7 @@
     "minimist": "^1.2.0",
     "mongodb": "^3.0.1",
     "node-fetch": "^1.7.3",
-    "pie-catalog-client": "^1.5.0",
+    "pie-catalog-client": "^2.0.0",
     "pug": "^2.0.0-rc.4",
     "resolve": "^1.5.0",
     "semver": "^5.5.0",
