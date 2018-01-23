@@ -93,8 +93,9 @@ export function router(
   }
 
 
-  router.get('/avatars/github/:user', (req, res, next) => {
-    avatarService.stream('github', req.params.user)
+  router.get(/^\/avatars\/github\/(.*)/, (req, res, next) => {
+    logger.silly('avatar params:', req.params);
+    avatarService.stream('github', req.params[0])
       .then(s => s.pipe(res))
       .catch(next);
   });
