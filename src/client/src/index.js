@@ -1,7 +1,7 @@
 import * as client from 'pie-catalog-client';
 
-console.log(client);
 const { ELEMENT_CLICK } = client.events;
+
 import { elements } from './client';
 
 let init = () => {

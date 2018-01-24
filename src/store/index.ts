@@ -11,10 +11,6 @@ import { buildLogger } from 'log-factory';
 import { normalize } from 'path';
 import { PackageId } from '../types/index';
 
-
-// stream in a tar
-// read a specific file 
-// pipe to next
 const logger = buildLogger();
 
 let withString = (fn: (j: string) => Promise<any>): Writable => {

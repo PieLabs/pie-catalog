@@ -128,7 +128,7 @@ export function router(
   });
 
 
-  const handler = nameFn => (req, res, next) => {
+  router.get(/^\/element\/(.*)/, (req, res, next) => {
 
     if (!req.path.endsWith('/')) {
       res.redirect(req.path + '/');
@@ -137,8 +137,9 @@ export function router(
 
     logger.debug('element page: ', req.params);
 
-    const name = nameFn(req.params);
+    const name = req.params[0];
     const id = new PackageId(name);
+
     elementService.load(id)
       .then(el => {
         res.render('repo', {
@@ -168,21 +169,7 @@ export function router(
         logger.error(e.stack);
         res.status(400).send(e.message);
       });
-  };
-  router.get('/element/:name/', handler(p => `${p.name}`));
-  router.get('/element/:scope/:name/', handler(p => `${p.scope}/${p.name}`));
-
-  // router.get('/element/:org/:repo/*', (req, res, next) => {
-  //   let { org, repo } = req.params;
-  //   logger.info(req.params);
-  //   elementService.tag(org, repo)
-  //     .then(tag => {
-  //       res.redirect(`/demo/${org}/${repo}/${tag}/${req.params[0]}`);
-  //     })
-  //     .catch(e => {
-  //       res.status(404).send();
-  //     });
-  // });
+  });
 
   router.get('/org/*', (req, res, next) => {
     render(res);

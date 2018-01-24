@@ -41,16 +41,8 @@ export interface ElementService {
   readonly demo: DemoService;
   saveBundle(id: PackageId, data: any): Promise<PackageId>;
   reset(id: PackageId): Promise<boolean>;
-  // saveSchema(id: PieId, name: string, schema: KeyMap): Promise<boolean>;
-  // saveConfigureMap(id: PieId, configureMap: KeyMap): Promise<boolean>;
-  // saveReadme(id: PieId, readme: string): Promise<boolean>;
-  // saveExternals(id: PieId, externals: { js: string[], css: string[] }): Promise<boolean>;
-  // savePkg(id: PieId, pkg: KeyMap): Promise<boolean>;
   listByRepoUser(user: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
   list(opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
-  // listByOrg(org: string, opts: ListOpts): Promise<{ opts: ListOpts, count: number, elements: ElementLite[] }>;
-
   delete(id: PackageId): Promise<DeleteResult>;
-  // tag(id: PackageId): Promise<string>;
   load(id: PackageId): Promise<Element>;
 }

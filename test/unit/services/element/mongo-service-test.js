@@ -96,62 +96,6 @@ describe('mongo-service', () => {
     });
   });
 
-  // describe('saveSchema', () => {
-
-  //   let schema = {};
-  //   beforeEach(() => service.saveSchema(id, 'schemas/config.json', schema));
-
-  //   it('calls collection.update', () => {
-  //     assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-  //       $set: {
-  //         tag: id.tag
-  //       },
-  //       $addToSet: {
-  //         schemas: {
-  //           name: 'schemas/config.json',
-  //           schema: schema
-  //         }
-  //       }
-  //     }, { upsert: true })
-  //   });
-  // });
-
-  // describe('savePkg', () => {
-  //   let pkg = {}
-  //   beforeEach(() => service.savePkg(id, pkg));
-
-  //   it('calls collection.update', () => {
-  //     assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-  //       $set: {
-  //         tag: id.tag,
-  //         package: pkg,
-  //         github: {}
-  //       }
-  //     }, { upsert: true })
-  //   });
-
-  //   it('calls github.loadInfo', () => {
-  //     assert.calledWith(github.loadInfo, 'org', 'repo');
-  //   });
-  // });
-
-
-  // describe('saveReadme', () => {
-  //   let readme = '#readme';
-  //   beforeEach(() => service.saveReadme(id, readme));
-
-  //   it('calls collection.update', () => {
-  //     assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-  //       $set: {
-  //         tag: id.tag,
-  //         readme: readme
-  //       }
-  //     }, { upsert: true })
-  //   });
-
-  // });
-
-
   describe('saveBundle', () => {
 
     describe('with successful save', () => {
