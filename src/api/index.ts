@@ -33,16 +33,17 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
 
   r.get('/user/:user', (req, res) => {
 
-    const { user } = req.params;
+    res.status(404).json({ error: 'todo' });
+    // const { user } = req.params;
 
-    service.listByRepoUser(user, { skip: 0, limit: 0 })
-      .then(result => {
-        res.json({
-          count: result.count,
-          org: req.params.org,
-          elements: result.elements
-        });
-      });
+    // service.listByRepoUser(user, { skip: 0, limit: 0 })
+    //   .then(result => {
+    //     res.json({
+    //       count: result.count,
+    //       org: req.params.org,
+    //       elements: result.elements
+    //     });
+    //   });
   });
 
   r.delete(/^\/element\/(.*)/, (req, res) => {
