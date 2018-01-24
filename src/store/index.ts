@@ -70,20 +70,16 @@ export default (elementService: ElementService): Router => {
   });
 
   /**
-   * ingest a zip file build by [pie-cli](github.com/PieLabs/pie-cli)'s catalog app.
-   * The zip is expected to have the following format: 
+   * ingest a tar.gz file built by [pie-cli](github.com/PieLabs/pie-cli)'s catalog app.
+   * The archive is expected to have the following format: 
    * 
-   * - pie-pkg/README.md -> to elementService
-   * - pie-pkg/package.json -> to elementService 
-   * - schemas/*.json  -> to elementService
-   * - * -> to demo service
+   * - pie-catalog-info.json (must be 1st entry in tar) -> saved to db
+   * - any-other-file -> saved to demo service
    * 
    * the demo assets are send to an object-store/cdn using a key: 
-   * - :org/:repo/:tag?|:sha/:filepath
-   * 
-   * the README, schemas, package.json are stored in a db: 
-   * 
-   * { org: :org, repo: :repo, versions: [ { tag: :tag?, sha: :sha, readme: '', schemas, package.json }, ...] }
+   * - :name/:filepath
+   *
+   * where name is extracted from pie-catalog-info.json when the stream first loads.
    */
 
   router.post('/ingest', async (req, res) => {
@@ -137,9 +133,11 @@ export default (elementService: ElementService): Router => {
 
       stream.on('end', async function () {
         if (name === DATA_BUNDLE) {
+          logger.silly(' >>> data bundle end');
           dataBundle = JSON.parse(bundleString);
           pieId = new PackageId(dataBundle.package.name);
           await elementService.delete(pieId);
+          logger.silly(' >>> data bundle end - call saveBundle');
           elementService.saveBundle(pieId, dataBundle)
             .then(id => {
               pieId = id;
@@ -170,6 +168,7 @@ export default (elementService: ElementService): Router => {
         } else {
           let ws = writeStream(pieId, elementService, stream, name, header);
 
+          logger.info('writeStream for ', name, ws);
           if (ws instanceof Writable) {
             let writeStatus = { name: name, stream: ws, status: 'pending', error: undefined };
             ws.on('finish', () => {

@@ -45,8 +45,8 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       });
   });
 
-  r.delete('/element/:name', (req, res) => {
-    const { name } = req.params;
+  r.delete(/^\/element\/(.*)/, (req, res) => {
+    const name = req.params[0];
     const id = new PackageId(name)
     service.delete(id)
       .then((result) => {
@@ -61,12 +61,11 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       })
   });
 
-  const handler = nameFn => (req, res) => {
-
-    const name = nameFn(req.params);
+  r.get(/^\/element\/(.*)/, (req, res) => {
+    const name = req.params[0];
     logger.silly('[load] name: ', name);
     const id = new PackageId(name);
-    service.load(new PackageId(name))
+    service.load(id)
       .then(r => {
         logger.debug(`[/element/${name}] got result`);
         (r as any).demoLink = getDemoLink(id);
@@ -77,10 +76,7 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
         logger.info('error loading: ', req.path, e.message);
         res.status(404).json({ name: id.name });
       });
-  };
-
-  r.get('/element/:scope/:name', handler(p => `${p.scope}/${p.name}`));
-  r.get('/element/:name', handler(p => `${p.name}`));
+  });
 
   return r;
 }
