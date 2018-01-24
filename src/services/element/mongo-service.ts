@@ -27,7 +27,7 @@ let idToQuery = (id: PieId) => {
   }
 }
 
-const liteFields = { name: 1, 'package.description': 1 };
+export const liteFields = { name: 1, 'package.description': 1 };
 
 const toKeyValueArray = (dependencies: KeyMap): { key: string, value: string }[] => _.map(dependencies, (value, key) => ({ value, key }));
 
