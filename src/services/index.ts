@@ -10,6 +10,7 @@ import { MainGithubService } from './github';
 import AvatarService, { FileBackend } from './avatar';
 import { join } from 'path';
 import { PieId } from '../types';
+import * as _ from 'lodash';
 
 export { PieId, ElementService, AvatarService }
 
@@ -62,14 +63,17 @@ export function buildOpts(args: any, env: any): BootstrapOpts {
 
 export async function bootstrap(opts: BootstrapOpts): Promise<Services> {
   logger.info('opts: ', opts);
-  const db = await MongoClient.connect(opts.mongoUri);
+  MongoClient
+  const client = await MongoClient.connect(opts.mongoUri);
+  const dbName = _.last(opts.mongoUri.split('/'));
+  const db = client.db(dbName);
   const collection = db.collection('elements');
-  const {service: demoService, router: demoRouter} = await demoServiceAndRouter(opts);
+  const { service: demoService, router: demoRouter } = await demoServiceAndRouter(opts);
   const github = new MainGithubService();
   const element = new MongoService(collection, demoService, github);
   const avatarBackend = new FileBackend(join(process.cwd(), '.avatar-file-backend'));
   const avatar = new AvatarService(avatarBackend, github);
-  const onError = () => db.close();
+  const onError = () => client.close();
 
   return {
     avatar,
