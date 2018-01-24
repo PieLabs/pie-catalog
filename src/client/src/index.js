@@ -37,6 +37,6 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 document.addEventListener(ELEMENT_CLICK, (e) => {
   console.log('view repo: ', e.detail);
   let { name } = e.detail.element;
-  window.location.href = `/element/${name}/`;
+  window.location.href = `/element/${name}`;
 });
 

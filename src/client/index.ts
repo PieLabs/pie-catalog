@@ -130,11 +130,6 @@ export function router(
 
   router.get(/^\/element\/(.*)/, (req, res, next) => {
 
-    if (!req.path.endsWith('/')) {
-      res.redirect(req.path + '/');
-      return;
-    }
-
     logger.debug('element page: ', req.params);
 
     const name = req.params[0];
