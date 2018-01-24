@@ -10,14 +10,19 @@ function MockCursor(arr) {
 
 describe('mongo-service', () => {
 
-  let mod, demo, collection, cursor, github, service, id;
+  let mod, demo, collection, cursor, github, service, id, bundle, mongoEscape;
 
   beforeEach(() => {
 
     id = {
-      org: 'org',
-      repo: 'repo',
-      tag: '1.0.0'
+      name: '@scope/name'
+    }
+
+    bundle = {
+      package: {},
+      repository: {},
+      demo: {},
+      npm: {}
     }
 
     demo = {
@@ -27,8 +32,9 @@ describe('mongo-service', () => {
     cursor = new MockCursor();
 
     collection = {
+      insertOne: stub().returns(Promise.resolve({})),
       createIndex: stub().returns(Promise.resolve()),
-      findOneAndDelete: stub().returns(Promise.resolve({ ok: true, value: id })),
+      deleteOne: stub().returns(Promise.resolve({ result: { ok: true } })),
       update: stub().returns(Promise.resolve({ result: id })),
       find: stub().returns(cursor)
     }
@@ -37,7 +43,14 @@ describe('mongo-service', () => {
       loadInfo: stub().returns(Promise.resolve({}))
     }
 
-    mod = require('../../../../lib/services/element/mongo-service');
+    mongoEscape = {
+      escape: spy(input => input),
+      unescape: spy(input => input)
+    }
+
+    mod = proxyquire('../../../../lib/services/element/mongo-service', {
+      './mongo-escape': mongoEscape
+    });
     service = new mod.default(collection, demo, github);
   });
 
@@ -45,10 +58,10 @@ describe('mongo-service', () => {
   describe('delete', () => {
 
     describe('when successful', () => {
-      beforeEach(() => service.delete('org', 'repo'));
+      beforeEach(() => service.delete(id));
 
       it('calls collection.findOneAndDelete', () => {
-        assert.calledWith(collection.findOneAndDelete, { org: 'org', repo: 'repo' });
+        assert.calledWith(collection.deleteOne, { name: id.name });
       });
 
       it('calls demo.delete', () => {
@@ -60,8 +73,8 @@ describe('mongo-service', () => {
       let result;
 
       beforeEach(() => {
-        collection.findOneAndDelete.returns(Promise.resolve({ ok: false }));
-        return service.delete('org', 'repo').then(r => result = r);
+        collection.deleteOne.returns(Promise.resolve({ result: { ok: false } }));
+        return service.delete(id).then(r => result = r);
       });
 
       it('returns ok: false', () => {
@@ -83,59 +96,38 @@ describe('mongo-service', () => {
     });
   });
 
-  describe('saveSchema', () => {
+  describe('saveBundle', () => {
 
-    let schema = {};
-    beforeEach(() => service.saveSchema(id, 'schemas/config.json', schema));
+    describe('with successful save', () => {
+      beforeEach(() => {
+        return service.saveBundle(id, bundle);
+      });
 
-    it('calls collection.update', () => {
-      assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-        $set: {
-          tag: id.tag
-        },
-        $addToSet: {
-          schemas: {
-            name: 'schemas/config.json',
-            schema: schema
-          }
-        }
-      }, { upsert: true })
-    });
-  });
+      it('calls mongoEscape', () => {
+        assert.calledWith(mongoEscape.escape, bundle);
+      });
 
-  describe('savePkg', () => {
-    let pkg = {}
-    beforeEach(() => service.savePkg(id, pkg));
-
-    it('calls collection.update', () => {
-      assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-        $set: {
-          tag: id.tag,
-          package: pkg,
-          github: {}
-        }
-      }, { upsert: true })
+      it('calls insertOne', () => {
+        assert.calledWith(collection.insertOne, bundle);
+      });
     });
 
-    it('calls github.loadInfo', () => {
-      assert.calledWith(github.loadInfo, 'org', 'repo');
+    describe('with error', () => {
+      beforeEach(() => {
+        collection.insertOne.returns(Promise.reject(new Error('!!')));
+      });
+
+      it('throws an error', () => {
+        service.saveBundle(id, bundle)
+          .catch(e => {
+            ok();
+          })
+          .then(r => {
+            throw new Error('should have got an error')
+          });
+      });
+
     });
-  });
-
-
-  describe('saveReadme', () => {
-    let readme = '#readme';
-    beforeEach(() => service.saveReadme(id, readme));
-
-    it('calls collection.update', () => {
-      assert.calledWith(collection.update, { org: 'org', repo: 'repo' }, {
-        $set: {
-          tag: id.tag,
-          readme: readme
-        }
-      }, { upsert: true })
-    });
-
   });
 
   describe('list', () => {
@@ -143,11 +135,15 @@ describe('mongo-service', () => {
     beforeEach(() => service.list({ skip: 0, limit: 0 }));
 
     it('calls collection.find', () => {
-      assert.calledWith(collection.find, {}, { 'package.description': 1, org: 1, repo: 1, tag: 1 }, 0, 0);
+      assert.calledWith(collection.find, {}, { fields: mod.liteFields, skip: 0, limit: 0 });
     });
   });
 
-  describe('listByOrg', () => {
+  /**
+   * Currently not in use - we're probably going to list by author
+   * similar to npmjs.com
+   */
+  xdescribe('listByOrg', () => {
 
     beforeEach(() => service.listByOrg('org', { skip: 0, limit: 0 }));
 

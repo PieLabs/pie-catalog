@@ -6,21 +6,18 @@ import { MockResponse, MockRouter } from '../helpers';
 
 describe('api', () => {
 
-  let mod, deps, router, elementService, handler, req, res, listResult, getDemoLink;
+  let mod, deps, router, elementService, handler, req, res, listResult, getDemoLink, pkgName;
 
   beforeEach(() => {
+    pkgName = '@scope/name';
     router = new MockRouter();
     res = new MockResponse();
 
     req = {
-      params: {
-        org: 'org',
-        repo: 'repo',
-        tag: '1.0.0'
-      }
+      params: {}
     };
 
-    listResult = [{ org: 'org', repo: 'repo' }];
+    listResult = [{ name: pkgName }];
 
     elementService = {
       list: stub().returns(Promise.resolve({
@@ -75,37 +72,20 @@ describe('api', () => {
     });
   });
 
-  describe('GET /org/:org', () => {
+  describe('DELETE /element/:name', () => {
 
     beforeEach((done) => {
-      handler = router.handlers.get['/org/:org'];
+      handler = router.handlers.delete[/^\/element\/(.*)/];
       res.done = done;
-      handler(req, res);
-    });
-
-    it('calls service.listByOrg', () => {
-      assert.calledWith(elementService.listByOrg, 'org', { skip: 0, limit: 0 });
-    });
-
-    it('calls res.json', () => {
-      assert.calledWith(res.json, {
-        count: 1, org: 'org', elements: [
-          _.merge(listResult[0], { repoLink: '/element/org/repo' })
-        ]
-      })
-    });
-  });
-
-  describe('DELETE /element/:org/:repo', () => {
-
-    beforeEach((done) => {
-      handler = router.handlers.delete['/element/:org/:repo'];
-      res.done = done;
+      req.params = [pkgName]
       handler(req, res);
     });
 
     it('calls service.delete', () => {
-      assert.calledWith(elementService.delete, 'org', 'repo');
+      assert.calledWith(
+        elementService.delete,
+        match(n => n.name === pkgName)
+      );
     });
 
     it('calls res.json', () => {
@@ -114,24 +94,26 @@ describe('api', () => {
 
   });
 
-  describe('GET /element/:org/:repo', () => {
+  describe('GET /element/*name', () => {
 
     beforeEach((done) => {
-      handler = router.handlers.get['/element/:org/:repo'];
+      elementService.load.returns(Promise.resolve({ name: pkgName }));
+      handler = router.handlers.get[/^\/element\/(.*)/];
+      req.params = [pkgName];
       res.done = done;
       handler(req, res);
     });
 
     it('calls service.load', () => {
-      assert.calledWith(elementService.load, 'org', 'repo');
+      assert.calledWith(elementService.load, match(i => i.name === pkgName));
     });
 
     it('calls getDemoLink', () => {
-      assert.calledWith(getDemoLink, { org: 'org', repo: 'repo', tag: '1.0.0' });
+      assert.calledWith(getDemoLink, match(i => i.name === pkgName));
     });
 
     it('calls res.json', () => {
-      assert.calledWith(res.json, _.extend({}, req.params, { demoLink: 'demoLink', schemas: [] }));
+      assert.calledWith(res.json, _.extend({ name: pkgName }, { demoLink: 'demoLink', schemas: [] }));
     });
   });
 });

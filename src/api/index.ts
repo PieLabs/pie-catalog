@@ -1,9 +1,13 @@
+import * as _ from 'lodash';
+
+import { ElementService, PieId } from '../services';
+
 import { Router } from 'express';
-import { PieId, ElementService } from '../services';
 import { buildLogger } from 'log-factory';
+import { PackageId } from '../types/index';
+
 const logger = buildLogger();
 
-import * as _ from 'lodash';
 
 export default function mkApi(service: ElementService, getDemoLink: (PieId) => string) {
 
@@ -18,8 +22,8 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
     service.list({ skip: 0, limit: 0 })
       .then(result => {
 
-        result.elements = _.map(result.elements, r => {
-          r.repoLink = `/element/${r.org}/${r.repo}`
+        result.elements = _.map(result.elements, (r: any) => {
+          r.repoLink = `/element/${r.name}`
           return r;
         });
 
@@ -27,20 +31,14 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       });
   });
 
-  r.get('/org/:org', (req, res) => {
-
-    service.listByOrg(req.params.org, { skip: 0, limit: 0 })
-      .then(result => {
-        res.json({
-          count: result.count,
-          org: req.params.org,
-          elements: result.elements
-        });
-      });
+  r.get('/user/:user', (req, res) => {
+    res.status(404).json({ error: 'todo' });
   });
 
-  r.delete('/element/:org/:repo', (req, res) => {
-    service.delete(req.params.org, req.params.repo)
+  r.delete(/^\/element\/(.*)/, (req, res) => {
+    const name = req.params[0];
+    const id = new PackageId(name)
+    service.delete(id)
       .then((result) => {
         if (result.ok) {
           res.json({ success: true });
@@ -53,21 +51,20 @@ export default function mkApi(service: ElementService, getDemoLink: (PieId) => s
       })
   });
 
-  r.get('/element/:org/:repo', (req, res) => {
-
-    let {org, repo} = req.params;
-
-    service.load(org, repo)
+  r.get(/^\/element\/(.*)/, (req, res) => {
+    const name = req.params[0];
+    logger.silly('[load] name: ', name);
+    const id = new PackageId(name);
+    service.load(id)
       .then(r => {
-        logger.debug(`[/element/${org}/${repo}] got result`);
-        let id = new PieId(r.org, r.repo, r.tag);
+        logger.debug(`[/element/${name}] got result`);
         (r as any).demoLink = getDemoLink(id);
         r.schemas = r.schemas || [];
         res.json(r);
       })
       .catch(e => {
         logger.info('error loading: ', req.path, e.message);
-        res.status(404).json({ org: org, repo: repo });
+        res.status(404).json({ name: id.name });
       });
   });
 

@@ -4,7 +4,7 @@ import proxyquire from 'proxyquire';
 import { Writable, Readable } from 'stream';
 import * as _ from 'lodash';
 import { MockRouter } from '../helpers';
-
+import { setDefaultLevel } from 'log-factory';
 describe('store', () => {
 
   let mod, express, router, tarStream, extract, extractHandlers, gunzipMaybe, elementService, mkRouter, ingestHandler;
@@ -28,9 +28,8 @@ describe('store', () => {
         upload: stub().returns(Promise.resolve(null))
       },
       reset: stub().returns(Promise.resolve(null)),
-      savePkg: stub().returns(Promise.resolve()),
-      saveReadme: stub().returns(Promise.resolve()),
-      saveSchema: stub().returns(Promise.resolve())
+      delete: stub().returns(Promise.resolve(null)),
+      saveBundle: stub().returns(Promise.resolve(true))
     }
 
     mod = proxyquire('../../../lib/store', {
@@ -59,14 +58,29 @@ describe('store', () => {
     }
   }
 
-  function MockWritable() {
-    this.handlers = {};
-    this.on = function (key, handler) {
+  class MockWritable extends Writable {
+    constructor() {
+      super();
+      this.handlers = {}
+    }
+    on(key, handler) {
       this.handlers[key] = handler;
     }
   }
 
-  describe('POST /ingest/:org/:repo/:tag', () => {
+  function MockJsonStream(data) {
+    var handlers = {}
+    this.on = function (keyword, handler) {
+      handlers[keyword] = handler;
+    }
+
+    this.flush = function () {
+      handlers['data'](JSON.stringify(data));
+      handlers['end']();
+    }
+  }
+
+  describe('POST /ingest', () => {
     let res, responseJson, mockExtract, writables;
 
     beforeEach((done) => {
@@ -97,22 +111,36 @@ describe('store', () => {
         done();
       });
 
-      ingestHandler = router.handlers.post['/ingest/:org/:repo/:tag'];
+      ingestHandler = router.handlers.post['/ingest'];
 
+      const pkgInfo = {
+        package: {
+          name: '@scope/name'
+        }
+      }
       ingestHandler(req, res)
         .then(() => {
-          mockExtract.handlers.entry({ name: 'name.txt' }, { on: stub() }, stub());
+          const jsonStream = new MockJsonStream(pkgInfo);
+          mockExtract.handlers.entry({ name: 'pie-catalog-data.json' }, jsonStream, stub());
+          jsonStream.flush();
           mockExtract.handlers.entry({ name: 'test.txt' }, { on: stub() }, stub());
           mockExtract.handlers.finish();
           writables.forEach(w => {
+            console.log('writables: ', writables);
             w.handlers.finish();
           });
         })
         .catch(done);
     });
 
+    it('calls saveBundle', done => {
+      setTimeout(() => {
+        assert.calledWith(elementService.saveBundle, match.object, match.object);
+        done();
+      }, 0);
+    })
     it('returns json', () => {
-      assert.calledWith(res.json, { success: true, files: ['name.txt', 'test.txt'] });
+      assert.calledWith(res.json, { success: true, files: ['test.txt'] });
     });
 
     it('returns ok', () => {
@@ -126,7 +154,8 @@ describe('store', () => {
 
       let header = _.isObject(name) ? name : { name: name, type: 'file' };
       return (done) => {
-        let id = { org: 'org', repo: 'repo', tag: 'tag' }
+
+        const id = { name: 'package-id' };
         let stream = new Readable();
         stream._read = () => { }
         parts.forEach(p => stream.push(p));
@@ -152,22 +181,8 @@ describe('store', () => {
       }
     }
 
-    it('handles pie-pkg/package.json', handles(['{', '"hello"', ':', '"there"', '}'], 'pie-pkg/package.json', (id) => {
-      assert.calledWith(elementService.savePkg, id, { hello: 'there' });
-    }));
-
-    it('handles pie-pkg/README.md', handles(['#', 'README'], 'pie-pkg/README.md', (id) => {
-      assert.calledWith(elementService.saveReadme, id, '#README');
-    }));
-
-    it('handles schemas/config.json', handles(['{', '}'], 'schemas/config.json', (id) => {
-      assert.calledWith(elementService.saveSchema, id, 'schemas/config.json', {});
-    }));
-
     it('skips directories', handles([], { name: 'some-dir', type: 'directory' }, (id) => {
-      assert.notCalled(elementService.savePkg);
-      assert.notCalled(elementService.saveReadme);
-      assert.notCalled(elementService.saveSchema);
+      assert.notCalled(elementService.saveBundle);
     }));
 
     it('handles any other files as a demo file', handles([], 'some-file.txt', (id) => {

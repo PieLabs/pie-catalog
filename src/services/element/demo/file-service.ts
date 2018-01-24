@@ -1,18 +1,18 @@
 import * as bluebird from 'bluebird';
 import * as express from 'express';
 
-import { DemoService as Api, PieId, DemoRouter as Router } from './service';
+import { DemoService as Api, PackageId, DemoRouter as Router } from './service';
 import { Readable, Writable } from 'stream';
-import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove } from 'fs-extra';
+import { createReadStream, createWriteStream, ensureDirSync, readFile, readJson, remove, exists, existsSync } from 'fs-extra';
 import { dirname, join } from 'path';
 
 import { buildLogger } from 'log-factory';
 import { replaceReact } from './utils';
-
 const logger = buildLogger();
 
-let readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
-let readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
+const readJsonAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
+const readFileAsync: (n: string, e: string) => bluebird<any> = bluebird.promisify(readFile);
+const existsAsync: (n: string) => bluebird<any> = bluebird.promisify(exists);
 
 const removePromise = (dir: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -25,6 +25,7 @@ const removePromise = (dir: string): Promise<any> => {
     })
   });
 }
+
 export default class DemoService implements Api, Router {
 
   constructor(readonly root: string) {
@@ -32,16 +33,15 @@ export default class DemoService implements Api, Router {
     logger.info('demo-service');
   }
 
-
-  private repoRoot(id: PieId): string {
-    return `${id.org}/${id.repo}/${id.tag}`;
+  private repoRoot(id: PackageId): string {
+    return id.name;
   }
 
-  private toPath(id: PieId, name: string) {
+  private toPath(id: PackageId, name: string) {
     return `${this.repoRoot(id)}/${name}`;
   }
 
-  private getFilePath(id: PieId, name: string) {
+  private getFilePath(id: PackageId, name: string) {
     return join(this.root, this.toPath(id, name));
   }
 
@@ -52,25 +52,28 @@ export default class DemoService implements Api, Router {
     return true;
   }
 
-  async delete(id: PieId): Promise<boolean> {
+  async delete(id: PackageId): Promise<boolean> {
     logger.debug('[delete], id: ', id);
     let dir = join(this.root, this.repoRoot(id));
     let result = await removePromise(dir);
     return true;
   }
 
-  upload(id: PieId, name: string, stream: Readable): Promise<any> {
+  upload(id: PackageId, name: string, stream: Readable): Promise<any> {
     return new Promise((resolve, reject) => {
-      logger.silly('[stream], id', id, name);
+      logger.silly('[upload], id', id, name);
       let path = this.getFilePath(id, name);
-      logger.silly('[stream] path: ', path);
+      logger.silly('[upload] path: ', path);
       ensureDirSync(dirname(path));
       let ws = createWriteStream(path);
       ws.on('error', (e) => {
         logger.error('error writing the file: ', e);
         reject(e);
       });
-      ws.on('close', resolve);
+      ws.on('close', () => {
+        logger.info(`[upload] uploaded to: ${path}, ${existsSync(path)}`)
+        resolve();
+      });
       stream.pipe(ws);
     });
   }
@@ -79,18 +82,8 @@ export default class DemoService implements Api, Router {
     return '/demo';
   }
 
-  getDemoLink(id: PieId): string {
+  getDemoLink(id: PackageId): string {
     return `${this.prefix()}/${this.toPath(id, 'example.html')}`;
-  }
-
-  configAndMarkup(id: PieId): Promise<{ config: any, markup: string }> {
-    return Promise.all(
-      [
-        readJsonAsync(this.getFilePath(id, 'config.json'), 'utf8'),
-        readFileAsync(this.getFilePath(id, 'index.html'), 'utf8')
-      ]).then(([config, markup]) => {
-        return { config, markup };
-      });
   }
 
   /** for the local file store return a static router that serves up the files. */

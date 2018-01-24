@@ -9,6 +9,7 @@ import { Router } from 'express';
 import { StringTransform } from './transforms';
 import { buildLogger } from 'log-factory';
 import { normalize } from 'path';
+import { PackageId } from '../types/index';
 
 const logger = buildLogger();
 
@@ -42,41 +43,12 @@ let withJson = (fn: (j: { [key: string]: any }) => Promise<any>): Writable => {
   });
 }
 
-export let writeStream = (id: PieId, elementService: ElementService, stream: Readable, name: string, header: any): Writable | void => {
-  if (name === 'pie-pkg/package.json') {
-    return stream
-      .pipe(new StringTransform())
-      .pipe(withJson(json => elementService.savePkg(id, json)));
 
-  } else if (name === 'pie-pkg/README.md') {
-    return stream
-      .pipe(new StringTransform())
-      .pipe(withString(s => elementService.saveReadme(id, s)));
-
-  } else if (name === 'pie-pkg/externals.json') {
-    return stream
-      .pipe(new StringTransform())
-      .pipe(withJson(s => {
-        let externals = {
-          js: s['js'] || [],
-          css: s['css'] || []
-        }
-        return elementService.saveExternals(id, externals);
-      }));
-  } else if (_.startsWith(name, 'schemas') && header.type === 'file') {
-    return stream
-      .pipe(new StringTransform())
-      .pipe(withJson(json => elementService.saveSchema(id, name, json)));
-
-  } else if (name === 'pie-pkg/configure-map.json') {
-    return stream
-      .pipe(new StringTransform())
-      .pipe(withJson(json => elementService.saveConfigureMap(id, json)));
-  } else if (header.type === 'file') {
+export const writeStream = (id: PackageId, elementService: ElementService, stream: Readable, name: string, header: any): Writable | void => {
+  if (header.type === 'file') {
     let p = elementService.demo.upload(id, name, stream);
     let w = new Writable();
-    p.then((d) => w.end())
-      .catch(e => w.emit('error', e));
+    p.then(d => w.end()).catch(e => w.emit('error', e));
     return w;
   } else {
     logger.debug(`drain this stream: ${name} `)
@@ -94,38 +66,31 @@ export default (elementService: ElementService): Router => {
   });
 
   /**
-   * ingest a zip file build by [pie-cli](github.com/PieLabs/pie-cli)'s catalog app.
-   * The zip is expected to have the following format: 
+   * ingest a tar.gz file built by [pie-cli](github.com/PieLabs/pie-cli)'s catalog app.
+   * The archive is expected to have the following format: 
    * 
-   * - pie-pkg/README.md -> to elementService
-   * - pie-pkg/package.json -> to elementService 
-   * - schemas/*.json  -> to elementService
-   * - * -> to demo service
+   * - pie-catalog-info.json (must be 1st entry in tar) -> saved to db
+   * - any-other-file -> saved to demo service
    * 
    * the demo assets are send to an object-store/cdn using a key: 
-   * - :org/:repo/:tag?|:sha/:filepath
-   * 
-   * the README, schemas, package.json are stored in a db: 
-   * 
-   * { org: :org, repo: :repo, versions: [ { tag: :tag?, sha: :sha, readme: '', schemas, package.json }, ...] }
+   * - :name/:filepath
+   *
+   * where name is extracted from pie-catalog-info.json when the stream first loads.
    */
 
-  router.post('/ingest/:org/:repo/:tag', async (req, res) => {
+  router.post('/ingest', async (req, res) => {
     logger.info('ingest....');
     logger.info('params: ', req.params);
     logger.info('query: ', req.query);
 
-    let writeStreams = [];
+    const writeStreams = [];
     let extractComplete = false;
-    let { org, repo, tag } = req.params;
-    let id = PieId.build(org, repo, tag);
 
-
-    let respond = (name: string) => {
+    const respond = (name: string) => {
       logger.debug('[respond] name: ', name);
 
       if (!extractComplete) {
-        logger.debug('[respond] name: ', name, 'extraction is not completed.. wait.'); 0
+        logger.debug('[respond] name: ', name, 'extraction is not completed.. wait.');
         return;
       }
 
@@ -147,60 +112,94 @@ export default (elementService: ElementService): Router => {
       }
     }
 
-    if (!id) {
-      res.status(400).json({ error: `org,repo,tag not valid: ${org}, ${repo}, ${tag}` });
-    } else {
+    const extract = tar.extract();
 
-      await elementService.reset(id);
+    let pieId: PackageId = null;
+    let dataBundle = null;
+    let bundleString = '';
 
-      let extract = tar.extract();
+    const DATA_BUNDLE = 'pie-catalog-data.json';
 
-      extract.on('entry', (header, stream, next) => {
-        logger.info('entry: ', header);
-        logger.silly('entry: ', header);
+    extract.on('entry', (header, stream, next) => {
+      logger.info('entry: ', header.name, header);
 
-        stream.on('end', function () {
-          next(); // ready for next entry
-        });
 
-        stream.on('error', function (e) {
-          next(e);
-        });
+      logger.info('pkg ready', dataBundle !== null, dataBundle && dataBundle.package.name);
+      let name = normalize(header.name);
 
-        let name = normalize(header.name);
-        let ws = writeStream(id, elementService, stream, name, header);
-
-        if (ws) {
-          let writeStatus = { name: name, stream: ws, status: 'pending' };
-          ws.on('finish', () => {
-            writeStatus.status = 'done';
-            respond(name);
-          });
-
-          ws.on('error', (e) => {
-            writeStatus[name].status = 'error';
-            writeStatus[name].error = e;
-            respond(name);
-          });
-
-          writeStreams.push(writeStatus);
+      stream.on('end', async function () {
+        if (name === DATA_BUNDLE) {
+          logger.silly(' >>> data bundle end');
+          dataBundle = JSON.parse(bundleString);
+          pieId = new PackageId(dataBundle.package.name);
+          await elementService.delete(pieId);
+          logger.silly(' >>> data bundle end - call saveBundle');
+          elementService.saveBundle(pieId, dataBundle)
+            .then(id => {
+              pieId = id;
+              next();
+            })
+            .catch(next);
+        } else {
+          if (!pieId || pieId.name === null) {
+            stream.resume();
+            next(new Error('no pie id'));
+          } else {
+            next();
+          }
         }
       });
 
-      extract.on('error', (e) => {
-        logger.error(e);
-        res.status(500).json({ success: false, error: e.message });
+      stream.on('error', function (e) {
+        next(e);
       });
 
-      extract.on('finish', function () {
-        logger.info('all files in tar listed - done!');
-        extractComplete = true;
-        respond('');
-      });
+      if (name === DATA_BUNDLE) {
+        stream.on('data', b => {
+          bundleString += b.toString();
+        });
+      } else {
+        if (dataBundle === null || pieId === null) {
+          next(new Error(`data bundle isnt ready - ${DATA_BUNDLE} should be the first file in the tar, subsequent entries rely on it.`));
+        } else {
+          let ws = writeStream(pieId, elementService, stream, name, header);
 
-      req.pipe(gunzip()).pipe(extract);
+          logger.info('writeStream for ', name, ws);
+          if (ws instanceof Writable) {
+            let writeStatus = { name: name, stream: ws, status: 'pending', error: undefined };
+            ws.on('finish', () => {
+              writeStatus.status = 'done';
+              respond(name);
+            });
 
-    }
+            ws.on('error', (e) => {
+              writeStatus.status = 'error';
+              writeStatus.error = e;
+              respond(name);
+            });
+
+            writeStreams.push(writeStatus);
+          }
+        }
+      }
+
+    });
+
+    extract.on('error', (e) => {
+      logger.error(e);
+      res.status(500).json({ success: false, error: e.message });
+    });
+
+    extract.on('finish', () => {
+      logger.info('all files in tar listed - done!');
+      extractComplete = true;
+      respond('');
+    });
+
+    req
+      .pipe(gunzip())
+      .pipe(extract);
+
 
   });
 
