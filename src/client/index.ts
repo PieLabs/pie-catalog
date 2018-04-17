@@ -135,21 +135,31 @@ export function router(
 
   router.get(/^\/element\/(.*)/, (req, res, next) => {
     logger.debug("element page: ", req.params);
-
+    logger.debug("req.query");
     const name = req.params[0];
     const id = new PackageId(name);
 
+    const reactDev = [
+      "//unpkg.com/react@16/umd/react.development.js",
+      "//unpkg.com/react-dom@16/umd/react-dom.development.js"
+    ];
+
+    const reactProd = [
+      "//unpkg.com/react@16/umd/react.production.min.js",
+      "//unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+    ];
+
+    const reactLibs =
+      req.query && req.query.mode === "dev" ? reactDev : reactProd;
+    logger.debug(req.params);
     elementService
       .load(id)
       .then(el => {
         res.render("repo", {
           js: _.concat(
             Array.isArray(el.demo.externals.js) ? el.demo.externals.js : [],
-            [
-              "//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js",
-              "//unpkg.com/react@16/umd/react.production.min.js",
-              "//unpkg.com/react-dom@16/umd/react-dom.production.min.js"
-            ]
+            ["//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"],
+            reactLibs
           ),
           css: el.demo.externals ? el.demo.externals.css : [],
           org: el.repository.user,
