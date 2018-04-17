@@ -1,6 +1,6 @@
 {
   "name": "pie-catalog",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "The Portable Interaction Elements catalog webapp + api",
   "preferGlobal": false,
   "private": true,
@@ -11,8 +11,7 @@
     "prepublish": "npm run build",
     "build": "gulp build",
     "it": "./node_modules/.bin/gulp it",
-    "dev":
-      "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='info'",
+    "dev": "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='info'",
     "release": "./node_modules/.bin/release-it",
     "source-maps": "gulp build && ./node_modules/.bin/tsc"
   },
@@ -24,7 +23,10 @@
     "node": ">=7.2.0",
     "npm": ">=3.10.7"
   },
-  "keywords": ["pie", "catalog"],
+  "keywords": [
+    "pie",
+    "catalog"
+  ],
   "author": "info@corespring.org",
   "license": "MIT",
   "bugs": {
