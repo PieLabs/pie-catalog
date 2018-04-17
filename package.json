@@ -13,7 +13,7 @@
     "it": "./node_modules/.bin/gulp it",
     "dev":
       "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='info'",
-    "release": "./node_modules/.bin/gulp release",
+    "release": "./node_modules/.bin/release-it",
     "source-maps": "gulp build && ./node_modules/.bin/tsc"
   },
   "repository": {
@@ -67,7 +67,7 @@
     "proxyquire": "^1.8.0",
     "raw-loader": "^0.5.1",
     "run-sequence": "^2.2.1",
-    "release-it": "^6.1.1",
+    "release-it": "^7.4.1",
     "sinon": "^4.1.6",
     "style-loader": "^0.19.1",
     "temp": "^0.8.3",
