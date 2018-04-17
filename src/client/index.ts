@@ -1,28 +1,35 @@
-import * as _ from 'lodash';
-import * as bluebird from 'bluebird';
-import * as express from 'express';
-import * as gzip from './middleware/gzip';
-import * as jsesc from 'jsesc';
-import * as r from 'resolve';
-import * as webpack from 'webpack';
-import * as webpackMiddleware from 'webpack-dev-middleware';
+import * as _ from "lodash";
+import * as bluebird from "bluebird";
+import * as express from "express";
+import * as gzip from "./middleware/gzip";
+import * as jsesc from "jsesc";
+import * as r from "resolve";
+import * as webpack from "webpack";
+import * as webpackMiddleware from "webpack-dev-middleware";
 
-import { AvatarService, ElementService } from '../services';
-import { createReadStream, exists, readFile, readJson, stat } from 'fs-extra';
-import { extname, join, resolve } from 'path';
+import { AvatarService, ElementService } from "../services";
+import { createReadStream, exists, readFile, readJson, stat } from "fs-extra";
+import { extname, join, resolve } from "path";
 
-import { buildLogger } from 'log-factory';
-import { lookup } from 'mime-types';
-import polyfills from './polyfills';
-import { PackageId } from '../types/index';
+import { buildLogger } from "log-factory";
+import { lookup } from "mime-types";
+import polyfills from "./polyfills";
+import { PackageId } from "../types/index";
 
-const readJsonAsync: (p: string, e: string) => bluebird<any> = bluebird.promisify(readJson);
+const readJsonAsync: (
+  p: string,
+  e: string
+) => bluebird<any> = bluebird.promisify(readJson);
 
-const existsAsync = (p) => new Promise((resolve) => {
-  exists(p, (e) => resolve(e));
-});
+const existsAsync = p =>
+  new Promise(resolve => {
+    exists(p, e => resolve(e));
+  });
 
-const readFileAsync: (p: string, e: string) => bluebird<{}> = bluebird.promisify(readFile);
+const readFileAsync: (
+  p: string,
+  e: string
+) => bluebird<{}> = bluebird.promisify(readFile);
 
 const logger = buildLogger();
 
@@ -32,16 +39,16 @@ logger.info(`ENV: ${env}`);
 
 export function router(
   avatarService: AvatarService,
-  elementService: ElementService): { router: express.Router, views: string } {
-
-  let render = (res) => {
-    res.render('index', {
+  elementService: ElementService
+): { router: express.Router; views: string } {
+  let render = res => {
+    res.render("index", {
       pretty: true,
       config: {
-        avatarUrl: '/avatars/github/:user'
+        avatarUrl: "/avatars/github/:user"
       }
     });
-  }
+  };
 
   const router: express.Router = express.Router();
 
@@ -51,99 +58,99 @@ export function router(
 
     let exists = await existsAsync(filepath);
     if (exists) {
-      return await readFileAsync(filepath, 'utf8')
-        .catch(e => {
-          logger.error(e);
-          return null;
-        });
+      return await readFileAsync(filepath, "utf8").catch(e => {
+        logger.error(e);
+        return null;
+      });
     } else {
       logger.info(`[tryToLoad] filepath: ${filepath} does not exist`);
       return null;
     }
-  }
+  };
 
   let loadVersionInfo = async () => {
-    logger.debug('load version info...');
-    let pkg = await tryToLoad('../../package.json');
-    let sha = await tryToLoad('../../.git-version').then(s => s ? s.trim() : null);
+    logger.debug("load version info...");
+    let pkg = await tryToLoad("../../package.json");
+    let sha = await tryToLoad("../../.git-version").then(
+      s => (s ? s.trim() : null)
+    );
     logger.silly(`got pkg: ${pkg}`);
     logger.silly(`got sha: ${sha}`);
     let version = pkg ? JSON.parse(pkg).version : null;
-    return { version, sha }
-  }
+    return { version, sha };
+  };
 
   let loadVersionInfoOnce = _.memoize(loadVersionInfo);
 
-  if (env === 'dev') {
+  if (env === "dev") {
+    const cfg = require("./webpack.config");
 
-    const cfg = require('./webpack.config');
-
-    cfg.output.publicPath = '/';
+    cfg.output.publicPath = "/";
     let compiler = webpack(cfg);
     let middleware = webpackMiddleware(compiler, {
-      publicPath: '/',
+      publicPath: "/",
       noInfo: true
     });
-    router.use(middleware)
+    router.use(middleware);
   } else {
-    let dir = join(__dirname, '../../lib/client/public');
-    //try and find the .gz version of the file and update the headers accordingly 
+    let dir = join(__dirname, "../../lib/client/public");
+    //try and find the .gz version of the file and update the headers accordingly
     router.use(gzip.staticFiles(dir));
     router.use(express.static(dir));
   }
 
-
   router.get(/^\/avatars\/github\/(.*)/, (req, res, next) => {
-    logger.silly('avatar params:', req.params);
-    avatarService.stream('github', req.params[0])
+    logger.silly("avatar params:", req.params);
+    avatarService
+      .stream("github", req.params[0])
       .then(s => s.pipe(res))
       .catch(next);
   });
 
-  router.get('/version', (req, res) => {
-
+  router.get("/version", (req, res) => {
     loadVersionInfoOnce()
       .then(v => res.json(v))
       .catch(e => {
-        logger.error('[GET /version]', e.message);
+        logger.error("[GET /version]", e.message);
         res.status(404);
       });
   });
 
-  router.get('/', (req, res) => {
+  router.get("/", (req, res) => {
     render(res);
   });
 
-  router.get('/org/:org', (req, res) => {
+  router.get("/org/:org", (req, res) => {
     let org = req.params.org;
 
-    res.render('org', {
+    res.render("org", {
       //the pie-cli catalog externalizes lodash and react - so we need to add thes to the page's runtime for the element to work.
       org: org,
       pretty: true,
       config: {
-        avatarUrl: '/avatars/github/:user'
+        avatarUrl: "/avatars/github/:user"
       }
     });
   });
 
-
   router.get(/^\/element\/(.*)/, (req, res, next) => {
-
-    logger.debug('element page: ', req.params);
+    logger.debug("element page: ", req.params);
 
     const name = req.params[0];
     const id = new PackageId(name);
 
-    elementService.load(id)
+    elementService
+      .load(id)
       .then(el => {
-        res.render('repo', {
-          js: _.concat(Array.isArray(el.demo.externals.js) ? el.demo.externals.js : [], [
-            '//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js',
-            '//cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react.js',
-            '//cdnjs.cloudflare.com/ajax/libs/react/15.6.1/react-dom.js'
-            // '/demo/react.min.js'
-          ]),
+        res.render("repo", {
+          js: _.concat(
+            Array.isArray(el.demo.externals.js) ? el.demo.externals.js : [],
+            [
+              "//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js",
+              "//unpkg.com/react@16/umd/react.production.min.js",
+              "//unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+            ]
+          ),
           css: el.demo.externals ? el.demo.externals.css : [],
           org: el.repository.user,
           repo: el.repository.project,
@@ -156,9 +163,9 @@ export function router(
           },
           pretty: true,
           config: {
-            avatarUrl: '/avatars/github/:user'
+            avatarUrl: "/avatars/github/:user"
           }
-        })
+        });
       })
       .catch(e => {
         logger.error(e.stack);
@@ -166,18 +173,17 @@ export function router(
       });
   });
 
-  router.get('/org/*', (req, res, next) => {
+  router.get("/org/*", (req, res, next) => {
     render(res);
   });
 
-
-  let streamNodeModulePath = (p) => {
-    let jsPath = join(__dirname, '/node_modules/', p);
+  let streamNodeModulePath = p => {
+    let jsPath = join(__dirname, "/node_modules/", p);
     return createReadStream(jsPath);
-  }
+  };
 
-  router.use('/polyfills', polyfills);
+  router.use("/polyfills", polyfills);
 
-  let views = join(__dirname, 'views');
-  return { router, views }
-} 
+  let views = join(__dirname, "views");
+  return { router, views };
+}
