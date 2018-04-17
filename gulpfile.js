@@ -58,11 +58,7 @@ gulp.task("polyfills", () => {
 });
 
 gulp.task("build", done =>
-  runSequence(
-    "clean",
-    ["pug", "ts", "client", "polyfills", "custom-react"],
-    done
-  )
+  runSequence("clean", ["pug", "ts", "client", "polyfills"], done)
 );
 
 gulp.task("dev", ["build", "watch-pug", "watch-ts"]);
