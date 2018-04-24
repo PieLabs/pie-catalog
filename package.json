@@ -11,7 +11,8 @@
     "prepublish": "npm run build",
     "build": "gulp build",
     "it": "./node_modules/.bin/gulp it",
-    "dev": "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='silly'",
+    "dev":
+      "export NODE_ENV=dev && ./node_modules/.bin/nodemon --watch 'src/**/*.ts' --exec './node_modules/.bin/ts-node' src/index.ts --logConfig='silly'",
     "release": "./node_modules/.bin/release-it",
     "source-maps": "gulp build && ./node_modules/.bin/tsc"
   },
@@ -23,10 +24,7 @@
     "node": ">=7.2.0",
     "npm": ">=3.10.7"
   },
-  "keywords": [
-    "pie",
-    "catalog"
-  ],
+  "keywords": ["pie", "catalog"],
   "author": "info@corespring.org",
   "license": "MIT",
   "bugs": {
@@ -93,7 +91,7 @@
     "minimist": "^1.2.0",
     "mongodb": "^3.0.1",
     "node-fetch": "^1.7.3",
-    "pie-catalog-client": "^2.0.0",
+    "pie-catalog-client": "^2.1.1",
     "pug": "^2.0.0-rc.4",
     "resolve": "^1.5.0",
     "semver": "^5.5.0",
