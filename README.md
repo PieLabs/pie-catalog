@@ -56,7 +56,7 @@ The app has 3 main areas of functionality:
 
 ### client
 
-just run the app and to to the root of the page, you'll see the client load up. If you don't have any elements stored - you'll just see an empty page. See below for instructions on how to store a pie archive.
+just run the app and go to the root of the page, you'll see the client load up. If you don't have any elements stored - you'll just see an empty page. See below for instructions on how to store a pie archive.
 
 ### api
 
