@@ -1,6 +1,6 @@
 {
   "name": "pie-catalog",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "description": "The Portable Interaction Elements catalog webapp + api",
   "preferGlobal": false,
   "private": true,
