@@ -148,6 +148,7 @@ export function router(
     const reactProd = [
       "//unpkg.com/react@16/umd/react.production.min.js",
       "//unpkg.com/react-dom@16/umd/react-dom.production.min.js",
+      //add dom-server
       "//unpkg.com/react-dom@16/umd/react-dom-server.browser.production.min.js"
     ];
 
