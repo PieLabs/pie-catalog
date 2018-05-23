@@ -141,12 +141,14 @@ export function router(
 
     const reactDev = [
       "//unpkg.com/react@16/umd/react.development.js",
-      "//unpkg.com/react-dom@16/umd/react-dom.development.js"
+      "//unpkg.com/react-dom@16/umd/react-dom.development.js",
+      "//unpkg.com/react-dom@16/umd/react-dom-server.browser.development.js"
     ];
 
     const reactProd = [
       "//unpkg.com/react@16/umd/react.production.min.js",
-      "//unpkg.com/react-dom@16/umd/react-dom.production.min.js"
+      "//unpkg.com/react-dom@16/umd/react-dom.production.min.js",
+      "//unpkg.com/react-dom@16/umd/react-dom-server.browser.production.min.js"
     ];
 
     const reactLibs =
