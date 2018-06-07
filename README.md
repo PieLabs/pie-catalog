@@ -66,9 +66,12 @@ as above when you run the app you'll see the client interacting with the api.
 
 To create an archive for this app you'll need pie-cli. With that installed, `cd` to a pie that you want to put onto the catalog and:
 
-`pie pack -a catalog --createArchive` - this will create a `pie-item.tar.gz` with everything that the element needs to run.
+```bash 
+pie pack -a catalog --createArchive # this will create a `pie-item.tar.gz` with everything that the element needs to run.
+cd docs/demo
+curl --request POST --data-binary "@pie-item.tar.gz" http://:host/store/ingest # this will send the tar to the app which will the extract the contents and store them in the backend
 
-`curl --request POST --data-binary "@pie-item.tar.gz" http://:host/store/ingest/:org/:repo/:semver` - this will send the tar to the app which will the extract the contents and store them in the backend
+```
 
 To delete an element from the catalog run: `curl --request DELETE http://:host/api/element/:org/:repo`.
 
